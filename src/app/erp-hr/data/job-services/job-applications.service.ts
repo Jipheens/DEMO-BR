@@ -1,0 +1,179 @@
+
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment.prod';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class JobApplicationAPIService {
+ 
+  headers = new HttpHeaders().set('Content-Type', 'application/json');
+  baseURL = `${environment.baseUrlHR}/api/v1/job/application`;
+  baseURL2 = `${environment.baseUrlHR}/api/v1/job/interview`;
+
+
+  constructor(private http: HttpClient) { }
+
+  create(data: any): Observable<any> {
+    let API_URL = `${this.baseURL}/create`;
+    return this.http.post(API_URL, data, { headers: this.headers, withCredentials: false }).pipe(map(res => {
+      return res || {}
+    }),
+      catchError(this.errorMgmt)
+    );
+  }
+  read(): Observable<any> {
+    let API_URL = `${this.baseURL}/all`;
+    return this.http.get(API_URL, { headers: this.headers, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  readByStatus(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/fetchbyStatus`;
+    return this.http.get(API_URL, { params: params, headers: this.headers, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  readByStatusAndJobNumber(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/by_jobrefnumber_and_status`;
+    return this.http.get(API_URL, { params: params, headers: this.headers, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  readById(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/find/by/id`;
+    return this.http.get(API_URL, {params:params, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  readByNationalId(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/by_national_id`;
+    return this.http.get(API_URL, {params:params, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  readByJobRefNumberAndStatus(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/by_jobrefnumber_and_status`;
+    return this.http.get(API_URL, {params:params, withCredentials: false })
+      .pipe(
+        map((res) => {
+          return res || {}
+        }),
+        catchError(this.errorMgmt)
+      )
+  }
+  update(data: any): Observable<any> {
+    let API_URL = `${this.baseURL}/update`;
+    return this.http.put(API_URL, data, { headers: this.headers, withCredentials: false }).pipe(map(res => {
+      
+      return res || {}
+    }),
+      catchError(this.errorMgmt)
+    );
+  }
+  scheduleInterview(data: any): Observable<any> {
+    let API_URL = `${this.baseURL}/interview_schedule`;
+    return this.http.put(API_URL, data, { headers: this.headers, withCredentials: false }).pipe(map(res => {
+      
+      return res || {}
+    }),
+      catchError(this.errorMgmt)
+    );
+  }
+  interviewResults(data: any): Observable<any> {
+    let API_URL = `${this.baseURL}/interview_result`;
+    return this.http.put(API_URL, data, { headers: this.headers, withCredentials: false }).pipe(map(res => {
+      
+      return res || {}
+    }),
+      catchError(this.errorMgmt)
+    );
+  }
+  delete(params: any): Observable<any> {
+    let API_URL = `${this.baseURL}/delete`;
+    return this.http.delete(API_URL, {params:params, headers: this.headers, withCredentials: false }).pipe(map(res => {
+      return res || {}
+    }),
+      catchError(this.errorMgmt)
+    );
+  }
+
+  verify(processedRows: any): Observable<any> {
+    const expenseUrl = `${this.baseURL}/update/state`;
+    return this.http.put(expenseUrl, processedRows);
+  }
+
+
+  //schedule interviews
+  scheduleMultipleInterviews(data: any): Observable<any> {
+    let API_URL = `${this.baseURL2}/create`;
+    return this.http.post(API_URL, data, { headers: this.headers, withCredentials: false }).pipe(map(res => {
+      return res || {}
+    }),
+     
+    );
+  }
+
+  //get scheduled Interviews
+
+  getScheduledInterviews(params: any): Observable<any> {
+    let API_URL = `${this.baseURL2}/get/all`;
+    return this.http.get(API_URL, {params, headers: this.headers, withCredentials: false }).pipe(map(res => {
+      return res || {}
+    }),
+     
+    );
+  }
+
+  getScheduledInterviewsById(params: any): Observable<any> {
+    let API_URL = `${this.baseURL2}/get/by/id`;
+    return this.http.get(API_URL, {params, headers: this.headers, withCredentials: false }).pipe(map(res => {
+      return res || {}
+    }),
+     
+    );
+  }
+
+
+  downloadExcel(interviewId: number): Observable<Blob> {
+    return this.http.get(`${this.baseURL2}/download/score-sheet?interviewId=${interviewId}`, { responseType: 'blob' });
+  }
+
+
+  errorMgmt(error: HttpErrorResponse) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = error.error.message;
+    } else {
+      errorMessage = `${error.error.message}`;
+    }
+    return throwError(errorMessage);
+  }
+}
+
+
+
+

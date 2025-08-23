@@ -1,0 +1,647 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "~material-icons-font/sass/variables";
+@import "~material-icons-font/sass/mixins";
+$MaterialIcons_FontPath: "~material-icons-font/fonts";
+@import "~material-icons-font/sass/main";
+@import "~material-icons-font/sass/Regular";
+
+@import '~ngx-org-chart/_theming.scss';
+
+
+.bg-kingdom {
+  background: linear-gradient(to right, #003300, #007700); 
+}
+
+
+
+html {
+  font-size: 18px;
+  font-family: 'Gill Sans', sans-serif !important;
+}
+
+// #e3e3e3
+.table tr.activeRow td {
+  background-color: #e8e8e8 !important;
+  //color: white;
+}
+
+//******************************************************************************************************
+
+.error-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.error-item {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  padding: 5px 10px;
+}
+
+//*************************************************************************************************************************************
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  font-size: 14px;
+  width: 100%;
+}
+
+thead th,
+tbody td {
+  font-size: 12px;
+  padding: 8px;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+//******************************************************************************************
+
+//*****************************************************************************************************************************
+
+$badge-color-hod: #2196f3; // Blue for HOD
+$badge-color-hod-approved: #4caf50; // Green for HOD Approved
+$badge-color-finance: #e91e63; // Pink for Finance
+$badge-color-finance-approved: #673ab7; // Purple for Finance Approved
+$badge-color-procurement: #3f51b5; // Indigo for Procurement
+$badge-color-procurement-approved: #795548; // Brown for Procurement Approved
+
+// Remark Text Colors
+$remark-text-color: #757575; // Grey for remark text
+
+// Define styles for the chat header section
+.col-xs-12.col-sm-12.col-md-12.col-lg-12 {
+  .bg-color {
+    // margin-right: 10px;
+    // margin-left: 10px;
+    // margin-top: 10px;
+    // margin-bottom: 10px;
+    margin: 10px;
+    background-color: #ebebee;
+    padding: 0px;
+    border-radius: 10px;
+
+    .chat-header {
+      .row {
+        .col-2,
+        .col-3,
+        .col-4,
+        .col-6,
+        .col-12,
+        .col-xs-2,
+        .col-xs-4,
+        .col-xs-12,
+        .col-sm-2,
+        .col-sm-3,
+        .col-sm-12,
+        .col-md-6,
+        .col-md-12,
+        .col-lg-6,
+        .col-lg-12 {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          .chat-about {
+            width: 100%;
+            margin-bottom: 6px;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+
+            .chat-with {
+              font-size: 14px;
+              color: #333;
+              margin-bottom: 6px;
+            }
+
+            .chat-num-messages {
+              .badge {
+                padding: 4px 10px;
+                font-size: 12px;
+                border-radius: 5px;
+                display: inline-block;
+                margin-right: 10px;
+                font-weight: bold;
+                color: #fff; // White text for better visibility
+              }
+
+              // Define badge colors and class names
+              .badge-hod {
+                background-color: $badge-color-hod; // Blue for HOD
+              }
+
+              .badge-hod-approved {
+                background-color: $badge-color-hod-approved; // Green for HOD Approved
+              }
+
+              .badge-finance {
+                background-color: $badge-color-finance; // Pink for Finance
+              }
+
+              .badge-finance-approved {
+                background-color: $badge-color-finance-approved; // Green for Finance Approved
+              }
+
+              .badge-procurement {
+                background-color: $badge-color-procurement; // Yellow for Procurement
+              }
+
+              .badge-procurement-approved {
+                background-color: $badge-color-procurement-approved; // Green for Procurement Approved
+              }
+            }
+
+            .remarks {
+              display: block;
+              margin-top: 10px;
+
+              strong {
+                font-weight: bold;
+                margin-right: 5px;
+              }
+
+              .remarks-content {
+                font-size: 12px;
+                color: $remark-text-color; // Gray text color for remarks
+                margin-top: 5px; // Add some spacing
+              }
+            }
+
+            &:hover {
+              background-color: #f5f5f5;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//*****************************************************************************************************************************
+// /* Define styles for the selected button */
+//****************************************************************************************************
+
+/* Pending */
+.mat-button.pending {
+  background: linear-gradient(to right, #007bff, #3e7ad6);
+}
+/* Submitted */
+.mat-button.submitted {
+  background: linear-gradient(to right, #17426f, #3e7ad6);
+}
+/* Verified */
+.mat-button.verified {
+  background: linear-gradient(to right, #6610f2, #9a37f2);
+}
+
+/* Approved */
+.mat-button.approved {
+  background: linear-gradient(to right, #198754, #42a75c);
+}
+
+/* Rejected */
+.mat-button.rejected {
+  background: linear-gradient(to right, #f44336, #fe7067);
+}
+
+/* Returned */
+.mat-button.returned {
+  background: linear-gradient(to right, #b8925b, #dfc487);
+}
+
+/* Exited */
+.mat-button.exited {
+  background: linear-gradient(to right, #7b1fa2, #9b59b6);
+  }
+  
+  /* Deleted */
+  .mat-button.deleted {
+  background: linear-gradient(to right, #e74c3c, #c0392b);
+  }
+
+  
+  .mat-button.locked {
+    background: linear-gradient(to right, #e73ca3, #c02bb9);
+    }
+  
+/* Appraisal */
+.mat-button.appraisal {
+  background: linear-gradient(to right, #3f342f, #5d301f);
+      color: white;
+}
+/* Interviewing */
+.mat-button.interviewing {
+  background: linear-gradient(to right, #4a3d38, #a15c42);
+      color: white;
+}
+
+/* Shortlisted */
+.mat-button.shortlisted {
+  background: linear-gradient(to right, #3f51b5, #673ab7);
+  color: white;
+}
+
+/* Investigation */
+.mat-button.investigation {
+  background: linear-gradient(to right, #c85000, #b17900);
+  }
+  
+  /* Has-a-case */
+  .mat-button.has-a-case {
+  background: linear-gradient(to right, #005c44, #007a38);
+  }
+  
+  /* Disciplinary-Hearing */
+  .mat-button.disciplinary-hearing {
+  background: linear-gradient(to right, #a71d2a, #c43a47);
+  }
+  
+  /* Show-cause-issued */
+  .mat-button.show-cause-issued {
+  background: linear-gradient(to right, #432d68, #6c4fa3);
+  }
+  
+  /* Show-cause-responded */
+  .mat-button.show-cause-responded {
+  background: linear-gradient(to right, #4a2c91, #6a51b1);
+  }
+  
+  /* Completed */
+  .mat-button.completed {
+  background: linear-gradient(to right, #1e7e34, #2f9c4f);
+  }
+
+
+/* Success */
+.mat-button.success {
+  background: linear-gradient(to right, #28a745, #20c997);
+}
+
+/* Failed */
+.mat-button.failed {
+  background: linear-gradient(to right, #dc3545, #f97583);
+}
+
+
+
+/* CONTRACT */
+.mat-button.contract {
+  background: linear-gradient(to right, #2471a3, #2980b9);
+ 
+  }
+  
+  /* PERMANENT */
+  .mat-button.permanent {
+  background: linear-gradient(to right, #1e8449, #27ae60);
+  
+  }
+  
+  /* INTERNSHIP */
+  .mat-button.internship {
+  background: linear-gradient(to right, #d35400, #e67e22);
+  
+  }
+  
+  /* ATTACHMENT */
+  .mat-button.attachment {
+  background: linear-gradient(to right, #7d3c98, #8e44ad);
+  
+  }
+  
+  /* SECONDMENT */
+  .mat-button.secondment {
+  background: linear-gradient(to right, #2471a3, #2980b9);
+  
+  }
+  
+  /* DIRECT SALES REPRESENTATIVE */
+  .mat-button.dsr {
+  background: linear-gradient(to right, #a93226, #c0392b);
+  
+  }
+
+  /* Partial */
+.partial {
+  background: linear-gradient(to right, #ff9800, #ffb74d);
+  color: white;
+}
+
+/* Complete */
+.complete {
+  background: linear-gradient(to right, #198754, #42a75c);
+  color: white;
+}
+
+/* Exempt */
+.exempt {
+  background: linear-gradient(to right, #6c757d, #adb5bd);
+  color: white;
+}
+
+/* Overdue */
+.overdue {
+  background: linear-gradient(to right, #dc3545, #f5c6cb);
+  color: white;
+}
+
+
+
+/* HR Service */
+.mat-button.hr-service {
+  background: linear-gradient(to right, #00796b, #009688); /* Teal Green */
+}
+
+/* Admin Service */
+.mat-button.admin-service {
+  background: linear-gradient(to right, #303f9f, #3f51b5); /* Indigo Blue */
+}
+
+/* Finance Service */
+.mat-button.finance-service {
+  background: linear-gradient(to right, #6a1b9a, #8e24aa); /* Purple */
+}
+
+/* Supplier Portal Service */
+.mat-button.supplier-portal-service {
+  background: linear-gradient(to right, #ef6c00, #ff9800); /* Deep Orange */
+}
+
+/* Applicants Portal Service */
+.mat-button.applicants-portal-service {
+  background: linear-gradient(to right, #c2185b, #e91e63); /* Pink */
+}
+
+
+/* Authentication */
+.mat-button.authentication {
+  background: linear-gradient(to right, #00796b, #009688); /* Teal Green */
+}
+
+/* Requests */
+.mat-button.requests {
+  background: linear-gradient(to right, #303f9f, #3f51b5); /* Indigo Blue */
+}
+
+/* Synchronization */
+.mat-button.synchronization {
+  background: linear-gradient(to right, #6a1b9a, #8e24aa); /* Purple */
+}
+
+/* Transactions */
+.mat-button.transactions {
+  background: linear-gradient(to right, #ef6c00, #ff9800); /* Deep Orange */
+}
+
+/* CAPEX */
+.mat-button.capex {
+  background: linear-gradient(to right, #f39c12, #e67e22);
+}
+
+/* OPEX */
+.mat-button.opex {
+  background: linear-gradient(to right, #2ecc71, #27ae60);
+}
+  // ******************************************************************************
+  /* Active */
+.mat-button.active {
+  background: linear-gradient(to right, #333333, #555555);
+}
+
+.mat-button,
+.mat-button.active {
+  color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  transition: all 0.2s ease-in-out;
+}
+
+.mat-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.26);
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.mat-button {
+  margin-right: 8px !important;
+}
+
+//*****************************************************************************************************************************
+.imp {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+//*****************************************************************************************************************************
+.custom-badge-solid-yellow {
+  background-color: yellow;
+  color: black;
+}
+
+.custom-badge-solid-purple {
+  background-color: purple;
+  color: white;
+}
+
+.custom-badge-solid-teal {
+  background-color: teal;
+  color: white;
+}
+
+
+
+//********************************************************************************************************************************
+.imp {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+//********************************************************************************************************************************
+
+
+/* Adjust other badge classes accordingly */
+
+
+// // Define breakpoints for different screen sizes
+// $breakpoints: (
+//   xs: 0px,
+//   sm: 576px,
+//   md: 768px,
+//   lg: 992px,
+//   xl: 1200px,
+// );
+
+// // Define zoom levels for different screen sizes
+// $zoom-levels: (
+//   xs: 100%, // No zoom for extra small screens
+//   sm: 95%,  // Zoom level for small screens
+//   md: 90%,  // Zoom level for medium screens
+//   lg: 85%,  // Zoom level for large screens
+//   xl: 80%,  // Zoom level for extra large screens
+// );
+
+// // Loop through breakpoints to generate media queries
+// @each $size, $value in $breakpoints {
+//   @media (min-width: #{$value}) {
+//     html {
+//       zoom: map-get($zoom-levels, $size);
+//     }
+//   }
+// }
+
+// // Define breakpoints for different screen sizes
+// $breakpoints: (
+//   xs: 0px,
+//   sm: 576px,
+//   md: 768px,
+//   lg: 992px,
+//   xl: 1200px,
+// );
+
+// // Define zoom levels for different screen sizes
+// $zoom-levels: (
+//   xs: 100%, // No zoom for extra small screens
+//   sm: 95%,  // Zoom level for small screens
+//   md: 90%,  // Zoom level for medium screens
+//   lg: 85%,  // Zoom level for large screens
+//   xl: 80%,  // Zoom level for extra large screens
+// );
+
+// // Loop through breakpoints to generate media queries
+// @each $size, $value in $breakpoints {
+//   @media (min-width: #{$value}) {
+//     html {
+//       zoom: map-get($zoom-levels, $size);
+//     }
+//   }
+// }
+
+// // Define the base font size for the application
+// $base-font-size: 16px;
+
+// // Calculate the zoom level based on the device width
+// @function calculate-zoom-level($device-width) {
+//   @if $device-width >= 1200 {
+//     @return 100%;
+//   } @else if $device-width >= 992 {
+//     @return 90%;
+//   } @else if $device-width >= 768 {
+//     @return 80%;
+//   } @else {
+//     @return 70%;
+//   }
+// }
+
+// // Set the zoom level based on the device width
+// body {
+//   font-size: $base-font-size;
+//   zoom: calculate-zoom-level(100%);
+// }
+// Define the base font size for the application
+// $base-font-size: 16px;
+
+// // Calculate the zoom level based on the device width
+// @function calculate-zoom-level($device-width) {
+//   @if $device-width >= 1200 {
+//     @return 100%;
+//   } @else if $device-width >= 992 {
+//     @return 90%;
+//   } @else if $device-width >= 768 {
+//     @return 80%;
+//   } @else {
+//     @return 70%;
+//   }
+// }
+
+// // Set the zoom level based on the device width
+// html {
+//   font-size: $base-font-size;
+//   zoom: calculate-zoom-level(100%);
+// }
+
+// // Define base font size
+// $base-font-size: 20px;
+
+// // Define breakpoints for different screen sizes
+// $small-screen: 480px;
+// $medium-screen: 768px;
+// $large-screen: 1024px;
+
+// // Function to calculate zoom level based on screen width
+// @function calculate-zoom($screen-width) {
+//   @if $screen-width < $small-screen {
+//     @return 0.4; // Example zoom level for small screens
+//   } @else if $screen-width < $medium-screen {
+//     @return 0.4; // Example zoom level for medium screens
+//   } @else if $screen-width < $large-screen {
+//     @return 0.6; // Example zoom level for large screens
+//   } @else {
+//     @return 0.8; // Example zoom level for extra-large screens
+//   }
+// }
+
+// // Apply zoom level using media queries
+// html {
+//   font-size: $base-font-size;
+//   @media screen and (max-width: $small-screen) {
+//     zoom: calculate-zoom($small-screen);
+//   }
+//   @media screen and (min-width: $small-screen) and (max-width: $medium-screen) {
+//     zoom: calculate-zoom($medium-screen);
+//   }
+//   @media screen and (min-width: $medium-screen) and (max-width: $large-screen) {
+//     zoom: calculate-zoom($large-screen);
+//   }
+//   @media screen and (min-width: $large-screen) {
+//     zoom: calculate-zoom($large-screen); // Adjust for your largest screen size
+//   }
+// }
+// Define the base font size for the application
+// Define the base font size for the application
+
+
+@media (max-width: 768px) {
+  /* Styles for smaller screens (e.g., phones) */
+  html {
+    font-size: 14px; /* Adjust as needed */
+  }
+  .specific-element {
+    /* Adjust specific elements for smaller screens */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  /* Styles for medium screens (e.g., tablets) */
+  html {
+    font-size: 15px; /* Adjust as needed */
+  }
+  .another-element {
+    /* Adjust specific elements for medium screens */
+  }
+}
+
+@media (min-width: 992px) {
+  /* Styles for larger screens (e.g., desktops) */
+  html {
+    font-size: 16px; /* Adjust as needed */
+  }
+}

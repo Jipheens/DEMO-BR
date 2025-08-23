@@ -1,0 +1,309 @@
+<section class="content">
+    <div class="content-block">
+        <div class="block-header">
+            <!-- breadcrumb -->
+            <app-breadcrumb [title]="'Organization Details'" [items]="['Organization']" [active_item]="'Details'">
+            </app-breadcrumb>
+        </div>
+
+        <div class="row clearfix">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="m-2 mx-2" *ngIf="loading || downloadLoading || posting">
+                        <mat-progress-bar color="primary" mode="indeterminate">
+                        </mat-progress-bar>
+                    </div>
+                    <div class="body" *ngIf="showForm">
+                        <div class="row" *ngIf="pageFunction !== 'Add' && results">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="card bg-color">
+                                    <div class="chat">
+                                        <div class="chat-header clearfix">
+                                            <div class="row">
+                                                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+                                                    <div class="chat-about">
+                                                        <div class="chat-with">Posted By</div>
+                                                        <div class="chat-num-messages mt-2">
+                                                            <div class="badge badge-solid-blue"
+                                                                style="color: #fff; background-color: #007bff">
+                                                                {{ results?.postedBy || N.A }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+                                                    <div class="chat-about">
+                                                        <div class="chat-with">Posted Date</div>
+                                                        <div class="chat-num-messages mt-2">
+                                                            <div class="badge badge-solid-pink"
+                                                                style="color: #fff; background-color: #e81c62">
+                                                                {{
+                                                                results?.postedTime | date : "medium" || N.A
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+                                                    <div class="chat-about">
+                                                        <div class="chat-with">Verified By</div>
+                                                        <div class="chat-num-messages mt-2">
+                                                            <div class="badge badge-solid-blue"
+                                                                style="color: #fff; background-color: #28a745">
+                                                                {{ results?.verifiedBy || N.A }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
+                                                    <div class="chat-about">
+                                                        <div class="chat-with">Verification Date</div>
+                                                        <div class="chat-num-messages mt-2">
+                                                            <div class="badge badge-solid-pink"
+                                                                style="color: #fff; background-color: #d35400">
+                                                                {{
+                                                                results?.verifiedTime | date : "medium" || N.A
+                                                                }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="chat-about mt-2 remarks-container">
+                                                        <div class="chat-with">Verifier Remarks</div>
+                                                        <div class="chat-num-messages mt-2">
+                                                            <div class="badge badge-solid-green"
+                                                                style="color: #fff; background-color: #004840">
+                                                                {{ results?.verifierRemarks || N.A }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mx-2">
+                            <mat-tab-group>
+                                <mat-tab>
+                                    <ng-template mat-tab-label>
+                                        <i class="fas fa-building"></i> Organization Details
+                                    </ng-template>
+
+                                    <div class="header">
+                                        <div class="row">
+                                            <h2>{{ pageFunction }} Organization Details</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix mx-2 mt-0">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                            <div>
+                                                <form [formGroup]="formData">
+                                                    <br />
+                                                    <label> Basic information</label>
+                                                    <div class="row">
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Organization Name</mat-label>
+                                                                <input type="name" matInput
+                                                                    placeholder="Enter organization Name"
+                                                                    formControlName="organizationName" />
+                                                                <mat-error *ngIf="
+                                    formData
+                                      .get('organizationName')
+                                      .hasError('required')
+                                  ">
+                                                                    Organization Name is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Organization KRA PIN</mat-label>
+                                                                <input type="text" matInput placeholder="Enter KRA PIN"
+                                                                    formControlName="kraPin" />
+                                                                <mat-error *ngIf="
+                                    formData.get('kraPin').hasError('required')
+                                  ">
+                                                                    KRA PIN is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Business NO.</mat-label>
+                                                                <input type="text" matInput
+                                                                    placeholder="Enter Business NO."
+                                                                    formControlName="businessNo" />
+                                                                <mat-error *ngIf="
+                                    formData
+                                      .get('businessNo')
+                                      .hasError('required')
+                                  ">
+                                                                    Business NO. is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Location </mat-label>
+                                                                <input type="text" matInput placeholder="Enter Location"
+                                                                    formControlName="location" />
+                                                                <mat-error *ngIf="
+                                    formData
+                                      .get('location')
+                                      .hasError('required')
+                                  ">
+                                                                    Location is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+                                                    <label> Location information</label>
+                                                    <div class="row">
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Country of Operation</mat-label>
+                                                                <input type="text" matInput placeholder="Enter Country"
+                                                                    formControlName="country" />
+                                                                <mat-error *ngIf="
+                                    formData.get('country').hasError('required')
+                                  ">
+                                                                    Country of Operation is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>County</mat-label>
+                                                                <input type="text" matInput placeholder="Enter County"
+                                                                    formControlName="county" />
+                                                                <mat-error *ngIf="
+                                    formData.get('county').hasError('required')
+                                  ">
+                                                                    County is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Organization Building</mat-label>
+                                                                <input type="text" matInput placeholder="Enter Building"
+                                                                    formControlName="building" />
+                                                                <mat-error *ngIf="
+                                    formData
+                                      .get('building')
+                                      .hasError('required')
+                                  ">
+                                                                    Organization Building is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <!-- Add similar structure for the fourth column if needed -->
+                                                        </div>
+                                                    </div>
+                                                    <label> Contact information</label>
+                                                    <div class="row">
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Enter Website</mat-label>
+                                                                <input type="text" matInput placeholder="Enter Website"
+                                                                    formControlName="website" />
+                                                                <mat-error *ngIf="
+                                    formData.get('website').hasError('required')
+                                  ">
+                                                                    Website is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Email Address</mat-label>
+                                                                <input type="email" matInput
+                                                                    placeholder="Enter Email Address"
+                                                                    formControlName="email" />
+                                                                <mat-error *ngIf="
+                                    formData.get('email').hasError('email')
+                                  ">
+                                                                    Please enter a valid email address
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Telephone</mat-label>
+                                                                <input type="mobile" matInput
+                                                                    placeholder="Enter organization Telephones"
+                                                                    formControlName="telephone" />
+                                                                <mat-error *ngIf="
+                                    formData
+                                      .get('telephone')
+                                      .hasError('required')
+                                  ">
+                                                                    Telephone is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-0">
+                                                            <mat-form-field class="example-full-width mb-1"
+                                                                appearance="outline">
+                                                                <mat-label>Postal Address</mat-label>
+                                                                <input type="text" matInput
+                                                                    placeholder="Enter organization postal address"
+                                                                    formControlName="address" />
+                                                                <mat-error *ngIf="
+                                    formData.get('address').hasError('required')
+                                  ">
+                                                                    Postal Address is required
+                                                                </mat-error>
+                                                            </mat-form-field>
+                                                        </div>
+                                                    </div>
+                                                    <hr />
+
+                                                    <div class="row mx-4 mt-4">
+                                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-12">
+                                                            <div mat-dialog-action [align]="'end'" class="mt-2">
+                                                                <button class="btn-space" type="button"
+                                                                    mat-raised-button color="warn" mat-button
+                                                                    (click)="cancel()">
+                                                                    Cancel
+                                                                </button>
+                                                                <button mat-raised-button color="primary"
+                                                                    [hidden]="hideSubmit" [class.auth-spinner]="posting"
+                                                                    [disabled]="posting" (click)="onSubmit()">
+                                                                    {{ this.btnText }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </mat-tab>
+                            </mat-tab-group>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

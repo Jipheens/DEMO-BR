@@ -1,0 +1,69 @@
+
+<ng-container>
+    <!-- first row -->
+    <div class="row mx-2">
+      <div class="col-md-6 col-sm-12 card">
+        <div class="row">
+          <div class="col-md-8 col-sm-12"></div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <div id="lineChartContainer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12 card">
+        <div class="header">
+          <h4 class="title">Roles Distribution Chart</h4>
+          <div class="filter">
+            <input class="form-control" (keyup)="applyFilter($event)" placeholder="Filter..." #input />
+          </div>
+        </div>
+        <hr />
+        <div class="content">
+          <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell">
+            <!-- Index column -->
+            <ng-container matColumnDef="index">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-10">
+                #
+              </mat-header-cell>
+              <mat-cell *matCellDef="let element; let i = index" class="column-nowrap psl-3 tbl-col-width-per-10">{{ i + 1
+                }}</mat-cell>
+            </ng-container>
+  
+            <!-- Department Name column -->
+            <ng-container matColumnDef="roleName">
+              <mat-header-cell *matHeaderCellDef mat-sort-header
+                class="column-nowrap psl-3 tbl-col-width-per-40">Role Name
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-40">
+                {{ row.roleName }}
+              </mat-cell>
+            </ng-container>
+  
+            <!-- Total Employees column -->
+            <ng-container matColumnDef="userCount">
+              <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 ">
+             Number of users
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row" class="column-nowrap psl-3 ">
+                {{ row.userCount }}
+              </mat-cell>
+            </ng-container>
+  
+            <!-- Header row -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  
+            <!-- Data rows -->
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+  
+            <!-- No data row -->
+            <mat-cell *matNoDataRow colspan="4">No data matching the filter "{{ input.value }}"</mat-cell>
+          </mat-table>
+        </div>
+        <mat-paginator [pageSizeOptions]="[5, 10, 20, 30, 40, 50, 100]" aria-label="Select page"></mat-paginator>
+      </div>
+    </div>
+  
+    </ng-container>

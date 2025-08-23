@@ -1,0 +1,112 @@
+:root {
+  --primary: #4361ee;
+  --danger: #ff6b6b;
+  --success: #43aa8b;
+  --warning: #f9c74f;
+  --dark-text: #2d3748;
+  --light-text: #f8f9fa;
+  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.1);
+  --card-radius: 16px;
+}
+
+.card-container {
+  margin-bottom: 25px;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.stat-card {
+  border-radius: var(--card-radius);
+  border: none;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+
+  &:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.card-content {
+  padding: 24px;
+  position: relative;
+}
+
+.card-icon {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 32px;
+  opacity: 0.2;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .card-icon {
+  transform: scale(1.1);
+  opacity: 0.3;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.progress-container {
+  margin-bottom: 12px;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+.stat-details {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.trend-up {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Card color variants */
+.card-primary {
+  background: linear-gradient(135deg, #4361ee, #3a56d4);
+  color: white;
+}
+
+.card-danger {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+}
+
+.card-success {
+  background: linear-gradient(135deg, #43aa8b, #3a9578);
+  color: white;
+}
+
+.card-warning {
+  background: linear-gradient(135deg, #f9c74f, #f3bc3c);
+  color: white;
+}

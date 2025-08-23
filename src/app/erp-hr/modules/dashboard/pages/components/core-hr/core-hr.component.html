@@ -1,0 +1,170 @@
+<ng-container>
+  <!-- first row -->
+  <div class="row mx-2">
+    <div class="col-md-6 col-sm-12 card">
+      <div class="row">
+        <div class="col-md-4 col-sm-12" style="font-size: 8px">
+          <input class="pull-right form-control" (keyup)="onSelectedYear($event)" placeholder="Year" #input />
+        </div>
+        <div class="col-md-8 col-sm-12"></div>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="col-md-12 col-sm-12">
+          <div id="joinersAndLeaversChart"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-sm-12 card">
+      <div class="mat-elevation-z1" id="maleVsFemaleOptions"></div>
+    </div>
+  </div>
+
+  <!-- second row -->
+  <div class="row mx-2">
+    <div class="col-md-6 col-sm-12 card">
+      <div id="activeEmpPerDepartmentChart"></div>
+    </div>
+    <div class="col-md-6 col-sm-12 card">
+      <div class="header">
+        <h4 class="title">Employee Turnover Rate</h4>
+        <div class="filter">
+          <input class="form-control" (keyup)="applyFilter($event)" placeholder="Filter..." #input />
+        </div>
+      </div>
+      <hr />
+      <div class="content">
+        <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell">
+          <!-- Index column -->
+          <ng-container matColumnDef="index">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-10">
+              #
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element; let i = index" class="column-nowrap psl-3 tbl-col-width-per-10">{{ i + 1
+              }}</mat-cell>
+          </ng-container>
+
+          <!-- Department Name column -->
+          <ng-container matColumnDef="departmentname">
+            <mat-header-cell *matHeaderCellDef mat-sort-header
+              class="column-nowrap psl-3 tbl-col-width-per-40">Department Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-40">
+              {{ row.departmentname }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Total Employees column -->
+          <ng-container matColumnDef="totalEmployees">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-15">
+              Total Employees
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-15">
+              {{ row.totalEmployees }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Turnover Rate column -->
+          <ng-container matColumnDef="turnoverrate">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-25">Turnover
+              Rate</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-25">
+              <span *ngIf="row.turnoverrate < 30" class="badge badge-pill badge-success">{{ row.turnoverrate }}</span>
+              <span *ngIf="row.turnoverrate >= 30 && row.turnoverrate < 50" class="badge badge-pill badge-primary">{{
+                row.turnoverrate }}</span>
+              <span *ngIf="row.turnoverrate >= 50 && row.turnoverrate < 70" class="badge badge-pill badge-warning">{{
+                row.turnoverrate }}</span>
+              <span *ngIf="row.turnoverrate >= 70" class="badge badge-pill badge-danger">{{ row.turnoverrate }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Header row -->
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+          <!-- Data rows -->
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+
+          <!-- No data row -->
+          <mat-cell *matNoDataRow colspan="4">No data matching the filter "{{ input.value }}"</mat-cell>
+        </mat-table>
+      </div>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20, 30, 40, 50, 100]" aria-label="Select page"></mat-paginator>
+    </div>
+  </div>
+
+  <!-- third row -->
+  <div class="row mx-2">
+    <div class="col-md-6 col-sm-12 card">
+      <div class="header">
+        <h4 class="title">KPI Classification</h4>
+        <div class="filter">
+          <input class="form-control" (keyup)="applyFilter($event)" placeholder="Filter..." />
+        </div>
+      </div>
+      <hr />
+      <div class="content">
+        <mat-table #table matTableExporter [dataSource]="dataSource2" matSort class="mat-cell">
+          <!-- Index column -->
+          <ng-container matColumnDef="index">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-10">
+              #
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element; let i = index" class="column-nowrap psl-3 tbl-col-width-per-10">{{ i + 1
+              }}</mat-cell>
+          </ng-container>
+
+          <!-- No. of Employees column -->
+          <ng-container matColumnDef="goalsno">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-25">No. of
+              Employees
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-25">
+              {{ row.goalsno }}
+            </mat-cell>
+          </ng-container>
+
+          <!-- Turnover Rate column -->
+          <ng-container matColumnDef="classification">
+            <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-45">Turnover
+              Rate</mat-header-cell>
+            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-45">
+              <span *ngIf="row.classification == 'Exceptional'" class="badge badge-pill badge-success">{{
+                row.classification }}</span>
+              <span *ngIf="row.classification == 'Exceeds Targets'" class="badge badge-pill badge-primary">{{
+                row.classification }}</span>
+              <span *ngIf="row.classification == 'Met Targets'" class="badge badge-pill badge-info">{{
+                row.classification }}</span>
+              <span *ngIf="row.classification == 'Needs Improvement'" class="badge badge-pill badge-warning">{{
+                row.classification }}</span>
+              <span *ngIf="row.classification == 'Unsatisfactory'" class="badge badge-pill badge-danger">{{
+                row.classification }}</span>
+            </mat-cell>
+          </ng-container>
+
+          <!-- Header row -->
+          <mat-header-row *matHeaderRowDef="displayedColumns2"></mat-header-row>
+
+          <!-- Data rows -->
+          <mat-row *matRowDef="let row; columns: displayedColumns2"></mat-row>
+
+          <!-- No data row -->
+          <mat-cell *matNoDataRow colspan="4">No data matching the filter "{{ input.value }}"</mat-cell>
+        </mat-table>
+      </div>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20, 30, 40, 50, 100]" aria-label="Select page"></mat-paginator>
+    </div>
+    <div class="col-md-6 col-sm-12 card">
+      <div id="kpigoalstatusChart"></div>
+    </div>
+  </div>
+
+  <!-- forth row -->
+  <div class="row mx-2">
+    <div class="col-md-6 col-sm-12 card">
+      <div class="mat-elevation-z1" id="ageDistribuition"></div>
+    </div>
+    <div class="col-md-6 col-sm-12 card">
+      <div class="mat-elevation-z1" id="workTypeDistribuition"></div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,72 @@
+<!-- <button (click)="layoutRight()">Right</button>
+<button (click)="layoutTop()">Top</button>
+<button (click)="layoutLeft()">Left</button>
+<button (click)="layoutBottom()">Bottom</button>
+<div class="chart-container"></div> -->
+
+<div class="body">
+  <div class="table-responsive">
+    <div class="materialTableHeader">
+      <div class="row">
+        <div class="col-12">
+          <ul class="header-buttons-left ms-0">
+            <li class="dropdown">
+              <h2>Structure Orientation</h2>
+            </li>
+
+            <li>
+              <div class="m-l-50" matTooltip="Right">
+                <button mat-mini-fab color="primary" (click)="layoutRight()">
+                  <mat-icon class="col-white">arrow_forward</mat-icon>
+                </button>
+              </div>
+            </li>
+            <li>
+              <div class="m-l-10" matTooltip="Top">
+                <button mat-mini-fab color="primary" (click)="layoutTop()">
+                  <mat-icon class="col-white">arrow_upward</mat-icon>
+                </button>
+              </div>
+            </li>
+            <li>
+              <div class="m-l-10" matTooltip="Left">
+                <button mat-mini-fab color="primary" (click)="layoutLeft()">
+                  <mat-icon class="col-white">arrow_back</mat-icon>
+                </button>
+              </div>
+            </li>
+            <li>
+              <div class="m-l-10" matTooltip="Bottom">
+                <button mat-mini-fab color="primary" (click)="layoutBottom()">
+                  <mat-icon class="col-white">arrow_downward</mat-icon>
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
+        
+      </div>
+    </div>
+
+
+
+    <div class="m-2 mx-2" *ngIf="data.length <= 0"
+
+      >
+      <mat-progress-bar color="primary" mode="indeterminate">
+      </mat-progress-bar>
+    </div>
+
+    <div *ngIf="data.length <= 0"
+
+      class="tbl-spinner">
+      <mat-progress-spinner
+        color="primary"
+        [diameter]="40"
+        mode="indeterminate"
+      >
+      </mat-progress-spinner>
+    </div>
+  </div>
+</div>
+<div class="chart-container"></div>

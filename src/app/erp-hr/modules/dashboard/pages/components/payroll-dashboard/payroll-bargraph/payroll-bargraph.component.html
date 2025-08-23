@@ -1,0 +1,61 @@
+<div class="mat-elevation-z1 bg-white">
+    <div class="row">
+        <mat-card-header class="breadcrumb">
+          <div>
+            <a routerLink="/administration/" skipLocationChange>Dashboard / </a>
+            <a routerLink=" " skipLocationChange>Payroll / </a>
+            <a routerLink=" " skipLocationChange>Chart </a>
+          </div>
+        </mat-card-header>
+      </div>
+    <br>
+    <div class="row">
+      <div class="col-md-3">
+        <input type="number" class="pull-right form-control" (blur)="onSelectedYear($event)" placeholder="Year" #input>
+      </div>
+      <div class="col-md-6"></div>
+      <div class="col-md-3">
+        <p>Data for: {{this.selectedYear}} </p>
+      </div>
+      <div class="col-md-8">
+        <form [formGroup]="datewiseForm" *ngIf="this.needYear">
+          <p>
+            <mat-form-field>
+              <mat-label>Select Year</mat-label>
+              <mat-select  (selectionChange)="getMonthWise($event)" formControlName="year">
+                <mat-option *ngFor="let item of this.years" value="{{item.year}}">{{item.year}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </p>
+      </form>
+
+        <form [formGroup]="datewiseForm" *ngIf="this.needMonth">
+          <div class="row">
+        <div class="col-md-6">
+            <p>
+            <mat-form-field>
+              <mat-label>Select Year</mat-label>
+              <mat-select (selectionChange)="getDateWise($event)" formControlName="year">
+                <mat-option *ngFor="let item of this.years"  value="{{item.year}}">{{item.year}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </p>
+          </div>
+        <div class="col-md-6">
+          <p>
+            <mat-form-field>
+              <mat-label>Select Month</mat-label>
+              <mat-select  (selectionChange)="getDateWise($event)" formControlName="month">
+                <mat-option *ngFor="let item of monthsArray" value="{{item}}">{{item}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </p>
+          </div>
+          </div>
+      </form>
+      </div>
+    </div>
+    <hr>
+    
+    <div class="mat-elevation-z1 bg-white" id="Account-chart"></div>
+  </div>

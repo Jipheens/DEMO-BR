@@ -1,0 +1,113 @@
+<div class="addContainer">
+    <div *ngIf="Data" class="contact-details">
+        <div class="modalHeader">
+            <div class="contact-details-name mb-1">
+                <strong>Request Portal Account</strong>
+            </div>
+            <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div mat-dialog-content>
+            <mat-card-content>
+
+                <ng-container>
+                    <div class="row mt-1" style="width: 98%; margin-left: 20px">
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                            <div class="row justify-content-center">
+                                <div class="col-5 m-b-10">Full Name:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.firstName }} {{ Data.middleName }} {{ Data.lastName }}</div>
+                                <div class="col-5 m-b-10">National Id:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.nationalId }}</div>
+                                <div class="col-5 m-b-10">Email Address:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.personalEmail }}</div>
+                                <div class="col-5 m-b-10">Phone Number:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.personalPhone }}</div>
+
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-5 m-b-10">Emp No:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.empNo }}</div>
+
+                                <div class="col-5 m-b-10">Basic Salary:</div>
+                                <div class="col-7 pro-left m-b-10">{{ Data.basicSalary }}</div>
+
+                                <div class="col-5 m-b-10">Status:</div>
+                                <div class="col-7 pro-left m-b-10">
+                                    <ng-container [ngSwitch]="Data.status">
+                                        <button *ngSwitchCase="'APPROVED'"
+                                            class="badge badge-solid-green btn btn btn-sm m-1">
+                                            <i class="fas fa-check-circle"></i>&nbsp;
+                                            {{ Data.status }}
+                                        </button>
+                                        <button *ngSwitchCase="'REJECTED'"
+                                            class="badge badge-solid-red btn btn btn-sm m-1">
+                                            <i class="fas fa-times-circle"></i>&nbsp;
+                                            {{ Data.status }}
+                                        </button>
+                                        <button *ngSwitchCase="'RETURNED'"
+                                            class="badge badge-solid-brown btn btn btn-sm m-1">
+                                            <i class="fas fa-undo-alt"></i>&nbsp;
+                                            {{ Data.status }}
+                                        </button>
+                                        <button *ngSwitchCase="'PENDING'"
+                                            class="badge badge-solid-blue btn btn btn-sm m-1">
+                                            <i class="fas fa-exclamation-circle"></i>&nbsp;
+                                            {{ Data.status }}
+                                        </button>
+                                        <button *ngSwitchDefault class="badge badge-solid-brown btn btn btn-sm m-1">
+                                            <i class="fas fa-question-circle"></i>&nbsp;
+                                            {{ Data.status }}
+                                        </button>
+                                    </ng-container>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                </ng-container>
+
+                <ng-container>
+                    <h6 class="mx-2">Job Group Details</h6>
+
+                    <form class="register-form mx-2" [formGroup]="mngForm">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                                <mat-form-field class="example-full-width" appearance="outline">
+                                    <mat-label>Role Name</mat-label>
+                                    <input matInput formControlName="roleName" required />
+                                    <mat-icon matSuffix (click)="rolesLookup()">search</mat-icon>
+
+                                    <mat-error *ngIf="mngForm.get('roleName').hasError('required')">
+                                        Role Name is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+
+                        </div>
+                    </form>
+
+                    <div class="row" *ngIf="!viewMode">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                            <div class="example-button-row" align="end">
+                                <button class="btn-space" mat-raised-button color="primary"
+                                    [class.auth-spinner]="posting" [disabled]="!mngForm.valid || posting"
+                                    (click)="submit()">
+                                    Submit Request
+                                </button>
+                                <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </mat-card-content>
+        </div>
+    </div>
+</div>

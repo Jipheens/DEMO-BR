@@ -1,0 +1,17 @@
+<div class="file-drop-area">
+    <button mat-raised-button color="primary">Choose file</button>
+    <span class="ms-2" *ngIf="imagePreviews.length === 0">
+        {{ 'or drag and drop file here' }}
+    </span>
+    <span class="file-msg" *ngFor="let preview of imagePreviews; let i = index">
+        <div class="me-2">{{ preview?.split(',')[0].split(':')[1] }}</div>
+        <img [src]="preview" alt="Selected Image {{ i + 1 }}" class="preview-image">
+        <a class="download-link" (click)="downloadImage(i)">Download</a>
+    </span>
+    <input class="file-input" type="file" accept="image/*" single (change)="getFileDetails($event)">
+</div>
+
+<!-- <div *ngIf="imagePreviews.length > 0">
+    <h2>Image Previews:</h2>
+    <img [src]="preview" alt="Selected Image" class="preview-image" *ngFor="let preview of imagePreviews">
+</div> -->

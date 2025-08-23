@@ -1,0 +1,65 @@
+<div class="addContainer">
+    <div class="modalHeader">
+      <div class="editRowModal">
+        <div class="modalHeader clearfix">
+          <img src="assets/images/em.png" width="30px" height="30px" alt="" />
+          <div class="modal-about">
+            <div class="font-weight-bold p-t-5 ms-2 me-2 font-17">
+              <strong>{{ pageFunction }} Annual Leave Band</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div mat-dialog-content>
+      <div class="m-2" *ngIf="isLoading">
+        <mat-progress-bar color="primary" mode="indeterminate">
+        </mat-progress-bar>
+      </div>
+  
+      <ng-container>
+        <h6 class="mx-2">Leave Band Details</h6>
+        <form class="register-form mx-2" [formGroup]="mngForm">
+            <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label> Band Name</mat-label>
+                        <input matInput formControlName="leaveBand" />
+                        <mat-icon matSuffix>compare_arrows</mat-icon>
+                        <mat-error *ngIf="mngForm.get('leaveBand').invalid && mngForm.get('leaveBand').touched">
+                            Band Name is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>  
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Payment Rate</mat-label>
+                        <input matInput formControlName="paymentRate" />
+                        <mat-icon matSuffix>compare_arrows</mat-icon>
+                        <mat-error *ngIf="mngForm.get('paymentRate').invalid && mngForm.get('paymentRate').touched">
+                            The Payment Rate is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>      
+                </div>                      
+        </form>
+        
+        <div class="row" *ngIf="!viewMode">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+            <div class="example-button-row" align="end">
+              <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                [disabled]="!mngForm.valid || posting" (click)="submit()">
+                {{ pageFunction }} Leave Band
+              </button>
+              <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>

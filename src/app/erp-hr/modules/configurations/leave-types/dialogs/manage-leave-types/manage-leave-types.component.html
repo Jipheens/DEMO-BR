@@ -1,0 +1,220 @@
+<div class="addContainer">
+    <div class="modalHeader">
+        <div class="editRowModal">
+            <div class="modalHeader clearfix">
+                <img src="assets/images/em.png" width="30px" height="30px" alt="" />
+                <div class="modal-about">
+                    <div class="font-weight-bold p-t-5 ms-2 me-2 font-17">
+                        <strong>{{ pageFunction }} Leave Type</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <div class="m-2" *ngIf="isLoading">
+            <mat-progress-bar color="primary" mode="indeterminate">
+            </mat-progress-bar>
+        </div>
+
+        <ng-container>
+            <h6 class="mx-2">Leave Type Details</h6>
+
+            <form class="register-form mx-2" [formGroup]="mngForm">
+                <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                        <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Leave Type</mat-label>
+                            <mat-select formControlName="leaveType">
+                                <mat-option *ngFor="let type of leaveTypes" [value]="type">{{
+                                    type
+                                    }}</mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="
+                  mngForm.get('leaveType').invalid &&
+                  mngForm.get('leaveType').touched
+                ">
+                                Leave Type is required
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+
+
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                            <section class="example-section">
+                                <label class="example-margin">Has Period:</label>
+                                <mat-radio-group formControlName="hasPeriod">
+                                    <mat-radio-button class="example-margin" value="Y">Yes</mat-radio-button>
+                                    <mat-radio-button class="example-margin" value="N">No</mat-radio-button>
+                                </mat-radio-group>
+                            </section>
+                            <mat-error *ngIf="
+                    mngForm.get('hasPeriod').invalid &&
+                    mngForm.get('hasPeriod').touched
+                  ">
+                                Please select an option for Has Period
+                            </mat-error>
+                        </div>
+                        <div *ngIf="mngForm.get('hasPeriod').value === 'Y'"
+                            class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                            <mat-form-field class="example-full-width" appearance="outline">
+                                <mat-label>Duration Allowed</mat-label>
+                                <input matInput formControlName="durationAllowed" />
+                                <mat-icon matSuffix>compare_arrows</mat-icon>
+                                <mat-error *ngIf="
+                      mngForm.get('durationAllowed').invalid &&
+                      mngForm.get('durationAllowed').touched
+                    ">
+                                    Please enter a valid number for Duration Allowed
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                            <section class="example-section">
+                                <label class="example-margin">Incur Deduction:</label>
+                                <mat-radio-group formControlName="incurDeduction">
+                                    <mat-radio-button class="example-margin" value="Y">Yes</mat-radio-button>
+                                    <mat-radio-button class="example-margin" value="N">No</mat-radio-button>
+                                </mat-radio-group>
+                            </section>
+
+                            <mat-error *ngIf="
+mngForm.get('incurDeduction').invalid &&
+mngForm.get('incurDeduction').touched
+">
+                                Please select an option for Incur Deduction
+                            </mat-error>
+                        </div>
+
+                        <ng-container *ngIf="mngForm.get('incurDeduction').value === 'Y'">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                                <section class="example-section">
+                                    <label class="example-margin">Full Payment First Month:</label>
+                                    <mat-radio-group formControlName="fullpaymentFirstmonth">
+                                        <mat-radio-button class="example-margin" value="Y">Yes</mat-radio-button>
+                                        <mat-radio-button class="example-margin" value="N">No</mat-radio-button>
+                                    </mat-radio-group>
+                                </section>
+
+                                <mat-error *ngIf="
+mngForm.get('fullpaymentFirstmonth').invalid &&
+mngForm.get('fullpaymentFirstmonth').touched
+">
+                                    Please select an option for Full Payment First Month
+                                </mat-error>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                                <mat-form-field class="example-full-width" appearance="outline">
+                                    <mat-label>Monthly Rate</mat-label>
+                                    <input matInput formControlName="monthlyRate" />
+                                    <mat-icon matSuffix>compare_arrows</mat-icon>
+                                    <mat-error *ngIf="
+                      mngForm.get('monthlyRate').invalid &&
+                      mngForm.get('monthlyRate').touched
+                    ">
+                                        Please enter a valid number for Monthly Rate
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
+
+                    </div>
+
+
+                    <!-- *ngIf="mngForm.get('hasAllowance').value === 'Yes'" -->
+
+                    <div class="row">
+
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                            <section class="example-section">
+                                <label class="example-margin">Has Allowance:</label>
+                                <mat-radio-group formControlName="hasAllowance">
+                                    <mat-radio-button class="example-margin" value="Y">Yes</mat-radio-button>
+                                    <mat-radio-button class="example-margin" value="N">No</mat-radio-button>
+                                </mat-radio-group>
+                            </section>
+
+                            <mat-error *ngIf="
+mngForm.get('hasAllowance').invalid &&
+mngForm.get('hasAllowance').touched
+">
+                                Please select an option for Has Allowance
+                            </mat-error>
+                        </div>
+
+                        <ng-container *ngIf="mngForm.get('hasAllowance').value === 'Y'">
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                                <mat-form-field class="example-full-width" appearance="outline">
+                                    <mat-label>Threshold Days</mat-label>
+                                    <input matInput formControlName="thresholdDays" />
+                                    <mat-icon matSuffix>compare_arrows</mat-icon>
+                                    <mat-error *ngIf="
+      mngForm.get('thresholdDays').invalid &&
+      mngForm.get('thresholdDays').touched
+    ">
+                                        Please enter a valid number for Threshold Days
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                                <mat-form-field class="example-full-width" appearance="outline">
+                                    <mat-label>Allowance Amount</mat-label>
+                                    <input matInput formControlName="allowanceAmount" />
+                                    <mat-icon matSuffix>compare_arrows</mat-icon>
+                                    <mat-error *ngIf="
+      mngForm.get('allowanceAmount').invalid &&
+      mngForm.get('allowanceAmount').touched
+    ">
+                                        Please enter a valid number for Allowance Amount
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                        </ng-container>
+
+                    </div>
+
+
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                        <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Leave Description</mat-label>
+                            <textarea matInput formControlName="leaveDescription" ></textarea>
+                            <mat-icon matSuffix>compare_arrows</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+
+
+
+
+                </div>
+            </form>
+
+            <div class="row" *ngIf="!viewMode">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                    <div class="example-button-row" align="end">
+                        <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                            [disabled]="!mngForm.valid || posting" (click)="submit()">
+                            {{ pageFunction }} Leave Type
+                        </button>
+                        <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,92 @@
+<div class="row">
+  <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4" (click)="onAccounts()">
+    <div class="card-container">
+      <div class="stat-card card-primary">
+        <div class="card-content">
+          <i class="card-icon fas fa-university"></i>
+          <div class="card-title">Active Accounts</div>
+          <div class="stat-value">{{ activeAccounts | number }}</div>
+          
+          <div class="progress-container">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="activeAccountsPercentage"></div>
+            </div>
+          </div>
+          
+          <div class="stat-details">
+            <span class="trend-up"><i class="fa fa-arrow-up mr-1"></i> {{ activeAccountGrowth }}% since last month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loan Requests Card -->
+  <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4" (click)="onLoanRequests()">
+    <div class="card-container">
+      <div class="stat-card card-danger">
+        <div class="card-content">
+          <i class="card-icon fas fa-file-invoice-dollar"></i>
+          <div class="card-title">Loan Requests</div>
+          <div class="stat-value">{{ loanRequests | number }}</div>
+          
+          <div class="progress-container">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="loanApprovalRate"></div>
+            </div>
+          </div>
+          
+          <div class="stat-details">
+            Approval Rate: {{ loanApprovalRate }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Accounts Card -->
+  <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4" (click)="onNewAccounts()">
+    <div class="card-container">
+      <div class="stat-card card-success">
+        <div class="card-content">
+          <i class="card-icon fas fa-user-plus"></i>
+          <div class="card-title">New Accounts</div>
+          <div class="stat-value">{{ newAccounts | number }}</div>
+          
+          <div class="progress-container">
+            <div class="progress">
+              <div class="progress-bar" style="width: 70%"></div>
+            </div>
+          </div>
+          
+          <div class="stat-details">
+            {{ accountOpenGrowth }}% ↑ from last month
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Card -->
+  <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 mb-4" (click)="onRevenue()">
+    <div class="card-container">
+      <div class="stat-card card-warning">
+        <div class="card-content">
+          <i class="card-icon fas fa-chart-line"></i>
+          <div class="card-title">Revenue (This Month)</div>
+          <div class="stat-value">{{ monthlyRevenue | currency }}</div>
+          
+          <div class="progress-container">
+            <div class="progress">
+              <div class="progress-bar" [style.width.%]="revenuePercentage"></div>
+            </div>
+          </div>
+          
+          <div class="stat-details">
+            Target: {{ monthlyTarget | currency }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

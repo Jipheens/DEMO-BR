@@ -1,0 +1,145 @@
+<div class="addContainer">
+    <div class="modalHeader">
+        <div class="editRowModal">
+            <div class="modalHeader clearfix">
+                <img src="assets/images/em.png" width="30px" height="30px" alt="" />
+                <div class="modal-about">
+                    <div class="font-weight-bold p-t-5 ms-2 me-2 font-17">
+                        <strong>Select Employee</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div mat-dialog-content>
+        <mat-card-content>
+            <div *ngIf="isLoading">
+                <div class="d-flex justify-content-center">
+                    <img src="assets/images/loading.gif"
+                        style="display: block; margin: auto; width: 60px; height: 60px" />
+                </div>
+            </div>
+            <div class="body">
+                <div class="table-responsi m-t-5">
+                    <ng-container *ngIf="!isLoading">
+                        <div class="table-header py-3"
+                            style="background-color: rgba(219, 218, 218, 0.836); margin: 5px">
+                            <div class="row">
+                                <div class="col-6 px-4">
+                                    <div class="mx-auto">
+                                        <input class="pull-left search form-control" (keyup)="applyFilter($event)"
+                                            placeholder="Filter..." #input />
+                                    </div>
+                                </div>
+                                <div class="col-6 px-4">
+                                    <div class="mx-auto">
+                                        <div class="m-l-10" [hidden]="!selection.hasValue()">
+                                            <button mat-mini-fab color="primary" (click)="proceed()"
+                                                [class.auth-spinner]="multimodifyloading"
+                                                [disabled]="multimodifyloading">
+                                                <mat-icon class="col-white">done_all </mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell"
+                        #exporter="matTableExporter">
+
+                        <ng-container matColumnDef="select">
+                            <mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-8'">
+                                <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                    [ngClass]="'tbl-checkbox'" (change)="expSelected()">
+                                </mat-checkbox>
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" [ngClass]="'tbl-col-width-per-8'">
+                                <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(row) : null"
+                                    [checked]="selection.isSelected(row)" [ngClass]="'tbl-checkbox'"
+                                    [aria-label]="checkboxLabel(row)" (change)="expSelected()">
+                                </mat-checkbox>
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- "empNo" Column -->
+                        <ng-container matColumnDef="empNo">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="column-nowrap psl-3 tbl-col-width-per-15">
+                                PF No.
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-15">
+                                {{ row.empNo }}
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- "fullName" Column -->
+                        <ng-container matColumnDef="fullName">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="column-nowrap psl-3 tbl-col-width-per-35">
+                                Full Name
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-35">
+                                {{ row.firstName }} {{ row.middleName }}  {{ row.lastName }}
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- "currDep" Column -->
+                        <ng-container matColumnDef="currDep">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="column-nowrap psl-3 tbl-col-width-per-30">
+                                Department
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-30">
+                                {{ row.departmentName }}
+                            </mat-cell>
+                        </ng-container>
+
+                        <!-- "nationalId" Column -->
+                        <ng-container matColumnDef="nationalId">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header
+                                class="column-nowrap psl-3 tbl-col-width-per-30">
+                                National ID
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-30">
+                                {{ row.nationalId }}
+                            </mat-cell>
+                        </ng-container>
+
+                        <mat-header-row *matHeaderRowDef="displayedColumns">
+                        </mat-header-row>
+                        <mat-row *matRowDef="let row; columns: displayedColumns;" [style.cursor]="'pointer'" matRipple>
+                        </mat-row>
+
+                        <tr *matNoDataRow>
+                            <td colspan="{{ displayedColumns.length }}"> No data matching the filter "{{ input }}"</td>
+                        </tr>
+                    </mat-table>
+                    <div class="m-2 mx-2" *ngIf="isLoading || downloadLoading">
+                        <mat-progress-bar color="primary" mode="indeterminate">
+                        </mat-progress-bar>
+                    </div>
+                    <div *ngIf="isLoading" class="tbl-spinner">
+                        <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                        </mat-progress-spinner>
+                    </div>
+
+                    <mat-paginator [pageSize]="10" [pageSizeOptions]="[2, 5, 10, 20, 30, 40, 50, 100]"
+                    aria-label="Select page of users"></mat-paginator>
+
+                    <!-- <mat-paginator [pageSizeOptions]="pageSizeOptions" aria-label="Select page"
+                        (page)="onPageChange($event)" [length]="totalItems" [pageIndex]="currentPage"
+                        [pageSize]="pageSize" showFirstLastButtons>
+                    </mat-paginator> -->
+                </div>
+            </div>
+        </mat-card-content>
+    </div>
+</div>

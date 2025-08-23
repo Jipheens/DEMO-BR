@@ -1,0 +1,88 @@
+<div class="addContainer">
+    <div class="modalHeader">
+      <div class="editRowModal">
+        <div class="modalHeader clearfix">
+          <img src="assets/images/em.png" width="30px" height="30px" alt="" />
+          <div class="modal-about">
+            <div class="font-weight-bold p-t-5 ms-2 me-2 font-17">
+              <strong>{{ pageFunction }} KPI Analysis</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="dialogRef.close()" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div mat-dialog-content>
+      <div class="m-2" *ngIf="isLoading">
+        <mat-progress-bar color="primary" mode="indeterminate">
+        </mat-progress-bar>
+      </div>
+  
+      <ng-container>
+        <h6 class="mx-2">KPI Analysis Details</h6>
+        <form class="register-form mx-2" [formGroup]="mngForm">
+            <div class="row">
+                <!-- Lower Range -->
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Lower Range</mat-label>
+                        <input matInput type="number" formControlName="lowerRange" />
+                        <mat-error *ngIf="mngForm.get('lowerRange').invalid && mngForm.get('lowerRange').touched">
+                            Lower Range is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+        
+                <!-- Upper Range -->
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Upper Range</mat-label>
+                        <input matInput type="number" formControlName="upperRange" />
+                        <mat-error *ngIf="mngForm.get('upperRange').invalid && mngForm.get('upperRange').touched">
+                            Upper Range is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+        
+                <!-- Rating -->
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Rating</mat-label>
+                        <input matInput type="number" formControlName="rating" />
+                        <mat-error *ngIf="mngForm.get('rating').invalid && mngForm.get('rating').touched">
+                            Rating is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+        
+                <!-- Description -->
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                    <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Description</mat-label>
+                        <textarea matInput formControlName="description" ></textarea>
+                        <mat-error *ngIf="mngForm.get('description').invalid && mngForm.get('description').touched">
+                            Description is required
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+        
+        <div class="row" *ngIf="!viewMode">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+            <div class="example-button-row" align="end">
+              <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                [disabled]="!mngForm.valid || posting" (click)="submit()">
+                {{ pageFunction }} KPI Analysis
+              </button>
+              <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>

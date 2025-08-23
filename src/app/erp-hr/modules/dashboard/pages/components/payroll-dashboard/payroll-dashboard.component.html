@@ -1,0 +1,708 @@
+<div class="">
+  <div class="mx-4">
+    <div class="row">
+      <div *ngIf="loading">
+        <p><small>Loading, please wait...</small></p>
+        <p>
+          <mat-progress-bar mode="query"></mat-progress-bar>
+        </p>
+      </div>
+      <!-- <mat-card-header class="breadcrumb">
+        <div>
+          <a routerLink="/administration/" skipLocationChange>Dashboard /
+          </a>
+          <a routerLink=" " skipLocationChange>Payroll / </a>
+          <a routerLink=" " skipLocationChange> Dashboard </a>
+        </div>
+      </mat-card-header> -->
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-xl-4 col-lg-6">
+        <div class="card l-bg-green-dark">
+          <div class="card-statistic-3">
+            <div class="card-icon card-icon-large">
+              <i class="fa fa-briefcase"></i>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Employees who Joined</h4>
+              <span class="data-1">{{ joined }}</span>
+              <mat-progress-bar mode="determinate"
+                class="progress-m progress-round progress-shadow l-orange-progress mt-2 mb-2" value="40">
+              </mat-progress-bar>
+              <p class="mb-0 text-sm">
+                <span class="mr-2"><i class="fa fa-arrow-up"></i></span>
+                <span class="text-nowrap"> Employees</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-lg-6">
+        <div class="card l-bg-cyan-dark">
+          <div class="card-statistic-3">
+            <div class="card-icon card-icon-large">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Active Employee</h4>
+              <span class="data-1">{{ active }}</span>
+              <mat-progress-bar mode="determinate"
+                class="progress-m progress-round progress-shadow l-purple-progress mt-2 mb-2" value="40">
+              </mat-progress-bar>
+              <p class="mb-0 text-sm">
+                <span class="mr-2"><i class="fa fa-arrow-up"></i> </span>
+                <span class="text-nowrap"> Employees</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-4 col-lg-6">
+        <div class="card l-bg-purple-dark">
+          <div class="card-statistic-3">
+            <div class="card-icon card-icon-large">
+              <i class="fa fa-globe"></i>
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">Employees who Exited</h4>
+              <span class="data-1">{{ exited }}</span>
+              <mat-progress-bar mode="determinate"
+                class="progress-m progress-round progress-shadow l-green-progress mt-2 mb-2" value="40">
+              </mat-progress-bar>
+              <p class="mb-0 text-sm">
+                <span class="mr-2"><i class="fa fa-arrow-up"></i> </span>
+                <span class="text-nowrap"> Employees</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="col-md-4 cols-sm-12">
+        <div class="card p-3 mb-2 bg-primary text-white">
+          <div class="card-header">Employees who Joined</div>
+          <div class="card-body">
+            <i class="material-icons monitorIconSize">fiber_new</i>
+            <h1 class="pull-right">{{ this.joined }}</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 cols-sm-12">
+        <div class="card p-3 mb-2 bg-success text-white">
+          <div class="card-header">Active Employee</div>
+          <div class="card-body">
+            <i class="material-icons monitorIconSize">reorder</i>
+            <h1 class="pull-right">{{ this.active }}</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 cols-sm-12">
+        <div class="card p-3 mb-2 bg-secondary text-white">
+          <div class="card-header">Employees who Exited</div>
+          <div class="card-body">
+            <i class="material-icons monitorIconSize">line_weight</i>
+            <h1 class="pull-right">
+              {{ this.exited }}
+            </h1>
+          </div>
+        </div>
+      </div> -->
+    </div>
+
+    <div class="materialTableHeader my-2">
+      <form [formGroup]="Form">
+        <div class="row">
+          <div class="col-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Prev Period Year</mat-label>
+              <input matInput formControlName="prevPeriodY" />
+              <mat-error *ngIf="Form.get('prevPeriodY').hasError('required')">
+                Please Enter previous period year
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Previous Month</mat-label>
+              <mat-select formControlName="prevPeriodM">
+                <mat-option *ngFor="let month of months" [value]="month">{{
+                  month
+                  }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="Form.get('prevPeriodM').hasError('required')">Please select a previous Period
+                Month</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Current Period Year</mat-label>
+              <input matInput formControlName="currPeriodY" />
+              <mat-error *ngIf="Form.get('currPeriodY').hasError('required')">
+                Please Enter Current period year
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Current Month</mat-label>
+              <mat-select formControlName="currPeriodM">
+                <mat-option *ngFor="let month of months" [value]="month">{{
+                  month
+                  }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="Form.get('currPeriodM').hasError('required')">Please select a current Period
+                Month</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="employeeState">
+                <mat-option *ngFor="let employeeState of employeeStates" [value]="employeeState">{{ employeeState
+                  }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="Form.get('employeeState').hasError('required')">Please select category</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Salary Analytics</h2>
+          </div>
+          <div class="body">
+            <div *ngIf="loadingShowSalaryChart">
+              <p><small>Loading, please wait...</small></p>
+              <p>
+                <mat-progress-bar mode="query"></mat-progress-bar>
+              </p>
+            </div>
+            <div style="text-align: center" *ngIf="!loadingShowSalaryChart">
+              <apx-chart [series]="salaryChartOptions.series" [chart]="salaryChartOptions.chart"
+                [dataLabels]="salaryChartOptions.dataLabels" [plotOptions]="salaryChartOptions.plotOptions"
+                [xaxis]="salaryChartOptions.xaxis" [yaxis]="salaryChartOptions.yaxis"
+                [stroke]="salaryChartOptions.stroke" [fill]="salaryChartOptions.fill"
+                [tooltip]="salaryChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Employee Analytics</h2>
+          </div>
+          <div class="body">
+            <div *ngIf="loadingShowEmployeeChart">
+              <p><small>Loading, please wait...</small></p>
+              <p>
+                <mat-progress-bar mode="query"></mat-progress-bar>
+              </p>
+            </div>
+            <div style="text-align: center" *ngIf="!loadingShowEmployeeChart">
+              <apx-chart [series]="employeeChartOptions.series" [chart]="employeeChartOptions.chart"
+                [dataLabels]="employeeChartOptions.dataLabels" [plotOptions]="employeeChartOptions.plotOptions"
+                [xaxis]="employeeChartOptions.xaxis" [yaxis]="employeeChartOptions.yaxis"
+                [stroke]="employeeChartOptions.stroke" [fill]="employeeChartOptions.fill"
+                [tooltip]="employeeChartOptions.tooltip">
+              </apx-chart>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <div class="materialTableHeader mt-2">
+      <div class="row">
+        <div class="col-5">
+          <ul class="header-buttons-left ms-0">
+            <li class="dropdown">
+              <h2>Payroll Close</h2>
+            </li>
+            <li class="dropdown m-l-20">
+              <label for="search-input"><i class="material-icons search-icon">search</i></label>
+              <input placeholder="Filter..." type="text" (keyup)="applyFilter($event)" #filter
+                class="browser-default search-field" aria-label="Search box" />
+            </li>
+          </ul>
+        </div>
+        <div class="col-2"></div>
+        <div class="col-2"></div>
+        <div class="col-3">
+          <ul class="header-buttons">
+            <li>
+              <div class="export-button m-l-10" matTooltip="XLSX">
+                <img src="assets/images/icons/xlsx.png" alt="" (click)="
+                    exporter.exportTable('xlsx', {
+                      fileName: 'Payroll-details-list',
+                      sheet: 'sheet1'
+                    })
+                  " />
+              </div>
+            </li>
+            <li>
+              <div class="export-button m-l-10" matTooltip="CSV">
+                <img src="assets/images/icons/csv.png" alt="" (click)="exporter.exportTable('csv')" />
+              </div>
+            </li>
+            <li>
+              <div class="export-button m-l-10" matTooltip="JSON">
+                <img src="assets/images/icons/json.png" alt="" (click)="exporter.exportTable('json')" />
+              </div>
+            </li>
+            <li>
+              <div class="export-button m-l-10" matTooltip="TXT">
+                <img src="assets/images/icons/txt.png" alt="" (click)="exporter.exportTable('txt')" />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="loadingPayrollAnalysis">
+      <p><small>Loading, please wait...</small></p>
+      <p>
+        <mat-progress-bar mode="query"></mat-progress-bar>
+      </p>
+    </div>
+
+    <mat-table #table matTableExporter [dataSource]="dataSourceAnalysis" matSort class="mat-cell"
+      #exporter="matTableExporter">
+      <ng-container matColumnDef="category">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-20">
+          Category
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+          {{ row.category }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="prevPayroll">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-20">
+          Previous Payroll
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+          {{ row.prevPayroll }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="currPayroll">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-20">
+          Current Payroll
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+          {{ row.currPayroll }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="changeRate">
+        <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-20">
+          Change Rate
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+          {{ row.changeRate }}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumnsAnalysis">
+      </mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumnsAnalysis" [style.cursor]="'pointer'" matRipple>
+      </mat-row>
+
+      <tr *matNoDataRow>
+        <td colspan="{{ displayedColumnsAnalysis.length }}">
+          No data matching the filter "{{ inputs }}"
+        </td>
+      </tr>
+    </mat-table>
+
+    <mat-paginator [pageSizeOptions]="[10, 20, 30, 40, 50, 100]" aria-label="Select page of Payroll"></mat-paginator>
+
+    <br />
+
+    <div class="table-responsive">
+      <div class="materialTableHeader">
+        <div class="row">
+          <div class="col-5">
+            <ul class="header-buttons-left ms-0">
+              <li class="dropdown">
+                <h2>Pension Report</h2>
+              </li>
+              <li class="dropdown m-l-20">
+                <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                <input placeholder="Filter..." type="text" (keyup)="applyFilter($event)" #filter
+                  class="browser-default search-field" aria-label="Search box" />
+              </li>
+            </ul>
+          </div>
+
+          <div class="col-2">
+            <button class="btn btn-small btn-block" mat-raised-button color="primary" (click)="downloadAnalysis()">
+              <i class="fa fa-plus" aria-hidden="true"></i>DOWNLOAD
+            </button>
+          </div>
+          <div class="col-5">
+            <ul class="header-buttons">
+              <li>
+                <div class="export-button m-l-10" matTooltip="XLSX">
+                  <img src="assets/images/icons/xlsx.png" alt="" (click)="
+                      exporter.exportTable('xlsx', {
+                        fileName: 'report',
+                        sheet: 'sheet1'
+                      })
+                    " />
+                </div>
+              </li>
+              <li>
+                <div class="export-button m-l-10" matTooltip="CSV">
+                  <img src="assets/images/icons/csv.png" alt="" (click)="exporter.exportTable('csv')" />
+                </div>
+              </li>
+              <li>
+                <div class="export-button m-l-10" matTooltip="JSON">
+                  <img src="assets/images/icons/json.png" alt="" (click)="exporter.exportTable('json')" />
+                </div>
+              </li>
+              <li>
+                <div class="export-button m-l-10" matTooltip="TXT">
+                  <img src="assets/images/icons/txt.png" alt="" (click)="exporter.exportTable('txt')" />
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <mat-table #table matTableExporter [dataSource]="dataSource" matSort class="mat-cell"
+        #exporter="matTableExporter">
+        <ng-container matColumnDef="index">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-5">Index</mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index" class="tbl-col-width-per-5">{{ row.index + 1 }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="payrollId">
+          <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-15">
+            Payroll ID
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-15">
+            {{ row.payrollId }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="employeeId">
+          <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-15">
+            Employee ID
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-15">
+            {{ row.empNo }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-20">
+            Name
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+            {{ row.firstName }} {{ row.middleName }} {{ row.lastName }}
+            {{ row.otherNames }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="empStartDate">
+          <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-15">
+            Start Date
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-15">
+            {{ row.empStartDate }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="workingDays">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            Working Days
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.workingDays }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="basicSalary">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            Basic Salary
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.basicSalary }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="grossSalary">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            GrossSalary
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.grossPay }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="shif">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            SHIF
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.shif }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="nssf">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            NSSF</mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.nssf }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="chargeablePay">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            ChargeablePay</mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.chargeablePay }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="taxableCharge">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            TaxableCharge
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.taxableCharge }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="insuranceRelief">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            InsuranceRelief
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.insuranceRelief }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="personalRelief">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            PersonalRelief
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.personalRelief }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="paye">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            PAYE
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.paye }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="housingLevy">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            HousingLevy
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ employeeHouseLevy + employerHouseLevy }}
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="netSalary">
+          <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-10">
+            NetSalary
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row" class="tbl-col-width-per-10">
+            {{ row.netSalary }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="column-nowrap psl-3 tbl-col-width-per-20">
+            Status
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index" class="column-nowrap psl-3 tbl-col-width-per-20"
+            (click)="$event.stopPropagation()">
+            <ng-container [ngSwitch]="row.status">
+              <button *ngSwitchCase="'APPROVED'" class="badge badge-solid-green btn btn btn-sm m-1">
+                <i class="fas fa-check-circle"></i>&nbsp;
+                {{ row.status }}
+              </button>
+              <button *ngSwitchCase="'REJECTED'" class="badge badge-solid-red btn btn btn-sm m-1">
+                <i class="fas fa-times-circle"></i>&nbsp;
+                {{ row.status }}
+              </button>
+              <button *ngSwitchCase="'RETURNED'" class="badge badge-solid-brown btn btn btn-sm m-1">
+                <i class="fas fa-undo-alt"></i>&nbsp;
+                {{ row.status }}
+              </button>
+              <button *ngSwitchCase="'PENDING'" class="badge badge-solid-blue btn btn btn-sm m-1">
+                <i class="fas fa-exclamation-circle"></i>&nbsp;
+                {{ row.status }}
+              </button>
+              <button *ngSwitchDefault class="badge badge-solid-brown btn btn btn-sm m-1">
+                <i class="fas fa-question-circle"></i>&nbsp;
+                {{ row.status }}
+              </button>
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns" [style.cursor]="'pointer'" matRipple>
+        </mat-row>
+
+        <tr *matNoDataRow>
+          <td colspan="{{ displayedColumns.length }}">
+            No data matching the filter "{{ inputs }}"
+          </td>
+        </tr>
+      </mat-table>
+      <div *ngIf="loading">
+        <p><small>Loading, please wait...</small></p>
+        <p>
+          <mat-progress-bar mode="query"></mat-progress-bar>
+        </p>
+      </div>
+      <mat-paginator [pageSizeOptions]="[5, 20, 30, 40, 50, 100]" aria-label="Select page of Payroll"></mat-paginator>
+    </div>
+  </div>
+</div>
+<!-- {
+  "id": 602,
+  "status": "PENDING",
+  "postedFlag": "Y",
+  "postedBy": "Superuser",
+  "postedTime": "2024-08-26T12:06:03.110377",
+  "modifiedFlag": "Y",
+  "modifiedBy": "Superuser",
+  "modifiedTime": "2024-08-26T12:40:12.033083",
+  "verifiedFlag": "N",
+  "verifiedBy": null,
+  "verifiedTime": null,
+  "verifierStatus": "PENDING",
+  "verifierRemarks": null,
+  "supervisorVerifierBy": null,
+  "supervisorVerifiedFlag": "N",
+  "supervisorVerifierTime": null,
+  "supervisorVerifierStatus": "PENDING",
+  "supervisorVerifierRemarks": null,
+  "hrVerifierBy": null,
+  "hrVerifiedFlag": "N",
+  "hrVerifierTime": null,
+  "hrVerifierStatus": "PENDING",
+  "hrVerifierRemarks": null,
+  "seniorHrVerifierBy": null,
+  "seniorHrVerifiedFlag": "N",
+  "seniorHrVerifierTime": null,
+  "seniorHrVerifierStatus": "PENDING",
+  "seniorHrVerifierRemarks": null,
+  "hodVerifierBy": null,
+  "hodVerifiedFlag": "N",
+  "hodVerifierTime": null,
+  "hodVerifierStatus": "PENDING",
+  "hodVerifierRemarks": null,
+  "deletedFlag": "N",
+  "deletedBy": null,
+  "deletedTime": null,
+  "payrollId": "0003EqE7hV20240826",
+  "costCenterCode": "CST1",
+  "payrollCircleCode": "Rced820240826",
+  "empNo": "0003",
+  "empStartDate": "2013-01-01",
+  "employmentTerms": "Permanent",
+  "residentialStatus": "Resident",
+  "employeeType": "Primary Employee",
+  "typeOfHousing": "Benefit not given",
+  "branchCode": "7",
+  "departmentId": 1,
+  "jobGroupFk": 105,
+  "workType": "Permanent",
+  "workingDays": 30,
+  "firstName": "PAULINE",
+  "middleName": "WANGARI",
+  "lastName": "KARIUKI",
+  "otherNames": "WANGARI",
+  "idNo": "13429621",
+  "acctNo": "6666666",
+  "bank": "KINGDOM BANK",
+  "nssfNo": "0417885",
+  "nhifNo": "486099814",
+  "shifNo": null,
+  "pinNo": "A002440615Z",
+  "periodM": "AUGUST",
+  "periodY": 2024,
+  "basicSalary": 70000,
+  "nssfTier1": 700,
+  "nssfTier2": 2900,
+  "nssfEmployee": 3600,
+  "nssfEmployer": 3600,
+  "nhif": 1400,
+  "shif": 0,
+  "paye": 9333.32,
+  "helb": 0,
+  "totalAllowance": 5000,
+  "totalOtherDeductions": 0,
+  "totalEarnings": 0,
+  "hasStaffLoan": "N",
+  "totalStaffLoanDeduction": 0,
+  "totalOutStandingStaffLoan": 0,
+  "taxableCustomDeduction": 0,
+  "nonTaxableCustomDeduction": 0,
+  "netSalary": 52566.58,
+  "totalNonCashBenefit": 0,
+  "grossPay": 69999.9,
+  "valueOfQuarters": 0,
+  "proratedBasicPay": 69999.9,
+  "carryForwardGP": 0,
+  "dcrsE1": 21000,
+  "dcrsActualE2": 7800,
+  "retirementAndOwnerOccupiedInterests": 7800,
+  "dcrsFixedE3": 20000,
+  "ownerOccupiedInterests": 0,
+  "chargeablePay": 57199.9,
+  "taxableCustomAllowance": 0,
+  "nonTaxableCustomAllowance": 5000,
+  "housingAllowance": 0,
+  "employeeHouseLevy": 1400, 
+  "employerHouseLevy": 1400,
+  "transportAllowance": 0,
+  "leaveAllowances": 0,
+  "overtimeAllowances": 0,
+  "directorsFee": 0,
+  "lumpSumPayment": 0,
+  "otherAllowance": 0,
+  "gratuity": 0,
+  "valueOfCarBenefit": 0,
+  "taxCharged": 11943.32,
+  "personalRelief": 2400,
+  "insuranceRelief": 210,
+  "totalRelief": 2610,
+  "pensionEmployeeVoluntary": 2500,
+  "pensionEmployee": 4200,
+  "pensionEmployer": 4200,
+  "pensionRelief": 4200,
+  "accumulatedPension": 20400,
+  "saccoDeductions": 0,
+  "leaveDeduction": 0,
+  "totalCashEarning": 0,
+  "totalDeductionsNetSalary": 22433.32,
+  "mortgage": 5000,
+  "mortgageRelief": 5000,
+  "outSourced": "N",
+  "disabledRegNo": null,
+  "isDisabled": "N",
+  "isFinal": "N",
+  "openPayslip": "N",
+  "comments": "Payroll Rerun",
+  "ourBranchID": "001",
+  "currencyID": "KSH",
+  "accountName": "PAULINE WANGARI KARIUKI"
+} -->

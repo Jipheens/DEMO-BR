@@ -1,0 +1,1044 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <!-- breadcrumb -->
+      <app-breadcrumb [title]="'Manage Client'" [items]="['Clients']" [active_item]="'Manage Client'">
+      </app-breadcrumb>
+    </div>
+
+    <div class="row clearfix">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              <strong>{{ pageFunction }} Client</strong>
+            </h2>
+          </div>
+          <div class="body" *ngIf="showForm">
+            <div class="row" *ngIf="pageFunction !== 'Add' && formData">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="bg-color">
+                  <div class="chat">
+                    <div class="chat-header clearfix">
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="chat-about">
+                                <div class="chat-with">HOD Approval</div>
+                                <div class="chat-num-messages mt-2">
+                                  <div class="badge badge-hod">
+                                    {{ formData.hodVerifierStatus }}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="chat-about">
+                                <div class="chat-with">Approved By</div>
+                                <div class="chat-num-messages mt-2">
+                                  <div class="badge badge-hod-approved">
+                                    {{ formData.hodVerifierBy }}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="chat-about mt-1">
+                                <div class="chat-with remarks">
+                                  <strong>Remarks:</strong>
+                                  <span class="remarks-content mx-2">{{
+                                    formData.hodVerifierRemarks
+                                    }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- HR Verification -->
+                        <div class="col-6">
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="chat-about">
+                                <div class="chat-with">HR Approval</div>
+                                <div class="chat-num-messages mt-2">
+                                  <div class="badge badge-finance">
+                                    {{ formData.hrVerifierStatus }}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="chat-about">
+                                <div class="chat-with">Approved By</div>
+                                <div class="chat-num-messages mt-2">
+                                  <div class="badge badge-finance-approved">
+                                    {{ formData.hrVerifiedBy }}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-12">
+                              <div class="chat-about mt-1">
+                                <div class="chat-with remarks">
+                                  <strong> Remarks:</strong>
+                                  <span class="remarks-content mx-2">{{
+                                    formData.hrVerifiedRemarks
+                                    }}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <mat-horizontal-stepper [linear]="false" #stepper>
+              <mat-step>
+                <ng-template matStepLabel>Basic Information</ng-template>
+                <form [formGroup]="mngForm">
+                  <div class="row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>First Name</mat-label>
+                        <input matInput formControlName="firstName" />
+                        <mat-error *ngIf="
+                            mngForm.get('firstName').invalid &&
+                            mngForm.get('firstName').touched
+                          ">
+                          Please enter a valid First Name
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Middle Name</mat-label>
+                        <input matInput formControlName="middleName" />
+                        <!-- <mat-error *ngIf="
+                            mngForm.get('middleName').invalid &&
+                            mngForm.get('middleName').touched
+                          ">
+                          Please enter a valid Middle Name
+                        </mat-error> -->
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Last Name</mat-label>
+                        <input matInput formControlName="lastName" />
+                        <mat-error *ngIf="
+                            mngForm.get('lastName').invalid &&
+                            mngForm.get('lastName').touched
+                          ">
+                          Please enter a valid Last Name
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Date of Birth (MM/DD/YYYY)</mat-label>
+                        <input matInput [matDatepicker]="dobDatePicker" formControlName="dob" />
+                        <mat-datepicker-toggle matSuffix [for]="dobDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #dobDatePicker></mat-datepicker>
+                        <mat-error *ngIf="
+                            mngForm.get('dob').invalid &&
+                            mngForm.get('dob').touched
+                          ">
+                          Please select a valid Date of Birth
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>National ID</mat-label>
+                        <input matInput formControlName="nationalId" />
+                        <mat-error *ngIf="
+                            mngForm.get('nationalId').invalid &&
+                            mngForm.get('nationalId').touched
+                          ">
+                          Please enter a valid National ID
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>KRA Number</mat-label>
+                        <input matInput formControlName="kraNo" />
+                        <mat-error *ngIf="
+                            mngForm.get('kraNo').invalid &&
+                            mngForm.get('kraNo').touched
+                          ">
+                          Please enter a valid KRA Number
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Religion</mat-label>
+
+                        <mat-select formControlName="religion">
+                          <mat-option *ngFor="let item of religionArray" [value]="item">{{ item }}</mat-option>
+                        </mat-select>
+
+                        <mat-error *ngIf="
+                            mngForm.get('religion').invalid &&
+                            mngForm.get('religion').touched
+                          ">
+                          Please enter a valid Religion
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <section class="example-section">
+                        <label class="example-margin">Gender:</label>
+                        <mat-radio-group formControlName="gender">
+                          <mat-radio-button class="example-margin" value="male">Male</mat-radio-button>
+                          <mat-radio-button class="example-margin" value="female">Female</mat-radio-button>
+                        </mat-radio-group>
+                      </section>
+
+                      <mat-error *ngIf="
+                          mngForm.get('gender').invalid &&
+                          mngForm.get('gender').touched
+                        ">
+                        Please select Gender
+                      </mat-error>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Marital Status</mat-label>
+                        <mat-select formControlName="maritalStatus">
+                          <mat-option *ngFor="let status of maritalStatusArray" [value]="status">{{ status
+                            }}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="
+                            mngForm.get('maritalStatus').invalid &&
+                            mngForm.get('maritalStatus').touched
+                          ">
+                          Please enter a valid Marital Status
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div *ngIf="mngForm.get('maritalStatus').value === 'Married'"
+                      class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-label>Marriage Certificate</mat-label>
+                      <div class="row">
+                        <div class="col-6" *ngIf="pageFunction !== 'Add'">
+                          <button matTooltip="DOWNLOAD PREVIOUS ATTACHMENT" mat-mini-fab color="primary"
+                            (click)="downloadDocument()" class="mat-button-custom">
+                            <mat-icon class="col-white">cloud_download</mat-icon>
+                          </button>
+                        </div>
+                        <div class="col-6 file-upload">
+                          <button matTooltip="SELECT NEW ATTACHMENT" mat-mini-fab color="primary" class="upload-btn"
+                            (click)="fileInput.click()">
+                            <mat-icon>attach_file</mat-icon>
+                          </button>
+                          <input type="file" class="form-controls" (change)="handleFileInput($event)" accept=".pdf"
+                            style="display: none" #fileInput />
+                          <div class="file-name-display">
+                            {{ file_name || "No file selected." }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="disabled">Disabled</mat-checkbox>
+                    </div>
+
+                    <div *ngIf="mngForm.get('disabled').value" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Disabled Registration Number</mat-label>
+                        <input matInput formControlName="disabledRegNo" />
+                        <mat-error *ngIf="
+                            mngForm.get('disabledRegNo').invalid &&
+                            mngForm.get('disabledRegNo').touched
+                          ">
+                          Please enter a valid Disabled Registration Number
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button mat-raised-button color="accent" (click)="cancel()">
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                      Next
+                    </button>
+                  </div>
+                </form>
+              </mat-step>
+              <mat-step>
+                <ng-template matStepLabel>Home Address</ng-template>
+                <form [formGroup]="mngForm">
+                  <div class="row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Nationality</mat-label>
+                        <input matInput formControlName="nationality" />
+                        <mat-error *ngIf="
+                            mngForm.get('nationality').invalid &&
+                            mngForm.get('nationality').touched
+                          ">
+                          Please enter a valid Nationality
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>County</mat-label>
+                        <input matInput formControlName="county" />
+                        <mat-error *ngIf="
+                            mngForm.get('county').invalid &&
+                            mngForm.get('county').touched
+                          ">
+                          Please enter a valid County
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Sub-County</mat-label>
+                        <input matInput formControlName="subCounty" />
+                        <mat-error *ngIf="
+                            mngForm.get('subCounty').invalid &&
+                            mngForm.get('subCounty').touched
+                          ">
+                          Please enter a valid Sub-County
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Residential Country</mat-label>
+                        <input matInput formControlName="residentialCountry" />
+                        <mat-error *ngIf="
+                            mngForm.get('residentialCountry').invalid &&
+                            mngForm.get('residentialCountry').touched
+                          ">
+                          Please enter a valid Residential Country
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Residential County</mat-label>
+                        <input matInput formControlName="residentialCounty" />
+                        <mat-error *ngIf="
+                            mngForm.get('residentialCounty').invalid &&
+                            mngForm.get('residentialCounty').touched
+                          ">
+                          Please enter a valid Residential County
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Residential Sub-County</mat-label>
+                        <input matInput formControlName="residentialSubCounty" />
+                        <mat-error *ngIf="
+                            mngForm.get('residentialSubCounty').invalid &&
+                            mngForm.get('residentialSubCounty').touched
+                          ">
+                          Please enter a valid Residential Sub-County
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Postal Address</mat-label>
+                        <input matInput formControlName="postalAddress" />
+                        <mat-error *ngIf="
+                            mngForm.get('postalAddress').invalid &&
+                            mngForm.get('postalAddress').touched
+                          ">
+                          Please enter a valid Postal Address
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Postal Code</mat-label>
+                        <input matInput formControlName="postalCode" />
+                        <mat-error *ngIf="
+                            mngForm.get('postalCode').invalid &&
+                            mngForm.get('postalCode').touched
+                          ">
+                          Please enter a valid Postal Code
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>City</mat-label>
+                        <input matInput formControlName="city" />
+                        <mat-error *ngIf="
+                            mngForm.get('city').invalid &&
+                            mngForm.get('city').touched
+                          ">
+                          Please enter a valid City
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button mat-raised-button color="accent" matStepperPrevious>
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                      Next
+                    </button>
+                  </div>
+                </form>
+              </mat-step>
+              <mat-step>
+                <ng-template matStepLabel>Contact Details</ng-template>
+                <form [formGroup]="mngForm">
+                  <div class="row">
+                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Personal Phone Number</mat-label>
+                        <input matInput formControlName="personalPhone" />
+                        <mat-error *ngIf="
+                            mngForm.get('personalPhone').invalid &&
+                            mngForm.get('personalPhone').touched
+                          ">
+                          Please enter a valid Personal Phone Number
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Alternative Phone</mat-label>
+                        <input matInput formControlName="alternativePhone" />
+                        <mat-error *ngIf="
+                            mngForm.get('alternativePhone').invalid &&
+                            mngForm.get('alternativePhone').touched
+                          ">
+                          Please enter a valid Alternative Phone Number
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Personal Email Address</mat-label>
+                        <input matInput formControlName="personalEmail" />
+                        <mat-error *ngIf="
+                            mngForm.get('personalEmail').invalid &&
+                            mngForm.get('personalEmail').touched
+                          ">
+                          Please enter a valid Personal Email Address
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Alternative Email</mat-label>
+                        <input matInput formControlName="alternativeEmail" />
+                        <mat-error *ngIf="
+                            mngForm.get('alternativeEmail').invalid &&
+                            mngForm.get('alternativeEmail').touched
+                          ">
+                          Please enter a valid Alternative Email Address
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button mat-raised-button color="accent" matStepperPrevious>
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                      Next
+                    </button>
+                  </div>
+                </form>
+              </mat-step>
+             
+              <mat-step>
+                <ng-template matStepLabel>Next of Kin Details</ng-template>
+                <ng-container>
+                  <form [formGroup]="nextOfKinForm">
+                    <ng-container *ngIf="showParTranForm1">
+                      <div class="row">
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Full Name</mat-label>
+                            <input matInput formControlName="name"/>
+                            <mat-error *ngIf="nextOfKinForm.get('name').invalid && nextOfKinForm.get('name').touched">
+                              Please enter a valid Full Name
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                        
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Phone Number</mat-label>
+                            <input matInput formControlName="phoneNumber" />
+                            <mat-error *ngIf="
+                                nextOfKinForm.get('phoneNumber').invalid &&
+                                nextOfKinForm.get('phoneNumber').touched
+                              ">
+                              Please enter a valid Phone Number
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Email</mat-label>
+                            <input matInput formControlName="email" />
+                            <mat-error *ngIf="
+                                nextOfKinForm.get('email').invalid &&
+                                nextOfKinForm.get('email').touched
+                              ">
+                              Please enter a valid Email Address
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Street Address</mat-label>
+                            <input matInput formControlName="address" />
+                            <mat-error *ngIf="
+                                nextOfKinForm.get('address').invalid &&
+                                nextOfKinForm.get('address').touched
+                              ">
+                              Please enter a valid Street Address
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Relationship</mat-label>
+                            <input matInput formControlName="relationship" />
+                            <mat-error *ngIf="
+                                nextOfKinForm.get('relationship').invalid &&
+                                nextOfKinForm.get('relationship').touched
+                              ">
+                              Please enter a valid Relationship
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Percentage Allocation</mat-label>
+                            <input matInput type="number" formControlName="percentageAllocation" (input)="calculateRemainingAllocation()"/>
+                            <mat-error *ngIf="nextOfKinForm.get('percentageAllocation')?.invalid && nextOfKinForm.get('percentageAllocation')?.touched">
+                              Please enter a valid percentage (0 - 100)
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                              <mat-label>Remaining Allocation</mat-label>
+                              <input matInput type="number" formControlName="remainingAllocation" readonly />
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                          <div class="example-button-row" align="start">
+                            <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                              [disabled]="!nextOfKinForm.valid || posting" [hidden]="viewMode"
+                              (click)="pushToDataSource1()">
+                              {{ parTranAction1 }} Qualification
+                            </button>
+
+                            <button mat-raised-button color="warn" (click)="cancelParTran1()" tabindex="-1">
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <mat-tab-group>
+                      <mat-tab>
+                        <ng-template mat-tab-label>
+                          <mat-icon>receipt</mat-icon> All Next of Kin
+                        </ng-template>
+
+                        <div class="row m-1">
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="table-responsiv">
+                              <div class="materialTableHeader">
+                                <div class="row">
+                                  <div class="col-8">
+                                    <ul class="header-buttons-left ms-0">
+                                      <li class="dropdown">
+                                        <h2>Next Of Kin</h2>
+                                      </li>
+                                      <li class="dropdown m-l-20">
+                                        <label for="search-input"><i
+                                            class="material-icons search-icon">search</i></label>
+                                        <input placeholder="Filter..." type="text" (keyup)="applyFilter1($event)"
+                                          #filter class="browser-default search-field" aria-label="Search box" />
+                                      </li>
+                                      <li>
+                                        <div class="m-l-10" matTooltip="ADD">
+                                          <button mat-mini-fab color="primary" (click)="addParTran1()">
+                                            <mat-icon class="col-white">add</mat-icon>
+                                          </button>
+                                        </div>
+                                      </li>
+                                      <li>
+                                        <div class="m-l-10" matTooltip="REFRESH">
+                                          <button mat-mini-fab color="primary" (click)="refresh1()">
+                                            <mat-icon class="col-white">refresh</mat-icon>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+
+                                  <div class="col-4">
+                                    <ul class="header-buttons">
+                                      <li>
+                                        <div class="export-button m-l-10" matTooltip="XLSX">
+                                          <img src="assets/images/icons/xlsx.png" alt="" (click)="
+                                              exporter.exportTable('xlsx', {
+                                                fileName: 'assets-list',
+                                                sheet: 'sheet1'
+                                              })
+                                            " />
+                                        </div>
+                                      </li>
+                                      <li>
+                                        <div class="export-button m-l-10" matTooltip="CSV">
+                                          <img src="assets/images/icons/csv.png" alt="" (click)="
+                                              exporter.exportTable('csv')
+                                            " />
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <mat-table #table matTableExporter [dataSource]="dataSource1" matSort class="mat-cell"
+                                #exporter="matTableExporter">
+                                <!-- ID Column -->
+                                <ng-container matColumnDef="id">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-10">ID</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-10">
+                                    {{ row.id ? row.id : "#" }}
+                                  </mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="name">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Name</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.name }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="phoneNumber">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Phone Number</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.phoneNumber }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="email">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Email</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.email }}</mat-cell>
+                                </ng-container>
+                                
+
+                                <ng-container matColumnDef="address">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Address</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.address }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="relationship">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Relationship</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.relationship }}</mat-cell>
+                                </ng-container>
+
+                                 <ng-container matColumnDef="percentageAllocation">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Percentage</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.percentageAllocation }}%
+                                  </mat-cell>
+                                </ng-container>
+
+                                <!-- Action Buttons -->
+                                <ng-container matColumnDef="action">
+                                  <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-15 pr-0"
+                                    *matHeaderCellDef>
+                                    Action
+                                  </mat-header-cell>
+                                  <mat-cell *matCellDef="let row; let i = index"
+                                    class="column-nowrap psl-3 tbl-col-width-per-15 pr-0">
+                                    <!-- Edit Button -->
+                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                                      (click)="editParTran1(row, i)" class="tbl-action-btn">
+                                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
+                                      </app-feather-icons>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                                      (click)="deleteParTran1(i)" class="tbl-action-btn">
+                                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
+                                      </app-feather-icons>
+                                    </button>
+                                  </mat-cell>
+                                </ng-container>
+
+                                <mat-header-row *matHeaderRowDef="displayedColumns1"></mat-header-row>
+                                <mat-row *matRowDef="
+                                    let row;
+                                    columns: displayedColumns1
+                                  " (click)="editParTran1(row, i)" [style.cursor]="'pointer'" matRipple>
+                                </mat-row>
+                                <mat-cell *matNoDataRow colspan="8">
+                                  No data matching the filter "{{
+                                  input1.value
+                                  }}"</mat-cell>
+                              </mat-table>
+                              <div *ngIf="dataSource1.data.length === 0" class="tbl-spinner">
+                                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                                </mat-progress-spinner>
+                              </div>
+                              <mat-paginator [pageSize]="10" [pageSizeOptions]="[
+                                  2, 5, 10, 20, 30, 40, 50, 100
+                                ]" aria-label="Select page of users"></mat-paginator>
+                            </div>
+                          </div>
+                        </div>
+                      </mat-tab>
+                    </mat-tab-group>
+                  </form>
+                </ng-container>
+
+                <div>
+                  <button mat-raised-button color="accent" matStepperPrevious>
+                    Back
+                  </button>
+                  <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                    Next
+                  </button>
+                </div>
+              </mat-step>
+
+            <mat-step>
+                <ng-template matStepLabel>Client Details</ng-template>
+
+                <ng-container>
+                  <form [formGroup]="workExpForm">
+                    <ng-container *ngIf="showParTranForm4">
+                      <div class="row">
+                        <div class="col-md-3 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Company Name</mat-label>
+                            <input matInput formControlName="companyName" />
+                            <mat-error *ngIf="
+                                workExpForm.get('companyName').invalid &&
+                                workExpForm.get('companyName').touched
+                              ">
+                              Please enter a valid Company Name
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Work Position</mat-label>
+                            <input matInput formControlName="workPosition" />
+                            <mat-error *ngIf="
+                                workExpForm.get('workPosition').invalid &&
+                                workExpForm.get('workPosition').touched
+                              ">
+                              Please enter a valid Work Position
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>Start Date (MM/DD/YYYY)</mat-label>
+                            <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" />
+                            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #startDatePicker></mat-datepicker>
+                            <mat-error *ngIf="
+                                workExpForm.get('startDate').invalid &&
+                                workExpForm.get('startDate').touched
+                              ">
+                              Please enter a valid Start Date
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12 mb-1">
+                          <mat-form-field class="example-full-width" appearance="outline">
+                            <mat-label>End Date (MM/DD/YYYY)</mat-label>
+                            <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" />
+                            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #endDatePicker></mat-datepicker>
+                            <mat-error *ngIf="
+                                workExpForm.get('endDate').invalid &&
+                                workExpForm.get('endDate').touched
+                              ">
+                              Please enter a valid End Date
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                          <div class="example-button-row" align="start">
+                            <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                              [disabled]="!workExpForm.valid || posting" [hidden]="viewMode"
+                              (click)="pushToDataSource4()">
+                              {{ parTranAction4 }} Experience
+                            </button>
+
+                            <button mat-raised-button color="warn" (click)="cancelParTran4()" tabindex="-1">
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <mat-tab-group>
+                      <mat-tab>
+                        <ng-template mat-tab-label>
+                          <mat-icon>receipt</mat-icon> All Experience Details
+                        </ng-template>
+
+                        <div class="row m-1">
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="table-responsiv">
+                              <div class="materialTableHeader">
+                                <div class="row">
+                                  <div class="col-8">
+                                    <ul class="header-buttons-left ms-0">
+                                      <li class="dropdown">
+                                        <h2>Experience</h2>
+                                      </li>
+                                      <li class="dropdown m-l-20">
+                                        <label for="search-input"><i
+                                            class="material-icons search-icon">search</i></label>
+                                        <input placeholder="Filter..." type="text" (keyup)="applyFilter4($event)"
+                                          #filter class="browser-default search-field" aria-label="Search box" />
+                                      </li>
+                                      <li>
+                                        <div class="m-l-10" matTooltip="ADD">
+                                          <button mat-mini-fab color="primary" (click)="addParTran4()">
+                                            <mat-icon class="col-white">add</mat-icon>
+                                          </button>
+                                        </div>
+                                      </li>
+                                      <li>
+                                        <div class="m-l-10" matTooltip="REFRESH">
+                                          <button mat-mini-fab color="primary" (click)="refresh4()">
+                                            <mat-icon class="col-white">refresh</mat-icon>
+                                          </button>
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+
+                                  <div class="col-4">
+                                    <ul class="header-buttons">
+                                      <li>
+                                        <div class="export-button m-l-10" matTooltip="XLSX">
+                                          <img src="assets/images/icons/xlsx.png" alt="" (click)="
+                                              exporter.exportTable('xlsx', {
+                                                fileName: 'assets-list',
+                                                sheet: 'sheet1'
+                                              })
+                                            " />
+                                        </div>
+                                      </li>
+                                      <li>
+                                        <div class="export-button m-l-10" matTooltip="CSV">
+                                          <img src="assets/images/icons/csv.png" alt="" (click)="
+                                              exporter.exportTable('csv')
+                                            " />
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <mat-table #table matTableExporter [dataSource]="dataSource4" matSort class="mat-cell"
+                                #exporter="matTableExporter">
+                                <!-- ID Column -->
+                                <ng-container matColumnDef="id">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-10">ID</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-10">
+                                    {{ row.id ? row.id : "#" }}
+                                  </mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="companyName">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Company Name</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.companyName }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="workPosition">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Work Position</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.workPosition }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="startDate">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">Start Date</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.startDate | date: 'short' }}</mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="endDate">
+                                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                                    class="column-nowrap psl-3 tbl-col-width-per-20">End Date</mat-header-cell>
+                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
+                                    row.endDate| date: 'short' }}</mat-cell>
+                                </ng-container>
+
+                                <!-- Action Buttons -->
+                                <ng-container matColumnDef="action">
+                                  <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-15 pr-0"
+                                    *matHeaderCellDef>
+                                    Action
+                                  </mat-header-cell>
+                                  <mat-cell *matCellDef="let row; let i = index"
+                                    class="column-nowrap psl-3 tbl-col-width-per-15 pr-0">
+                                    <!-- Edit Button -->
+                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                                      (click)="editParTran4(row, i)" class="tbl-action-btn">
+                                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
+                                      </app-feather-icons>
+                                    </button>
+
+                                    <!-- Delete Button -->
+                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                                      (click)="deleteParTran4(i)" class="tbl-action-btn">
+                                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
+                                      </app-feather-icons>
+                                    </button>
+                                  </mat-cell>
+                                </ng-container>
+
+                                <mat-header-row *matHeaderRowDef="displayedColumns4"></mat-header-row>
+                                <mat-row *matRowDef="
+                                    let row;
+                                    columns: displayedColumns4
+                                  " (click)="editParTran4(row, i)" [style.cursor]="'pointer'" matRipple>
+                                </mat-row>
+                                <mat-cell *matNoDataRow colspan="8">
+                                  No data matching the filter "{{
+                                  input4.value
+                                  }}"</mat-cell>
+                              </mat-table>
+                              <div *ngIf="dataSource4.data.length === 0" class="tbl-spinner">
+                                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                                </mat-progress-spinner>
+                              </div>
+                              <mat-paginator [pageSize]="10" [pageSizeOptions]="[
+                                  2, 5, 10, 20, 30, 40, 50, 100
+                                ]" aria-label="Select page of users"></mat-paginator>
+                            </div>
+                          </div>
+                        </div>
+                      </mat-tab>
+                    </mat-tab-group>
+                  </form>
+                </ng-container>
+
+                <div>
+                  <button mat-raised-button color="accent" matStepperPrevious>
+                    Back
+                  </button>
+                  <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                    Next
+                  </button>
+                </div>
+              </mat-step>
+             <mat-step>
+                <ng-template matStepLabel>Submit</ng-template>
+                <div>
+                  <p>
+                    Review your information and click "Submit" to complete the
+                    process.
+                  </p>
+
+                  <div>
+                    <button mat-raised-button color="accent" matStepperPrevious>
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="warn" (click)="stepper.reset()">
+                      Reset
+                    </button>
+                    <!-- [disabled]="!mngForm.valid || posting" -->
+                    <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
+                      [disabled]="posting" [hidden]="viewMode" (click)="onSubmit()">
+                      {{ pageFunction }} Client
+                    </button>
+                  </div>
+                </div>
+              </mat-step>
+            </mat-horizontal-stepper>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
