@@ -29,7 +29,7 @@ export class ManageEmployeesComponent implements OnInit {
   currentUserCode: any;
   formData: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
-
+  prefillClientId: string = '';
   downloadLoading: boolean = false;
   hideSubmit = false;
   hideApprovals: boolean = true;
@@ -117,13 +117,25 @@ ngOnInit(): void {
   this.route.queryParams.subscribe((params) => {
     console.log("params: ", params);
     
+    // Check if we need to prefill clientId
+    if (params.prefillClientId && params.requestCode) {
+      this.prefillClientId = params.requestCode;
+      console.log("Prefill Client ID set to:", this.prefillClientId);
+    }
+    
     if (params.requestCode && params.requestCode.trim() !== '') {
       this.requestCode = params.requestCode;
-      this.requestId = params.requestId; 
+      this.requestId = params.requestId;
       this.pageFunction = params.action; 
       console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
       
-      this.getDataByClientId(); 
+      // Only call getDataByClientId if we're NOT in Add mode with prefill
+      if (this.pageFunction === "Add" && params.prefillClientId) {
+        console.log("Add mode with prefill - skipping data fetch, going straight to form");
+        this.getPage(); // Go straight to form generation
+      } else {
+        this.getDataByClientId(); // For View/Update modes, fetch data
+      }
     } else {
       this.pageFunction = "Add";
       console.log("No valid clientId, setting pageFunction to Add");
@@ -305,8 +317,8 @@ getDataByClientId() {
     console.log("generateForm formData :: ", formData);
     this.mngForm = this.fb.group({
       id: [formData?.id ?? ""],
-
-      clientId: [formData?.clientId ?? "", Validators.required],
+      clientId: [this.pageFunction === "Add" && this.prefillClientId? this.prefillClientId : formData?.clientId ?? "",Validators.required],
+    //  clientId: [formData?.clientId ?? "", Validators.required],
       applicationId: [formData?.applicationId ?? "", Validators.required],
       title: [formData?.title ?? "", Validators.required],
       clientType: [formData?.clientType ?? "", Validators.required],
@@ -410,6 +422,18 @@ getDataByClientId() {
       ],
       
     });
+    
+    if (this.pageFunction === "Add" && this.prefillClientId) {
+    console.log("Applying prefill to clientId:", this.prefillClientId);
+    this.mngForm.patchValue({
+      clientId: this.prefillClientId
+    });
+    
+    setTimeout(() => {
+      console.log("Verified clientId value:", this.mngForm.get('clientId')?.value);
+    }, 100);
+  }
+
      if (formData?.addresses && formData.addresses.length > 0) {
       formData.addresses.forEach(address => {
         this.addAddress(address);
@@ -420,7 +444,7 @@ getDataByClientId() {
     if (this.pageFunction === "Add") {
       const storedData = localStorage.getItem("mngFormDataEmployee");
       if (storedData) {
-        this.mngForm.patchValue(JSON.parse(storedData));
+       // this.mngForm.patchValue(JSON.parse(storedData));
 
         this.onPopulateTables(JSON.parse(storedData));
 
@@ -430,6 +454,7 @@ getDataByClientId() {
         localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
       });
     }
+    
     
   }
 

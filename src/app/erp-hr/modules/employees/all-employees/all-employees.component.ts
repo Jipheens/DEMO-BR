@@ -5,7 +5,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { Subject, takeUntil, Subscription } from "rxjs";
+import { Subject, takeUntil, Subscription, debounceTime, distinctUntilChanged } from "rxjs";
 import { NotificationServiceService } from "src/@core/Models/Notification/notification-service.service";
 import { SnackbarService } from "src/app/shared/services/snackbar.service";
 import Swal from "sweetalert2";
@@ -40,7 +40,7 @@ export class AllEmployeesComponent implements OnInit {
   ];
 
   loading: boolean = false;
-  data: any;
+  data: any[];
   error: any;
   dialogConfig: any;
   destroy$: Subject<boolean> = new Subject<boolean>();
@@ -86,14 +86,20 @@ export class AllEmployeesComponent implements OnInit {
   ngOnInit(): void {
   this.Form = this.fb.group({
     status: ["ALL"],
-    enrollmentStatus: ["ALL"],
-    departmentCode: ["ALL"],
-    branchCode: ["ALL"],
+    clientIdFilter: [""]
   });
   
   // Call getData initially to load the hardcoded data
   this.getData();
   
+      this.Form.get('clientIdFilter')?.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(clientId => {
+        this.applyClientIdFilter(clientId);
+      });
   // Remove or comment out the valueChanges subscription since we're using hardcoded data
   // this.Form.valueChanges.subscribe(() => {
   //   this.getData();
@@ -221,22 +227,86 @@ export class AllEmployeesComponent implements OnInit {
   });
 }
 
+  applyClientIdFilter(clientId: string) {
+    if (!clientId || clientId.trim() === '') {
+      this.dataSource.filter = '';
+      return;
+    }
+    
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      return data.clientId.toLowerCase().includes(filter.toLowerCase());
+    };
+    
+    this.dataSource.filter = clientId.trim().toLowerCase();
+    
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  clientIdExists(clientId: string): boolean {
+    return this.data.some(item => item.clientId === clientId);
+  }
+
+  searchClient() {
+    const clientId = this.Form.get('clientIdFilter')?.value;
+    if (clientId && clientId.trim() !== '') {
+      this.applyClientIdFilter(clientId);
+    }
+  }
+
+  quickAddClient() {
+    const clientId = this.Form.get('clientIdFilter')?.value;
+    if (clientId && clientId.trim() !== '') {
+      if (this.clientIdExists(clientId)) {
+        this.snackbar.showNotification("snackbar-warning", "Client ID already exists. Use edit instead.");
+      } else {
+        this.mngRecord('Add');
+      }
+    } else {
+      this.snackbar.showNotification("snackbar-warning", "Please enter a Client ID first.");
+    }
+  }
+
   refresh() {
+    this.Form.get('clientIdFilter')?.setValue('');
+    this.Form.get('status')?.setValue('ALL');
+    this.selectedStatus = 'ALL';
     this.getData();
   }
 
- mngRecord(action: any, record?: any) {
-    console.log("this.action:; ", action);
-    console.log("this.record:; ", record);
-      let route = "/erp-hr/employees/manage-employees";
-      this.router.navigate([route], {
-        queryParams: {
-          requestCode: record.clientId,
-          requestId: record.id,
-          action: action,
-        },
-      });
+//  mngRecord(action: any, record?: any) {
+//     console.log("this.action:; ", action);
+//     console.log("this.record:; ", record);
+//       let route = "/erp-hr/employees/manage-employees";
+//       this.router.navigate([route], {
+//         queryParams: {
+//           requestCode: record.clientId,
+//           requestId: record.id,
+//           action: action,
+//         },
+//       });
     
+//   }
+  mngRecord(action: any, record?: any) {
+    console.log("Action:", action);
+    console.log("Record:", record);
+    
+    let route = "/erp-hr/employees/manage-employees";
+    let queryParams: any = { action: action };
+    
+    if (record && record.clientId) {
+      queryParams.requestCode = record.clientId;
+      queryParams.requestId = record.id || '';
+    } else if (action === 'Add') {
+      const typedClientId = this.Form.get('clientIdFilter')?.value;
+      if (typedClientId && typedClientId.trim() !== '') {
+        queryParams.requestCode = typedClientId;
+        queryParams.prefillClientId = true; 
+      }
+    }
+    
+    this.router.navigate([route], { queryParams: queryParams });
   }
 
   // deleteRecord(id: number) {
