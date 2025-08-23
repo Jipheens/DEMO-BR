@@ -1,45 +1,81 @@
 {
-  "employees": [
+  "requests": [
     {
-      "id": 1,
-      "RequestID": "7z6ez9rvrt9beh8j5pb0g",
-      "RequestData": {
+    "RequestID": "qhjbd1hlsbcau9okter02g",
+    "RequestData": {
         "id": "",
+        "clientId": "121434",
+        "applicationId": "254254",
+        "title": "MR",
+        "clientType": "Corporate",
+        "baseId": "4235242",
+        "residentStatus": "Kenyan - Resident",
+        "relationshipManager": "020606",
+        "identificationType": "Passport",
+        "passportNumber": "23524542",
+        "idExpiryDate": "2025-08-18T21:00:00.000Z",
+        "canSendGreetings": true,
+        "canSendAssociateSpecialOffer": true,
+        "canSendOurSpecialOffers": false,
+        "statementOnline": true,
+        "mobileAlert": false,
         "firstName": "jipheens",
-        "middleName": "",
-        "lastName": "wahome",
-        "dob": "2025-08-17T21:00:00.000Z",
-        "postalAddress": "",
-        "postalCode": "",
-        "personalPhone": "",
+        "middleName": "wahome",
+        "lastName": "Gicheru",
+        "dob": "2016-06-28T21:00:00.000Z",
+        "nationalId": "252524545",
+        "religion": "Islam",
+        "gender": "male",
+        "disabled": false,
+        "disabledRegNo": "",
+        "addresses": [
+            {
+                "addressType": "Work",
+                "residentialCountry": "Kenya",
+                "residentialCounty": "NAIROBI",
+                "residentialSubCounty": "RONGAI",
+                "city": "NAIROBI",
+                "postalAddress": "3656",
+                "postalCode": "4363",
+                "isPrimary": true
+            },
+            {
+                "addressType": "Home",
+                "residentialCountry": "Kenya",
+                "residentialCounty": "NAIROBI",
+                "residentialSubCounty": "OK",
+                "city": "NAIROBI",
+                "postalAddress": "KITUI",
+                "postalCode": "100",
+                "isPrimary": false
+            }
+        ],
+        "personalPhone": "0708586099",
         "alternativePhone": "",
         "personalEmail": "pamelamumbua2014@gmail.com",
         "alternativeEmail": "pamelamumbua2014@gmail.com",
         "nextOfKins": [
-          {
-            "name": "JAY",
-            "phoneNumber": "0727398084",
-            "email": "pamelamumbua2014@gmail.com",
-            "address": "KITUI",
-            "relationship": "SISTER",
-            "percentageAllocation": 100
-          }
+            {
+                "name": "james",
+                "phoneNumber": "0727398084",
+                "email": "pamelamumbua2014@gmail.com",
+                "address": "KITUI",
+                "relationship": "son",
+                "percentageAllocation": 100
+            }
         ],
-        "dependants": [
-          {
-            "dependantName": "JIPHEENS",
-            "dependantDob": "2025-08-24T21:00:00.000Z",
-            "birthCertNo": "365",
-            "dependantPhone": "",
-            "dependantEmail": "",
-            "dependantCertFile": ""
-          }
+        "employeeWorkExperiences": [
+            {
+                "companyName": "craft",
+                "workPosition": "dev",
+                "startDate": "2025-08-19T21:00:00.000Z",
+                "endDate": "2025-08-19T21:00:00.000Z"
+            }
         ],
-        "employeeWorkExperiences": [],
-        "kraNo": "544343643"
-      },
-      "RequestTime": "2025-08-22T17:13:27.347Z",
-      "AppName": "CLIENT_DATA"
-    }
+        "kraNo": "R4324324"
+    },
+    "RequestTime": "2025-08-23T12:39:12.302Z",
+    "AppName": "CLIENT_DATA"
+}
   ]
 }

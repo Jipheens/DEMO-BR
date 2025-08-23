@@ -25,7 +25,7 @@
                           <div class="row">
                             <div class="col-6">
                               <div class="chat-about">
-                                <div class="chat-with">HOD Approval</div>
+                                <div class="chat-with">Posted By</div>
                                 <div class="chat-num-messages mt-2">
                                   <div class="badge badge-hod">
                                     {{ formData.hodVerifierStatus }}
@@ -62,17 +62,17 @@
                           <div class="row">
                             <div class="col-6">
                               <div class="chat-about">
-                                <div class="chat-with">HR Approval</div>
+                                <div class="chat-with">Posted Date</div>
                                 <div class="chat-num-messages mt-2">
                                   <div class="badge badge-finance">
-                                    {{ formData.hrVerifierStatus }}
+                                    {{ formData.RequestTimeStamp | date:'medium' }}
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div class="col-6">
                               <div class="chat-about">
-                                <div class="chat-with">Approved By</div>
+                                <div class="chat-with">Approved Date</div>
                                 <div class="chat-num-messages mt-2">
                                   <div class="badge badge-finance-approved">
                                     {{ formData.hrVerifiedBy }}
@@ -81,18 +81,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col-12">
-                              <div class="chat-about mt-1">
-                                <div class="chat-with remarks">
-                                  <strong> Remarks:</strong>
-                                  <span class="remarks-content mx-2">{{
-                                    formData.hrVerifiedRemarks
-                                    }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -101,6 +90,143 @@
               </div>
             </div>
             <mat-horizontal-stepper [linear]="false" #stepper>
+  <mat-step>
+  <ng-template matStepLabel>Client Identification</ng-template>
+  <form [formGroup]="mngForm">
+    <div class="row">
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Client ID</mat-label>
+          <input matInput formControlName="clientId" [readonly]="pageFunction !== 'Add'" />
+          <mat-error *ngIf="mngForm.get('clientId')?.invalid && mngForm.get('clientId')?.touched">
+            Client ID is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Application ID</mat-label>
+          <input matInput formControlName="applicationId" />
+          <mat-error *ngIf="
+                            mngForm.get('applicationId')?.invalid && mngForm.get('applicationId')?.touched">
+            Application ID is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+        <mat-label>Title</mat-label>
+        <mat-select formControlName="title">
+          <mat-option *ngFor="let title of titleOptions" [value]="title">{{ title }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="mngForm.get('title')?.invalid && mngForm.get('title')?.touched">
+          Please select a title
+        </mat-error>
+      </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Client Type</mat-label>
+          <mat-select formControlName="clientType">
+            <mat-option *ngFor="let type of clientTypeOptions" [value]="type">{{ type }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="
+                            mngForm.get('clientType')?.invalid && mngForm.get('clientType')?.touched">
+            Please select a client type
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Base ID</mat-label>
+          <input matInput formControlName="baseId" />
+          <mat-error *ngIf="
+                            mngForm.get('baseId')?.invalid && mngForm.get('baseId')?.touched">
+            Base ID is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Resident Status</mat-label>
+          <mat-select formControlName="residentStatus">
+            <mat-option *ngFor="let status of residentStatusOptions" [value]="status">{{ status }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="
+                            mngForm.get('residentStatus')?.invalid && mngForm.get('residentStatus')?.touched">
+            Please select resident status
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Relationship Manager</mat-label>
+          <mat-select formControlName="relationshipManager">
+            <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
+              {{ manager.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="
+                            mngForm.get('relationshipManager')?.invalid && mngForm.get('relationshipManager')?.touched">
+            Please select a relationship manager
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Identification Type</mat-label>
+          <mat-select formControlName="identificationType">
+            <mat-option *ngFor="let idType of identificationTypeOptions" [value]="idType">{{ idType }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="
+                            mngForm.get('identificationType')?.invalid && mngForm.get('identificationType')?.touched">
+            Please select identification type
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Passport Number</mat-label>
+          <input matInput formControlName="passportNumber" />
+          <mat-error *ngIf="
+                            mngForm.get('passportNumber')?.invalid && mngForm.get('passportNumber')?.touched">
+            Please enter a valid passport number
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+        <mat-form-field class="example-full-width" appearance="outline">
+          <mat-label>Identification Expiry Date</mat-label>
+          <input matInput [matDatepicker]="idExpiryPicker" formControlName="idExpiryDate" />
+          <mat-datepicker-toggle matSuffix [for]="idExpiryPicker"></mat-datepicker-toggle>
+          <mat-datepicker #idExpiryPicker></mat-datepicker>
+          <mat-error *ngIf="
+                            mngForm.get('idExpiryDate')?.invalid && mngForm.get('idExpiryDate')?.touched">
+            Please select a valid expiry date
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <button mat-raised-button color="accent" (click)="cancel()">
+        Back
+      </button>
+      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+        Next
+      </button>
+    </div>
+  </form>
+</mat-step>
               <mat-step>
                 <ng-template matStepLabel>Basic Information</ng-template>
                 <form [formGroup]="mngForm">
@@ -171,7 +297,7 @@
                         </mat-error>
                       </mat-form-field>
                     </div>
-                                        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
                         <mat-label>KRA Number</mat-label>
                         <input matInput formControlName="kraNo" />
@@ -217,46 +343,6 @@
                     </div>
 
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Marital Status</mat-label>
-                        <mat-select formControlName="maritalStatus">
-                          <mat-option *ngFor="let status of maritalStatusArray" [value]="status">{{ status
-                            }}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="
-                            mngForm.get('maritalStatus').invalid &&
-                            mngForm.get('maritalStatus').touched
-                          ">
-                          Please enter a valid Marital Status
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div *ngIf="mngForm.get('maritalStatus').value === 'Married'"
-                      class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-label>Marriage Certificate</mat-label>
-                      <div class="row">
-                        <div class="col-6" *ngIf="pageFunction !== 'Add'">
-                          <button matTooltip="DOWNLOAD PREVIOUS ATTACHMENT" mat-mini-fab color="primary"
-                            (click)="downloadDocument()" class="mat-button-custom">
-                            <mat-icon class="col-white">cloud_download</mat-icon>
-                          </button>
-                        </div>
-                        <div class="col-6 file-upload">
-                          <button matTooltip="SELECT NEW ATTACHMENT" mat-mini-fab color="primary" class="upload-btn"
-                            (click)="fileInput.click()">
-                            <mat-icon>attach_file</mat-icon>
-                          </button>
-                          <input type="file" class="form-controls" (change)="handleFileInput($event)" accept=".pdf"
-                            style="display: none" #fileInput />
-                          <div class="file-name-display">
-                            {{ file_name || "No file selected." }}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-checkbox formControlName="disabled">Disabled</mat-checkbox>
                     </div>
 
@@ -285,141 +371,98 @@
                 </form>
               </mat-step>
               <mat-step>
-                <ng-template matStepLabel>Home Address</ng-template>
-                <form [formGroup]="mngForm">
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Nationality</mat-label>
-                        <input matInput formControlName="nationality" />
-                        <mat-error *ngIf="
-                            mngForm.get('nationality').invalid &&
-                            mngForm.get('nationality').touched
-                          ">
-                          Please enter a valid Nationality
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
+  <ng-template matStepLabel>Addresses</ng-template>
+  <form [formGroup]="mngForm">
+    <div formArrayName="addresses" *ngIf="mngForm.get('addresses')">
+      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-section">
+        <h3>Address {{i + 1}} <span *ngIf="address.get('isPrimary')?.value">(Primary)</span></h3>
+        
+        <div class="row">
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Address Type</mat-label>
+              <mat-select formControlName="addressType">
+                <mat-option value="Home">Home</mat-option>
+                <mat-option value="Work">Work</mat-option>
+                <mat-option value="Mailing">Mailing</mat-option>
+                <mat-option value="Other">Other</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Residential Country</mat-label>
+              <mat-select formControlName="residentialCountry">
+                <mat-option *ngFor="let country of countries" [value]="country.name">
+                  {{ country.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>County</mat-label>
-                        <input matInput formControlName="county" />
-                        <mat-error *ngIf="
-                            mngForm.get('county').invalid &&
-                            mngForm.get('county').touched
-                          ">
-                          Please enter a valid County
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Residential County</mat-label>
+              <input matInput formControlName="residentialCounty" />
+            </mat-form-field>
+          </div>
 
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Sub-County</mat-label>
-                        <input matInput formControlName="subCounty" />
-                        <mat-error *ngIf="
-                            mngForm.get('subCounty').invalid &&
-                            mngForm.get('subCounty').touched
-                          ">
-                          Please enter a valid Sub-County
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                  </div>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Residential Sub-County</mat-label>
+              <input matInput formControlName="residentialSubCounty" />
+            </mat-form-field>
+          </div>
 
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Residential Country</mat-label>
-                        <input matInput formControlName="residentialCountry" />
-                        <mat-error *ngIf="
-                            mngForm.get('residentialCountry').invalid &&
-                            mngForm.get('residentialCountry').touched
-                          ">
-                          Please enter a valid Residential Country
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="city" />
+            </mat-form-field>
+          </div>
 
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Residential County</mat-label>
-                        <input matInput formControlName="residentialCounty" />
-                        <mat-error *ngIf="
-                            mngForm.get('residentialCounty').invalid &&
-                            mngForm.get('residentialCounty').touched
-                          ">
-                          Please enter a valid Residential County
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Postal Address</mat-label>
+              <input matInput formControlName="postalAddress" />
+            </mat-form-field>
+          </div>
 
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Residential Sub-County</mat-label>
-                        <input matInput formControlName="residentialSubCounty" />
-                        <mat-error *ngIf="
-                            mngForm.get('residentialSubCounty').invalid &&
-                            mngForm.get('residentialSubCounty').touched
-                          ">
-                          Please enter a valid Residential Sub-County
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                  </div>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Postal Code</mat-label>
+              <input matInput formControlName="postalCode" />
+            </mat-form-field>
+          </div>
 
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Postal Address</mat-label>
-                        <input matInput formControlName="postalAddress" />
-                        <mat-error *ngIf="
-                            mngForm.get('postalAddress').invalid &&
-                            mngForm.get('postalAddress').touched
-                          ">
-                          Please enter a valid Postal Address
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Postal Code</mat-label>
-                        <input matInput formControlName="postalCode" />
-                        <mat-error *ngIf="
-                            mngForm.get('postalCode').invalid &&
-                            mngForm.get('postalCode').touched
-                          ">
-                          Please enter a valid Postal Code
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>City</mat-label>
-                        <input matInput formControlName="city" />
-                        <mat-error *ngIf="
-                            mngForm.get('city').invalid &&
-                            mngForm.get('city').touched
-                          ">
-                          Please enter a valid City
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button mat-raised-button color="accent" matStepperPrevious>
-                      Back
-                    </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                      Next
-                    </button>
-                  </div>
-                </form>
-              </mat-step>
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-checkbox formControlName="isPrimary">Primary Address</mat-checkbox>
+          </div>
+          
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1" *ngIf="addresses.length > 1">
+            <button mat-mini-fab color="warn" (click)="removeAddress(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button mat-raised-button color="primary" (click)="addAddress()">
+      Add Another Address
+    </button>
+    
+    <div>
+      <button mat-raised-button color="accent" matStepperPrevious>
+        Back
+      </button>
+      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+        Next
+      </button>
+    </div>
+  </form>
+</mat-step>
               <mat-step>
                 <ng-template matStepLabel>Contact Details</ng-template>
                 <form [formGroup]="mngForm">
@@ -771,7 +814,7 @@
               </mat-step>
 
             <mat-step>
-                <ng-template matStepLabel>Client Details</ng-template>
+                <ng-template matStepLabel>Employment Details</ng-template>
 
                 <ng-container>
                   <form [formGroup]="workExpForm">
@@ -854,7 +897,7 @@
                     <mat-tab-group>
                       <mat-tab>
                         <ng-template mat-tab-label>
-                          <mat-icon>receipt</mat-icon> All Experience Details
+                          <mat-icon>receipt</mat-icon> All Employment Details
                         </ng-template>
 
                         <div class="row m-1">
@@ -1011,6 +1054,37 @@
                     Next
                   </button>
                 </div>
+              </mat-step>
+                            <mat-step>
+                <ng-template matStepLabel>Special Offers</ng-template>
+                <form [formGroup]="mngForm">
+                  <div class="row">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="canSendGreetings">Can Send Greetings</mat-checkbox>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="canSendAssociateSpecialOffer">Can Send Associate Special Offer</mat-checkbox>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="canSendOurSpecialOffers">Can Send Our Special Offers</mat-checkbox>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="statementOnline">Statement Online</mat-checkbox>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+                      <mat-checkbox formControlName="mobileAlert">Mobile Alert</mat-checkbox>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button mat-raised-button color="accent" matStepperPrevious>
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                      Next
+                    </button>
+                  </div>
+                </form>
               </mat-step>
              <mat-step>
                 <ng-template matStepLabel>Submit</ng-template>

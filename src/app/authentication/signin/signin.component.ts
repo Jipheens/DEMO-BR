@@ -102,109 +102,109 @@ export class SigninComponent
     }
   }
 
-  onSubmit() {
-    this.tokenCookieService.deleteUser();
-    this.submitted = true;
-    this.loading = true;
-    this.error = "";
-    
-    if (this.authForm.invalid) {
-      this.error = "Please fill all required fields!";
-      this.loading = false;
-      return;
-    }
-    
-    const loginData = {
-      operatorID: this.authForm.value.username,
-      password: this.authForm.value.password,
-      branchID: this.authForm.value.branchID
-    };
-
-    this.authService.login(loginData)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          console.log("res: ", res.body);
-
-          if (res.body.statusCode == 200) {
-            this.tokenCookieService.saveUser(res.body.entity);
-            
-            this.snackbar.showNotification(
-              "snackbar-success",
-              res.body.message
-            );
-            this.router.navigate(["/erp-dashboard/main"]);
-          } else {
-            this.snackbar.showNotification("snackbar-danger", res.body.message);
-          }
-
-          this.loading = false;
-        },
-        error: (err) => {
-          console.log("err::: ", err)
-          if (err.status === 401) {
-            this.snackbar.showNotification(
-                "snackbar-danger",
-                "Authentication failed: Please check your credentials and try again."
-            );
-          } else if (err.status === 500) {
-            this.snackbar.showNotification(
-                "snackbar-danger",
-                "Please ensure the username is valid or contact the System Administrator for assistance!"
-            );
-          } else {
-            this.snackbar.showNotification(
-              "snackbar-danger",
-              err.message
-            );
-          }
-          
-          this.loading = false;
-        }
-      });
-  }
-
-  //   onSubmit() {
+  // onSubmit() {
+  //   this.tokenCookieService.deleteUser();
   //   this.submitted = true;
   //   this.loading = true;
   //   this.error = "";
-  
-  //   const hardcodedUsername = "admin";
-  //   const hardcodedPassword = "password123";
-  //   const hardcodedbranchID = "00";
-
-  //   const enteredUsername = this.authForm.value.username;
-  //   const enteredPassword = this.authForm.value.password;
-  //   const enteredbranchID = this.authForm.value.branchID;
-  //   if (enteredUsername === hardcodedUsername && enteredPassword === hardcodedPassword) {
-  //     console.log("Login successful");
-  
-      
-  //     const res = {
-  //       status: 200,
-  //       body: {
-  //         entity: {
-  //           message: "Login successful",
-            
-  //         }
-  //       }
-  //     };
-  
-      
-  //     if (res.status === 200) {
-  //       this.tokenCookieService.saveUser(res.body.entity); 
-  //       this.snackbar.showNotification("snackbar-success", res.body.entity.message);
-  //        this.router.navigate(["/erp-dashboard/main"]); 
-  //       this.loading = false;
-  //     } else {
-  //       this.error = res.body.entity.message; 
-  //       this.snackbar.showNotification("snackbar-danger", res.body.entity.message);
-  //       this.loading = false;
-  //     }
-  //   } else {
-  //     this.error = "Invalid Username or Password!";
-  //     this.snackbar.showNotification("snackbar-danger", this.error);
+    
+  //   if (this.authForm.invalid) {
+  //     this.error = "Please fill all required fields!";
   //     this.loading = false;
+  //     return;
   //   }
+    
+  //   const loginData = {
+  //     operatorID: this.authForm.value.username,
+  //     password: this.authForm.value.password,
+  //     branchID: this.authForm.value.branchID
+  //   };
+
+  //   this.authService.login(loginData)
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe({
+  //       next: (res) => {
+  //         console.log("res: ", res.body);
+
+  //         if (res.body.statusCode == 200) {
+  //           this.tokenCookieService.saveUser(res.body.entity);
+            
+  //           this.snackbar.showNotification(
+  //             "snackbar-success",
+  //             res.body.message
+  //           );
+  //           this.router.navigate(["/erp-dashboard/main"]);
+  //         } else {
+  //           this.snackbar.showNotification("snackbar-danger", res.body.message);
+  //         }
+
+  //         this.loading = false;
+  //       },
+  //       error: (err) => {
+  //         console.log("err::: ", err)
+  //         if (err.status === 401) {
+  //           this.snackbar.showNotification(
+  //               "snackbar-danger",
+  //               "Authentication failed: Please check your credentials and try again."
+  //           );
+  //         } else if (err.status === 500) {
+  //           this.snackbar.showNotification(
+  //               "snackbar-danger",
+  //               "Please ensure the username is valid or contact the System Administrator for assistance!"
+  //           );
+  //         } else {
+  //           this.snackbar.showNotification(
+  //             "snackbar-danger",
+  //             err.message
+  //           );
+  //         }
+          
+  //         this.loading = false;
+  //       }
+  //     });
   // }
+
+    onSubmit() {
+    this.submitted = true;
+    this.loading = true;
+    this.error = "";
+  
+    const hardcodedUsername = "admin";
+    const hardcodedPassword = "password123";
+    const hardcodedbranchID = "00";
+
+    const enteredUsername = this.authForm.value.username;
+    const enteredPassword = this.authForm.value.password;
+    const enteredbranchID = this.authForm.value.branchID;
+    if (enteredUsername === hardcodedUsername && enteredPassword === hardcodedPassword) {
+      console.log("Login successful");
+  
+      
+      const res = {
+        status: 200,
+        body: {
+          entity: {
+            message: "Login successful",
+            
+          }
+        }
+      };
+  
+      
+      if (res.status === 200) {
+        this.tokenCookieService.saveUser(res.body.entity); 
+        this.snackbar.showNotification("snackbar-success", res.body.entity.message);
+         this.router.navigate(["/erp-dashboard/main"]); 
+        this.loading = false;
+      } else {
+        this.error = res.body.entity.message; 
+        this.snackbar.showNotification("snackbar-danger", res.body.entity.message);
+        this.loading = false;
+      }
+    } else {
+      this.error = "Invalid Username or Password!";
+      this.snackbar.showNotification("snackbar-danger", this.error);
+      this.loading = false;
+    }
+  }
 }

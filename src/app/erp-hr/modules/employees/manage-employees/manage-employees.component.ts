@@ -1,7 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { HttpParams } from "@angular/common/http";
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, ValidationErrors, AbstractControl } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, ValidationErrors, AbstractControl, FormArray } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -12,6 +12,8 @@ import { TokenStorageService } from "src/app/core/service/token-storage.service"
 import { EmployeeService } from "src/app/erp-hr/data/employee-services/employee-management.service";
 import { EmployeesLookupComponent } from "src/app/erp-hr/hr-lookups/configurations-lookups/employees-lookup/employees-lookup.component";
 import { SnackbarService } from "src/app/shared/services/snackbar.service";
+import { COUNTRIES } from "./countries";
+import { MockDataService } from "../mock-data.service";
 
 @Component({
   selector: "app-manage-employees",
@@ -45,15 +47,26 @@ export class ManageEmployeesComponent implements OnInit {
     "Other",
   ];
 
-  maritalStatusArray: any = [
-    "Single",
-    "Married",
-    "Divorced",
-    "Separated",
-    "Widow",
-    "Widower",
-    "Prefer not to say",
+
+  titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG'];
+  clientTypeOptions = ['Corporate', 'Minor', 'Employee', 'Individual'];
+  identificationTypeOptions = ['ID', 'Alien ID', 'Passport', 'Military ID'];
+  residentStatusOptions = [
+    'Kenyan - Resident', 
+    'Kenyan - Non Resident', 
+    'Foreigner Resident', 
+    'Foreigner Non-Resident', 
+    'Minor - Local', 
+    'Minor- Foreigner'
   ];
+  
+  relationshipManagers = [
+    { id: '020606', name: 'ANUP JANTILAL SOLANKI' },
+    { id: '020607', name: 'JOHN DOE' },
+    { id: '020608', name: 'JANE SMITH' },
+  ];
+
+  countries = COUNTRIES;
   previousAllocation: any;
   constructor(
     private fb: FormBuilder,
@@ -63,12 +76,14 @@ export class ManageEmployeesComponent implements OnInit {
     private route: ActivatedRoute,
     private employeeService: EmployeeService,
     private dialog: MatDialog,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private mockDataService: MockDataService,
   ) {
     // this.currentUser = this.tokenStorageService.getUser().username;
     // this.currentUserCode = this.tokenStorageService.getUser().empPfNo;
     this.currentUser = 'Jipheens';
     this.currentUserCode = 'CSK-00280';
+    this.mngForm = this.fb.group({});
     this.generateSubForm1();
     this.generateSubForm4();
   }
@@ -76,58 +91,105 @@ export class ManageEmployeesComponent implements OnInit {
     this.destroy$.next(true);
     this.destroy$.complete();
   }
-  ngOnInit(): void {
-    this.getPage();
+  // ngOnInit(): void {
+  //   this.getPage();
 
-    if (
-      this.route.queryParams &&
-      typeof this.route.queryParams.subscribe === "function"
-    ) {
-      this.route.queryParams.subscribe((params) => {
-        console.log("params: ", params);
-        if (params.requestId) {
-          this.requestCode = params.requestCode;
-          this.requestId = params.requestId;
-          this.getDataById();
-          this.pageFunction = params.action;
-        }
-      });
-      this.showForm = true;
+  //   if (
+  //     this.route.queryParams &&
+  //     typeof this.route.queryParams.subscribe === "function"
+  //   ) {
+  //     this.route.queryParams.subscribe((params) => {
+  //       console.log("params: ", params);
+  //       if (params.requestId) {
+  //         this.requestCode = params.requestCode;
+  //         this.requestId = params.requestId;
+  //         this.getDataById();
+  //         this.pageFunction = params.action;
+  //       }
+  //     });
+  //     this.showForm = true;
+  //   } else {
+  //     this.showForm = true;
+  //   }
+  // }
+
+ngOnInit(): void {
+  this.route.queryParams.subscribe((params) => {
+    console.log("params: ", params);
+    
+    if (params.requestCode && params.requestCode.trim() !== '') {
+      this.requestCode = params.requestCode;
+      this.requestId = params.requestId; 
+      this.pageFunction = params.action; 
+      console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
+      
+      this.getDataByClientId(); 
     } else {
-      this.showForm = true;
+      this.pageFunction = "Add";
+      console.log("No valid clientId, setting pageFunction to Add");
+      this.getPage();
     }
-  }
+    this.showForm = true;
+  });
+}
+
   ngAfterViewInit() { }
 
-  getDataById() {
-    const params = new HttpParams().set("id", this.requestId);
-    this.employeeService
-      .readByEmployeeId(params)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          if (res.entity) {
-            this.formData = res.entity;
-            console.log("getDataById this.formData: ", this.formData);
-            if (this.pageFunction === "View") {
-              this.activateViewMode();
-            }
+  // getDataById() {
+  //   const params = new HttpParams().set("id", this.requestId);
+  //   this.employeeService
+  //     .readByEmployeeId(params)
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe({
+  //       next: (res) => {
+  //         if (res.entity) {
+  //           this.formData = res.entity;
+  //           console.log("getDataById this.formData: ", this.formData);
+  //           if (this.pageFunction === "View") {
+  //             this.activateViewMode();
+  //           }
 
-            this.onPopulateTables(res);
+  //           this.onPopulateTables(res);
 
-            this.getPage();
+  //           this.getPage();
 
-            this.showForm = true;
-          } else {
-            this.snackbar.showNotification("snackbar-danger", res.message);
-          }
-        },
-        error: (err) => {
-          this.snackbar.showNotification("snackbar-danger", err.message);
-        },
-        complete: () => { },
-      });
-  }
+  //           this.showForm = true;
+  //         } else {
+  //           this.snackbar.showNotification("snackbar-danger", res.message);
+  //         }
+  //       },
+  //       error: (err) => {
+  //         this.snackbar.showNotification("snackbar-danger", err.message);
+  //       },
+  //       complete: () => { },
+  //     });
+  // }
+
+getDataById() {
+  console.log("Getting data for ID:", this.requestId, "with action:", this.pageFunction);
+  
+  this.mockDataService.getById(this.requestCode).subscribe({
+    next: (res) => {
+      if (res.entity) {
+        this.formData = res.entity.RequestData || res.entity; 
+        console.log("getDataById this.formData: ", this.formData);
+        
+        if (this.pageFunction === "View") {
+          this.activateViewMode();
+        }
+
+        this.onPopulateTables({ entity: this.formData });
+        this.getPage(); 
+        this.showForm = true;
+      } else {
+        this.snackbar.showNotification("snackbar-danger", res.message);
+      }
+    },
+    error: (err) => {
+      this.snackbar.showNotification("snackbar-danger", err.message);
+    }
+  });
+}
   onPopulateTables(res) {
     if (res) {
       if (res.entity) {
@@ -162,34 +224,106 @@ export class ManageEmployeesComponent implements OnInit {
     }
   }
 
-  getPage(): void {
-    if (this.pageFunction === "Add") {
-      this.generateForm();
+  // getPage(): void {
+  //   if (this.pageFunction === "Add") {
+  //     this.generateForm();
 
-      this.hideApprovals = true;
-    } else if (this.pageFunction === "Update") {
-      this.generateForm(this.formData);
-      this.generateSubForm1();
-      this.hideApprovals = true;
-    } else if (this.pageFunction === "View") {
-      this.generateForm(this.formData);
-      this.generateSubForm1();
-      this.hideSubmit = true;
-      this.hideApprovals = true;
-    }
+  //     this.hideApprovals = true;
+  //   } else if (this.pageFunction === "Update") {
+  //     this.generateForm(this.formData);
+  //     this.generateSubForm1();
+  //     this.hideApprovals = true;
+  //   } else if (this.pageFunction === "View") {
+  //     this.generateForm(this.formData);
+  //     this.generateSubForm1();
+  //     this.hideSubmit = true;
+  //     this.hideApprovals = true;
+  //   }
+  // }
+
+getPage(): void {
+  console.log("getPage called with pageFunction:", this.pageFunction);
+  
+  if (this.pageFunction === "Add") {
+    this.generateForm();
+    this.hideApprovals = true;
+  } else if (this.pageFunction === "Update") {
+    this.generateForm(this.formData);
+    this.generateSubForm1();
+    this.hideApprovals = true;
+  } else if (this.pageFunction === "View") {
+    this.generateForm(this.formData);
+    this.generateSubForm1();
+    this.hideSubmit = true;
+    this.hideApprovals = true;
+    this.activateViewMode(); 
   }
+}
 
   viewMode: boolean = false;
   activateViewMode() {
     this.viewMode = true;
   }
 
+getDataByClientId() {
+  console.log("Getting data for Client ID:", this.requestCode, "with action:", this.pageFunction);
+  
+  if (!this.requestCode || this.requestCode.trim() === '') {
+    console.error("Invalid clientId:", this.requestCode);
+    this.snackbar.showNotification("snackbar-danger", "Invalid Client ID");
+    this.pageFunction = "Add"; 
+    this.getPage();
+    return;
+  }
+  
+  this.mockDataService.getByClientId(this.requestCode).subscribe({
+    next: (res) => {
+      if (res.entity) {
+        this.formData = res.entity.RequestData || res.entity;
+        console.log("getDataByClientId this.formData: ", this.formData);
+        
+        if (this.pageFunction === "View") {
+          this.activateViewMode();
+        }
+
+        this.onPopulateTables({ entity: this.formData });
+        this.getPage();
+        this.showForm = true;
+      } else {
+        this.snackbar.showNotification("snackbar-danger", res.message);
+      }
+    },
+    error: (err) => {
+      this.snackbar.showNotification("snackbar-danger", err.message);
+      this.pageFunction = "Add";
+      this.getPage();
+    }
+  });
+}
+
   generateForm(formData?): void {
     console.log("generateForm formData :: ", formData);
     this.mngForm = this.fb.group({
       id: [formData?.id ?? ""],
 
-      //Basic Info
+      clientId: [formData?.clientId ?? "", Validators.required],
+      applicationId: [formData?.applicationId ?? "", Validators.required],
+      title: [formData?.title ?? "", Validators.required],
+      clientType: [formData?.clientType ?? "", Validators.required],
+      baseId: [formData?.baseId ?? "", Validators.required],
+      residentStatus: [formData?.residentStatus ?? "", Validators.required],
+      relationshipManager: [formData?.relationshipManager ?? "", Validators.required],
+      identificationType: [formData?.identificationType ?? "", Validators.required],
+      passportNumber: [formData?.passportNumber ?? ""],
+      idExpiryDate: [formData?.idExpiryDate ?? ""],
+      
+      canSendGreetings: [formData?.canSendGreetings ?? false],
+      canSendAssociateSpecialOffer: [formData?.canSendAssociateSpecialOffer ?? false],
+      canSendOurSpecialOffers: [formData?.canSendOurSpecialOffers ?? false],
+      statementOnline: [formData?.statementOnline ?? false],
+      mobileAlert: [formData?.mobileAlert ?? false],
+
+
       empNo: [formData?.empNo ?? null],
       firstName: [
         formData?.firstName ?? "",
@@ -223,50 +357,13 @@ export class ManageEmployeesComponent implements OnInit {
       ],
       religion: [formData?.religion ?? "", Validators.required],
       gender: [formData?.gender ?? "male", Validators.required],
-      maritalStatus: [formData?.maritalStatus ?? "", Validators.required],
       disabled: [formData?.disabled ?? false],
       disabledRegNo: [
         formData?.disabledRegNo ?? ""
 
       ],
-      marriageCertificate: [""],
-
-      //Home Address
-      nationality: [
-        formData?.nationality ?? "Kenyan",
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(40),
-        ],
-      ],
-      county: [
-        formData?.county ?? ""
-
-      ],
-      subCounty: [
-        formData?.subCounty ?? ""
-
-      ],
-      residentialCountry: [
-        formData?.residentialCountry ?? "Kenya"
-
-      ],
-      residentialCounty: [
-        formData?.residentialCounty ?? ""
-
-      ],
-      residentialSubCounty: [
-        formData?.residentialSubCounty ?? ""
-
-      ],
-      city: [
-        formData?.city ?? ""
-
-      ],
-      postalAddress: [formData?.postalAddress ?? ""],
-      postalCode: [formData?.postalCode ?? ""],
-
+      addresses: this.fb.array([]),
+      
       //Contact Info
       personalPhone: [
         formData?.personalPhone ?? ""
@@ -313,7 +410,13 @@ export class ManageEmployeesComponent implements OnInit {
       ],
       
     });
- 
+     if (formData?.addresses && formData.addresses.length > 0) {
+      formData.addresses.forEach(address => {
+        this.addAddress(address);
+      });
+    } else {
+      this.addAddress();
+    }
     if (this.pageFunction === "Add") {
       const storedData = localStorage.getItem("mngFormDataEmployee");
       if (storedData) {
@@ -327,6 +430,32 @@ export class ManageEmployeesComponent implements OnInit {
         localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
       });
     }
+    
+  }
+
+    get addresses(): FormArray {
+    return this.mngForm.get('addresses') as FormArray;
+  }
+
+  createAddress(address?: any): FormGroup {
+    return this.fb.group({
+      addressType: [address?.addressType || 'Home', Validators.required],
+      residentialCountry: [address?.residentialCountry || 'Kenya', Validators.required],
+      residentialCounty: [address?.residentialCounty || '', Validators.required],
+      residentialSubCounty: [address?.residentialSubCounty || ''],
+      city: [address?.city || ''],
+      postalAddress: [address?.postalAddress || ''],
+      postalCode: [address?.postalCode || ''],
+      isPrimary: [address?.isPrimary || false]
+    });
+  }
+
+  addAddress(address?: any): void {
+    this.addresses.push(this.createAddress(address));
+  }
+
+  removeAddress(index: number): void {
+    this.addresses.removeAt(index);
   }
 
 generateTempId(): string {
@@ -659,7 +788,7 @@ generateSubForm1(formData?, isEdit = false): void {
       this.base64File = reader.result as string;
       this.file_name = file.name;
       this.mngForm.patchValue({
-        marriageCertificate: this.base64File,
+       // marriageCertificate: this.base64File,
       });
     };
 
@@ -714,7 +843,167 @@ generateSubForm1(formData?, isEdit = false): void {
   }
   posting: boolean = false;
  
-  onSubmit() {
+//   onSubmit() {
+//   this.posting = true;
+
+//   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
+//     return sum + (kin.percentageAllocation || 0);
+//   }, 0);
+
+//   if (totalAllocation !== 100) {
+//     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
+//     this.posting = false; 
+//     return; 
+//   }
+
+//   let formValue = this.mngForm.value;
+//   if (!formValue.empNo) {
+//     delete formValue.empNo;
+//   }
+
+//   console.log("this.mngForm.value: ", formValue);
+
+//   if (this.mngForm.valid) {
+//     const formattedRequest = {
+//       RequestID: this.generateRandomId(), 
+//       //RequestData: JSON.stringify(formValue), 
+//       RequestData: formValue,
+//       RequestTime: new Date().toISOString(), 
+//       AppName: "CLIENT_DATA" 
+//     };
+
+//     console.log("Formatted Request: ", formattedRequest);
+
+//     if (this.pageFunction == "Add") {
+//       this.employeeService
+//         .create(formattedRequest) 
+//         .pipe(takeUntil(this.destroy$))
+//         .subscribe({
+//           next: (res) => {
+//             console.log("res: ", res);
+
+//             if (res.statusCode == 201) {
+//               this.snackbar.showNotification("snackbar-success", res.message);
+//               this.cancel();
+//             } else {
+//               this.snackbar.showNotification("snackbar-danger", res.message);
+//             }
+//           },
+//           error: (err) => {
+//             this.snackbar.showNotification("snackbar-danger", err.message);
+//             this.posting = false;
+//           },
+//           complete: () => {
+//             this.posting = false;
+//           },
+//         });
+//     } else if (this.pageFunction == "Update") {
+//       this.employeeService
+//         .update(formattedRequest) 
+//         .pipe(takeUntil(this.destroy$))
+//         .subscribe({
+//           next: (res) => {
+//             if (res.statusCode == 200) {
+//               this.snackbar.showNotification("snackbar-success", res.message);
+//               this.cancel();
+//             } else {
+//               this.snackbar.showNotification("snackbar-danger", res.message);
+//             }
+//           },
+//           error: (err) => {
+//             this.snackbar.showNotification("snackbar-danger", err.message);
+//             this.posting = false;
+//           },
+//           complete: () => {
+//             this.posting = false;
+//           },
+//         });
+//     }
+//   } else {
+//     this.displayInvalidFields();
+//     this.posting = false;
+//   }
+// }
+
+
+
+//second submit for testing mock api
+
+// onSubmit() {
+//   this.posting = true;
+
+//   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
+//     return sum + (kin.percentageAllocation || 0);
+//   }, 0);
+
+//   if (totalAllocation !== 100) {
+//     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
+//     this.posting = false; 
+//     return; 
+//   }
+
+//   let formValue = this.mngForm.value;
+//   if (!formValue.empNo) {
+//     delete formValue.empNo;
+//   }
+
+//   console.log("this.mngForm.value: ", formValue);
+
+//   if (this.mngForm.valid) {
+//     const formattedRequest = {
+//       RequestID: this.generateRandomId(), 
+//       RequestData: formValue,
+//       RequestTime: new Date().toISOString(), 
+//       AppName: "CLIENT_DATA" 
+//     };
+
+//     console.log("Formatted Request: ", formattedRequest);
+
+//     if (this.pageFunction == "Add") {
+//       this.mockDataService.create(formattedRequest).subscribe({
+//         next: (res) => {
+//           console.log("Mock response: ", res);
+//           if (res.statusCode == 201) {
+//             this.snackbar.showNotification("snackbar-success", res.message);
+//             this.cancel();
+//           } else {
+//             this.snackbar.showNotification("snackbar-danger", res.message);
+//           }
+//         },
+//         error: (err) => {
+//           this.snackbar.showNotification("snackbar-danger", err.message);
+//           this.posting = false;
+//         },
+//         complete: () => {
+//           this.posting = false;
+//         },
+//       });
+//     } else if (this.pageFunction == "Update") {
+//       this.mockDataService.update(formattedRequest).subscribe({
+//         next: (res) => {
+//           if (res.statusCode == 200) {
+//             this.snackbar.showNotification("snackbar-success", res.message);
+//             this.cancel();
+//           } else {
+//             this.snackbar.showNotification("snackbar-danger", res.message);
+//           }
+//         },
+//         error: (err) => {
+//           this.snackbar.showNotification("snackbar-danger", err.message);
+//           this.posting = false;
+//         },
+//         complete: () => {
+//           this.posting = false;
+//         },
+//       });
+//     }
+//   } else {
+//     this.displayInvalidFields();
+//     this.posting = false;
+//   }
+// }
+
+onSubmit() {
   this.posting = true;
 
   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
@@ -735,10 +1024,24 @@ generateSubForm1(formData?, isEdit = false): void {
   console.log("this.mngForm.value: ", formValue);
 
   if (this.mngForm.valid) {
+    let requestId: string;
+    let clientId: string;
+
+    if (this.pageFunction === "Update") {
+      requestId = this.requestId || this.formData?.id || this.generateRandomId();
+      clientId = this.requestCode || this.formData?.clientId || formValue.clientId;
+    } else {
+      requestId = this.generateRandomId();
+      clientId = formValue.clientId || this.generateClientId();
+    }
+
     const formattedRequest = {
-      RequestID: this.generateRandomId(), 
-      //RequestData: JSON.stringify(formValue), 
-      RequestData: formValue,
+      RequestID: requestId, 
+      RequestData: {
+        ...formValue,
+        id: requestId, 
+        clientId: clientId 
+      },
       RequestTime: new Date().toISOString(), 
       AppName: "CLIENT_DATA" 
     };
@@ -746,54 +1049,51 @@ generateSubForm1(formData?, isEdit = false): void {
     console.log("Formatted Request: ", formattedRequest);
 
     if (this.pageFunction == "Add") {
-      this.employeeService
-        .create(formattedRequest) 
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (res) => {
-            console.log("res: ", res);
-
-            if (res.statusCode == 201) {
-              this.snackbar.showNotification("snackbar-success", res.message);
-              this.cancel();
-            } else {
-              this.snackbar.showNotification("snackbar-danger", res.message);
-            }
-          },
-          error: (err) => {
-            this.snackbar.showNotification("snackbar-danger", err.message);
-            this.posting = false;
-          },
-          complete: () => {
-            this.posting = false;
-          },
-        });
+      this.mockDataService.create(formattedRequest).subscribe({
+        next: (res) => {
+          console.log("Mock response: ", res);
+          if (res.statusCode == 201) {
+            this.snackbar.showNotification("snackbar-success", res.message);
+            this.cancel();
+          } else {
+            this.snackbar.showNotification("snackbar-danger", res.message);
+          }
+        },
+        error: (err) => {
+          this.snackbar.showNotification("snackbar-danger", err.message);
+          this.posting = false;
+        },
+        complete: () => {
+          this.posting = false;
+        },
+      });
     } else if (this.pageFunction == "Update") {
-      this.employeeService
-        .update(formattedRequest) 
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (res) => {
-            if (res.statusCode == 200) {
-              this.snackbar.showNotification("snackbar-success", res.message);
-              this.cancel();
-            } else {
-              this.snackbar.showNotification("snackbar-danger", res.message);
-            }
-          },
-          error: (err) => {
-            this.snackbar.showNotification("snackbar-danger", err.message);
-            this.posting = false;
-          },
-          complete: () => {
-            this.posting = false;
-          },
-        });
+      this.mockDataService.update(formattedRequest).subscribe({
+        next: (res) => {
+          if (res.statusCode == 200) {
+            this.snackbar.showNotification("snackbar-success", res.message);
+            this.cancel();
+          } else {
+            this.snackbar.showNotification("snackbar-danger", res.message);
+          }
+        },
+        error: (err) => {
+          this.snackbar.showNotification("snackbar-danger", err.message);
+          this.posting = false;
+        },
+        complete: () => {
+          this.posting = false;
+        },
+      });
     }
   } else {
     this.displayInvalidFields();
     this.posting = false;
   }
+}
+
+generateClientId(): string {
+  return 'CL' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
 generateRandomId(): string {
