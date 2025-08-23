@@ -1,68 +1,3 @@
-<!-- <section class="content">
-  <div class="content-block">
-    <div class="block-header">
-    </div>
-    <app-gen-widgets></app-gen-widgets>  
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="body">
-            <div class="row align-items-center">
-              <div class="col-md-2 p-2">
-                <img src="assets/images/pngegg8.png" alt="" width="250px" height="170px" class="px-2 mx-2">
-              </div>
-              
-              <div class="col-md-10">
-                <h4 class="font-20 weight-500 mb-2">
-                  Welcome back <div class="weight-600 font-30 col-green pt-1">{{currentUser}}!</div>
-                </h4>
-                <p class="font-18 max-width-600">We strive to offer a seamless payment and invoicing experience to meet your needs. For any inquiries or concerns, please don't hesitate to reach out to us. Thank you for choosing us..</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-
-    <div class="row">
-      <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12">
-        <div class="card bg-dark-green text-white">
-          <div class="header">
-            <h2>Weekly Order Overview</h2>
-          </div>
-          <div class="body">
-            <apx-chart [series]="barChartOptions.series" [chart]="barChartOptions.chart"
-              [dataLabels]="barChartOptions.dataLabels" [plotOptions]="barChartOptions.plotOptions"
-              [responsive]="barChartOptions.responsive" [xaxis]="barChartOptions.xaxis"
-              [legend]="barChartOptions.legend" [colors]="barChartOptions.colors" [tooltip]="barChartOptions.tooltip"
-              [fill]="barChartOptions.fill">
-            </apx-chart>
-          </div>
-        </div>
-      </div>
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
-        <div class="card bg-dark-green text-white">
-          <div class="header">
-            <h2>Top Selling Products</h2>
-          </div>
-          <div class="body">
-            <apx-chart [series]="radialChartOptions.radialseries" [chart]="radialChartOptions.chart"
-              [plotOptions]="radialChartOptions.plotOptions" [labels]="radialChartOptions.labels"></apx-chart>
-            <div class="text-center p-t-20">
-              <button mat-stroked-button color="primary">View Products</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    
-  </div>
-</section> -->
-
 <section class="content">
   <div class="content-block">
     <div class="block-header">
@@ -194,7 +129,17 @@
             margin-bottom: 10px;
             color: var(--primary);
         }
-        
+        .card.bg-dark-green .header {
+  background: linear-gradient(120deg, var(--primary), var(--secondary));
+  padding: 1rem;
+}
+
+.card.bg-dark-green .body {
+  background: #1a1a1a; /* solid dark background */
+  padding: 1rem;
+  border-radius: 0 0 1rem 1rem;
+}
+
         .action-item:hover .action-icon {
             color: white;
         }
@@ -349,10 +294,8 @@
                 </div>
             </div>
             
-            <!-- Banking Widgets -->
             <app-gen-widgets></app-gen-widgets>
             
-            <!-- Welcome Card -->
             <div class="row">
                 <div class="col-lg-12">
                     <div class="welcome-card">
@@ -377,7 +320,6 @@
                 </div>
             </div>
 
-            <!-- Quick Actions and Stats -->
             <div class="row">
                 <div class="col-xl-3 col-lg-6 col-md-6">
                     <div class="card">
@@ -535,7 +477,7 @@
                             <div style="height: 250px; background-color: rgba(255, 255, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                                 <div class="text-center p-4">
                                     <i class="fas fa-chart-bar fa-3x text-white mb-3"></i>
-                                    <p class="text-white">Banking activity chart would be displayed here</p>
+                                    <p class="text-white">Banking activity chart loading...</p>
                                 </div>
                             </div>
                             

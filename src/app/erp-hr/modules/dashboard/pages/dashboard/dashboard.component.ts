@@ -35,6 +35,7 @@ export type chartOptions = {
   colors: string[];
   responsive: ApexResponsive[];
   labels: string[];
+  
 };
 
 @Component({
@@ -49,7 +50,7 @@ export class DashboardComponent implements OnInit {
   public gaugeChartOptions: Partial<chartOptions>;
   public stackBarChart: Partial<chartOptions>;
   constructor(private tokenStorageService: TokenStorageService) {}
-
+ currentDate: Date = new Date();
 
 
 currentUser: any;
