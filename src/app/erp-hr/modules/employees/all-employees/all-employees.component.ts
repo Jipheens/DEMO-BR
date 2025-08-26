@@ -152,11 +152,9 @@ export class AllEmployeesComponent implements OnInit {
   //   this.dataSource.sort = this.sort;
 
   //   this.selectedStatus = this.Form.value.status;
-  //   this.selectedEnrollmentStatus = this.Form.value.enrollmentStatus;
 
   //   console.log(
   //     "this.selectedEnrollmentStatus:: ",
-  //     this.selectedEnrollmentStatus
   //   );
   //   let params = {
   //     status: this.Form.value.status,
@@ -170,7 +168,7 @@ export class AllEmployeesComponent implements OnInit {
   //     .pipe(takeUntil(this.destroy$))
   //     .subscribe({
   //       next: (res) => {
-  //         if (res.statusCode === 302) {
+  //         if (res.ResponseCode === 302) {
   //           this.data = res.entity;
   //           console.log("Data displayed on table", this.data);
 
@@ -196,29 +194,52 @@ export class AllEmployeesComponent implements OnInit {
 
   getData() {
   this.loading = true;
-  this.mockDataService.getAll().pipe(takeUntil(this.destroy$)).subscribe({
-    next: (data) => {
-      this.data = data.map(item => {
-        const clientData = item.RequestData || item;
-        console.log("clientData: ", clientData);
-        return {
-          id: item.RequestID || clientData.id,
-          clientId: clientData.clientId,
-          fullName: `${clientData.firstName || ''} ${clientData.middleName || ''} ${clientData.lastName || ''}`.trim(),
-          nationalId: clientData.nationalId,
-          personalPhone: clientData.personalPhone,
-          personalEmail: clientData.personalEmail,
-          dob: clientData.dob,
-          gender: clientData.gender,
-          status: clientData.status || 'ACTIVE', 
-          ...clientData 
-        };
-      });
-      
-      this.dataSource = new MatTableDataSource(this.data);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      this.loading = false;
+      const formattedRequest = {
+      RequestID: this.generateRandomId(),
+      RequestData: {
+        SearchID: "clientId",
+        Filter: `ClientTypeID = 'I'`,
+        WhereStmt: `clientId like '%%'`,
+        SortBy: "clientId asc",
+        PrevOrNext: "1",
+        Reference: "",
+        LoggedInUserId: "jipheens",
+        ModuleID: 1000,
+        OurBranchID: "002"
+      },
+      RequestTime: new Date().toISOString(),
+      AppName: "CLIENT_DATA"
+    };
+    this.employeeService.searchClients(formattedRequest).subscribe({
+    next: (res) => {
+    console.log("this is the res: ", res);
+    let results = res?.Details?.SearchResults;
+    if (!Array.isArray(results)) {
+    results = results ? [results] : [];
+  }
+  if (results.length === 0) {
+    this.snackbar.showNotification("snackbar-info", "Client not found or does not exist");
+    this.data = [];
+    this.dataSource = new MatTableDataSource([]);
+  } else {
+    this.data = results.map(item => ({
+      clientId: item.ClientID || item.clientId || '',
+      fullName: item.Name || item.fullName || '',
+      nationalId: item.IDNumber || item.IDNumber || '',
+      clientType: item.ClientType || item.clientType || '',
+      personalEmail: item.PersonalEmail || item.personalEmail || '',
+      gender: item.Gender || item.gender || '',
+      dob: item.DOB || item.dob || '',
+      status: item.Status || item.status || '',
+      age: item.DOB ? this.calculateAge(item.DOB) : (item.dob ? this.calculateAge(item.dob) : ''),
+      ...item
+    }));
+    console.log("Table data after search:", this.data);
+    this.dataSource = new MatTableDataSource(this.data);
+  }
+  this.dataSource.paginator = this.paginator;
+  this.dataSource.sort = this.sort;
+  this.loading = false;
     },
     error: (err) => {
       this.snackbar.showNotification("snackbar-danger", err.message);
@@ -248,12 +269,72 @@ export class AllEmployeesComponent implements OnInit {
     return this.data.some(item => item.clientId === clientId);
   }
 
-  searchClient() {
-    const clientId = this.Form.get('clientIdFilter')?.value;
-    if (clientId && clientId.trim() !== '') {
-      this.applyClientIdFilter(clientId);
-    }
+
+searchClient() {
+  const clientId = this.Form.get('clientIdFilter')?.value?.trim();
+  if (clientId) {
+    const formattedRequest = {
+      RequestID: this.generateRandomId(),
+      RequestData: {
+        SearchID: "clientId",
+        Filter: `ClientTypeID = 'I'`,
+        WhereStmt: `clientId like '%${clientId}%'`,
+        SortBy: "clientId asc",
+        PrevOrNext: "1",
+        Reference: "",
+        LoggedInUserId: "jipheens",
+        ModuleID: 1000,
+        OurBranchID: "002"
+      },
+      RequestTime: new Date().toISOString(),
+      AppName: "CLIENT_DATA"
+    };
+    console.log("Formatted Request: ", formattedRequest);
+    this.loading = true;
+    this.employeeService.searchClients(formattedRequest).subscribe({
+    next: (res) => {
+    console.log("this is the res: ", res);
+    let results = res?.Details?.SearchResults;
+    if (!Array.isArray(results)) {
+    results = results ? [results] : [];
   }
+  if (results.length === 0) {
+    this.snackbar.showNotification("snackbar-info", "Client not found or does not exist");
+    this.data = [];
+    this.dataSource = new MatTableDataSource([]);
+  } else {
+    this.data = results.map(item => ({
+      clientId: item.ClientID || item.clientId || '',
+      fullName: item.Name || item.fullName || '',
+      nationalId: item.IDNumber || item.IDNumber || '',
+      clientType: item.ClientType || item.clientType || '',
+      personalEmail: item.PersonalEmail || item.personalEmail || '',
+      gender: item.Gender || item.gender || '',
+      dob: item.DOB || item.dob || '',
+      status: item.Status || item.status || '',
+      age: item.DOB ? this.calculateAge(item.DOB) : (item.dob ? this.calculateAge(item.dob) : ''),
+      ...item
+    }));
+    console.log("Table data after search:", this.data);
+    this.dataSource = new MatTableDataSource(this.data);
+  }
+  this.dataSource.paginator = this.paginator;
+  this.dataSource.sort = this.sort;
+  this.loading = false;
+},
+      error: (err) => {
+        this.snackbar.showNotification("snackbar-danger", err.message || "Search failed");
+        this.data = [];
+        this.dataSource = new MatTableDataSource([]);
+        this.loading = false;
+      }
+    });
+  }
+}
+generateRandomId(): string {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
+}
 
   quickAddClient() {
     const clientId = this.Form.get('clientIdFilter')?.value;

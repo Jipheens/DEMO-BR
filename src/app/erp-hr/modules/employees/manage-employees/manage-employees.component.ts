@@ -116,25 +116,26 @@ export class ManageEmployeesComponent implements OnInit {
 ngOnInit(): void {
   this.route.queryParams.subscribe((params) => {
     console.log("params: ", params);
-    
-    // Check if we need to prefill clientId
+
     if (params.prefillClientId && params.requestCode) {
       this.prefillClientId = params.requestCode;
       console.log("Prefill Client ID set to:", this.prefillClientId);
     }
-    
+
     if (params.requestCode && params.requestCode.trim() !== '') {
       this.requestCode = params.requestCode;
       this.requestId = params.requestId;
-      this.pageFunction = params.action; 
+      this.pageFunction = params.action;
       console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
-      
-      // Only call getDataByClientId if we're NOT in Add mode with prefill
+
       if (this.pageFunction === "Add" && params.prefillClientId) {
         console.log("Add mode with prefill - skipping data fetch, going straight to form");
-        this.getPage(); // Go straight to form generation
+        this.getPage();
+      } else if (this.pageFunction === "View" || this.pageFunction === "Update") {
+        // Call getDataById for View or Update
+        this.getDataById(this.requestCode);
       } else {
-        this.getDataByClientId(); // For View/Update modes, fetch data
+        this.getPage();
       }
     } else {
       this.pageFunction = "Add";
@@ -177,31 +178,43 @@ ngOnInit(): void {
   //     });
   // }
 
-getDataById() {
-  console.log("Getting data for ID:", this.requestId, "with action:", this.pageFunction);
-  
-  this.mockDataService.getById(this.requestCode).subscribe({
-    next: (res) => {
-      if (res.entity) {
-        this.formData = res.entity.RequestData || res.entity; 
-        console.log("getDataById this.formData: ", this.formData);
-        
-        if (this.pageFunction === "View") {
-          this.activateViewMode();
-        }
-
-        this.onPopulateTables({ entity: this.formData });
-        this.getPage(); 
-        this.showForm = true;
-      } else {
-        this.snackbar.showNotification("snackbar-danger", res.message);
-      }
+getDataById(requestCode: string) {
+  const formattedRequest = {
+    RequestID: this.generateRandomId(),
+    RequestData: {
+      ClientID: requestCode
     },
-    error: (err) => {
-      this.snackbar.showNotification("snackbar-danger", err.message);
-    }
-  });
-}
+    RequestTime: new Date().toISOString(),
+    AppName: "CLIENT_DATA"
+  };
+  this.loading = true;
+  console.log("Fetching data for Client ID:", requestCode, "with payload:", formattedRequest);
+  this.employeeService.getClientById(formattedRequest).pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.entity) {
+            this.formData = res.entity;
+            console.log("getDataById this.formData: ", this.formData);
+            if (this.pageFunction === "View") {
+              this.activateViewMode();
+            }
+
+            this.onPopulateTables(res);
+
+            this.getPage();
+
+            this.showForm = true;
+          } else {
+            this.snackbar.showNotification("snackbar-danger", res.message);
+          }
+        },
+        error: (err) => {
+          this.snackbar.showNotification("snackbar-danger", err.message);
+        },
+        complete: () => { },
+      });
+  }
+
   onPopulateTables(res) {
     if (res) {
       if (res.entity) {

@@ -41,6 +41,27 @@ export class EmployeeService {
     );
   }
 
+  searchClients(request: any): Observable<any> {
+  const API_URL = `${environment.clintUrl}/api/v1/Shared/GetSystemSearch`;
+  const headers = this.headers.set('skipToken', 'true');
+  return this.http.post(API_URL, request, { headers }).pipe(
+     map((res) => {
+        return res || {};
+      }),
+      catchError(this.errorMgmt)
+    );
+  }
+
+
+getClientById(request: any): Observable<any> {
+  const API_URL = `${environment.clintUrl}/api/v1/ClientMaintenance/GetClient`;
+  const headers = this.headers.set('skipToken', 'true');
+  return this.http.post(API_URL, request, { headers }).pipe(
+    map((res) => res || {}),
+    catchError(this.errorMgmt)
+  );
+}
+
   updateMultiple(data: any): Observable<any> {
     let API_URL = `${this.baseURL}/migrate/update`;
     return this.http.put(API_URL, data, { headers: this.headers }).pipe(
