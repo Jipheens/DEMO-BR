@@ -282,14 +282,26 @@
                         <h1 class="mb-0">Customer module Dashboard</h1>
                         <p class="mb-0 mt-2">Welcome to your financial management portal</p>
                     </div>
-                    <div class="col-md-4 text-end">
+                    <!-- <div class="col-md-4 text-end">
                         <div class="d-flex align-items-center justify-content-end">
                             <div class="me-3">
                                 <div class="text-sm">Today's Date</div>
-                                <div class="fw-bold">Oct 16, 2023</div>
+                                <div class="fw-bold">{{currentDate}}.</div>
                             </div>
                             <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
                         </div>
+                    </div> -->
+                    <div class="col-md-4 text-end">
+                      <div class="d-flex align-items-center justify-content-end">
+                        <div class="me-3">
+                          <div class="text-sm">Today's Date</div>
+                          <div class="fw-bold">
+                            {{ currentDate | date:'fullDate' }} <br>
+                            <span class="fs-4 text-primary">{{ currentDate | date:'mediumTime' }}</span>
+                          </div>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
+                      </div>
                     </div>
                 </div>
             </div>

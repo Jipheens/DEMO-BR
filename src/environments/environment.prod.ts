@@ -55,6 +55,6 @@ export const environment = {
   clientUrlHR: "http://197.155.71.138:6301/administration",
   selfServiceUrlHR: "http://197.155.71.138:6301/portal",
   branchUrl:"http://localhost:5177",
-  clintUrl:"http://172.16.2.106:7030"
+  clintUrl:"http://172.17.50.10:6902"
 
 };

@@ -51,14 +51,22 @@ export class DashboardComponent implements OnInit {
   public stackBarChart: Partial<chartOptions>;
   constructor(private tokenStorageService: TokenStorageService) {}
  currentDate: Date = new Date();
-
+ private intervalId: any;
 
 currentUser: any;
   ngOnInit() {
     this.currentUser =this.tokenStorageService.getUser().username;
     this.chart1();
     this.chart2();
+        this.intervalId = setInterval(() => {
+      this.currentDate = new Date();
+    }, 1000);
 
+  }
+    ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
   private chart1() {
     this.barChartOptions = {
