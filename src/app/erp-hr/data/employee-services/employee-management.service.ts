@@ -20,7 +20,7 @@ export class EmployeeService {
   constructor(private http: HttpClient) {}
 
   create(data: any): Observable<any> {
-  let API_URL = `${environment.clintUrl}/api/v1/ClientMaintenance/GetClient`;
+  let API_URL = `${environment.clintUrl}/api/v1/ClientMaintenance/CreateClient`;
 
   const headers = this.headers.set('skipToken', 'true');
   return this.http.post(API_URL, data, { headers }).pipe(

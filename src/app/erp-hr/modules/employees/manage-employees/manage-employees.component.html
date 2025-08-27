@@ -1,7 +1,6 @@
 <section class="content">
   <div class="content-block">
     <div class="block-header">
-      <!-- breadcrumb -->
       <app-breadcrumb [title]="'Manage Client'" [items]="['Clients']" [active_item]="'Manage Client'">
       </app-breadcrumb>
     </div>
@@ -28,7 +27,7 @@
                                 <div class="chat-with">Posted By</div>
                                 <div class="chat-num-messages mt-2">
                                   <div class="badge badge-hod">
-                                    {{ formData.hodVerifierStatus }}
+                                    {{ formData.CreatedBy }}
                                   </div>
                                 </div>
                               </div>
@@ -57,7 +56,6 @@
                             </div>
                           </div>
                         </div>
-                        <!-- HR Verification -->
                         <div class="col-6">
                           <div class="row">
                             <div class="col-6">
@@ -65,7 +63,7 @@
                                 <div class="chat-with">Posted Date</div>
                                 <div class="chat-num-messages mt-2">
                                   <div class="badge badge-finance">
-                                    {{ formData.RequestTimeStamp | date:'medium' }}
+                                    {{ formData.CreatedOn | date:'medium' }}
                                   </div>
                                 </div>
                               </div>
@@ -90,271 +88,121 @@
               </div>
             </div>
             <mat-horizontal-stepper [linear]="false" #stepper>
-  <mat-step>
-  <ng-template matStepLabel>Client Identification</ng-template>
-  <form [formGroup]="mngForm">
-    <div class="row">
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Client ID</mat-label>
-          <input matInput formControlName="clientId" [readonly]="pageFunction !== 'Add'" />
-          <mat-error *ngIf="mngForm.get('clientId')?.invalid && mngForm.get('clientId')?.touched">
-            Client ID is required
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Application ID</mat-label>
-          <input matInput formControlName="applicationId" />
-          <mat-error *ngIf="
-                            mngForm.get('applicationId')?.invalid && mngForm.get('applicationId')?.touched">
-            Application ID is required
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-        <mat-label>Title</mat-label>
-        <mat-select formControlName="title">
-          <mat-option *ngFor="let title of titleOptions" [value]="title">{{ title }}</mat-option>
-        </mat-select>
-        <mat-error *ngIf="mngForm.get('title')?.invalid && mngForm.get('title')?.touched">
-          Please select a title
-        </mat-error>
-      </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Client Type</mat-label>
-          <mat-select formControlName="clientType">
-            <mat-option *ngFor="let type of clientTypeOptions" [value]="type">{{ type }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="
-                            mngForm.get('clientType')?.invalid && mngForm.get('clientType')?.touched">
-            Please select a client type
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Base ID</mat-label>
-          <input matInput formControlName="baseId" />
-          <mat-error *ngIf="
-                            mngForm.get('baseId')?.invalid && mngForm.get('baseId')?.touched">
-            Base ID is required
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Resident Status</mat-label>
-          <mat-select formControlName="residentStatus">
-            <mat-option *ngFor="let status of residentStatusOptions" [value]="status">{{ status }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="
-                            mngForm.get('residentStatus')?.invalid && mngForm.get('residentStatus')?.touched">
-            Please select resident status
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Relationship Manager</mat-label>
-          <mat-select formControlName="relationshipManager">
-            <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
-              {{ manager.name }}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="
-                            mngForm.get('relationshipManager')?.invalid && mngForm.get('relationshipManager')?.touched">
-            Please select a relationship manager
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Identification Type</mat-label>
-          <mat-select formControlName="identificationType">
-            <mat-option *ngFor="let idType of identificationTypeOptions" [value]="idType">{{ idType }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="
-                            mngForm.get('identificationType')?.invalid && mngForm.get('identificationType')?.touched">
-            Please select identification type
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Passport Number</mat-label>
-          <input matInput formControlName="passportNumber" />
-          <mat-error *ngIf="
-                            mngForm.get('passportNumber')?.invalid && mngForm.get('passportNumber')?.touched">
-            Please enter a valid passport number
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-        <mat-form-field class="example-full-width" appearance="outline">
-          <mat-label>Identification Expiry Date</mat-label>
-          <input matInput [matDatepicker]="idExpiryPicker" formControlName="idExpiryDate" />
-          <mat-datepicker-toggle matSuffix [for]="idExpiryPicker"></mat-datepicker-toggle>
-          <mat-datepicker #idExpiryPicker></mat-datepicker>
-          <mat-error *ngIf="
-                            mngForm.get('idExpiryDate')?.invalid && mngForm.get('idExpiryDate')?.touched">
-            Please select a valid expiry date
-          </mat-error>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <div>
-      <button mat-raised-button color="accent" (click)="cancel()">
-        Back
-      </button>
-      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-        Next
-      </button>
-    </div>
-  </form>
-</mat-step>
+              
               <mat-step>
-                <ng-template matStepLabel>Basic Information</ng-template>
+                <ng-template matStepLabel>Client Identification</ng-template>
                 <form [formGroup]="mngForm">
                   <div class="row">
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>First Name</mat-label>
-                        <input matInput formControlName="firstName" />
-                        <mat-error *ngIf="
-                            mngForm.get('firstName').invalid &&
-                            mngForm.get('firstName').touched
-                          ">
-                          Please enter a valid First Name
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Middle Name</mat-label>
-                        <input matInput formControlName="middleName" />
-                        <!-- <mat-error *ngIf="
-                            mngForm.get('middleName').invalid &&
-                            mngForm.get('middleName').touched
-                          ">
-                          Please enter a valid Middle Name
-                        </mat-error> -->
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Last Name</mat-label>
-                        <input matInput formControlName="lastName" />
-                        <mat-error *ngIf="
-                            mngForm.get('lastName').invalid &&
-                            mngForm.get('lastName').touched
-                          ">
-                          Please enter a valid Last Name
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Date of Birth (MM/DD/YYYY)</mat-label>
-                        <input matInput [matDatepicker]="dobDatePicker" formControlName="dob" />
-                        <mat-datepicker-toggle matSuffix [for]="dobDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #dobDatePicker></mat-datepicker>
-                        <mat-error *ngIf="
-                            mngForm.get('dob').invalid &&
-                            mngForm.get('dob').touched
-                          ">
-                          Please select a valid Date of Birth
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>National ID</mat-label>
-                        <input matInput formControlName="nationalId" />
-                        <mat-error *ngIf="
-                            mngForm.get('nationalId').invalid &&
-                            mngForm.get('nationalId').touched
-                          ">
-                          Please enter a valid National ID
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>KRA Number</mat-label>
-                        <input matInput formControlName="kraNo" />
-                        <mat-error *ngIf="
-                            mngForm.get('kraNo').invalid &&
-                            mngForm.get('kraNo').touched
-                          ">
-                          Please enter a valid KRA Number
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Religion</mat-label>
-
-                        <mat-select formControlName="religion">
-                          <mat-option *ngFor="let item of religionArray" [value]="item">{{ item }}</mat-option>
+                        <mat-label>Client Type</mat-label>
+                        <mat-select formControlName="ClientTypeID" (selectionChange)="onClientTypeChange()">
+                          <mat-option *ngFor="let type of clientTypeOptions" [value]="type">{{ type }}</mat-option>
                         </mat-select>
-
-                        <mat-error *ngIf="
-                            mngForm.get('religion').invalid &&
-                            mngForm.get('religion').touched
-                          ">
-                          Please enter a valid Religion
+                        <mat-error *ngIf="mngForm.get('ClientTypeID')?.invalid">
+                          Please select a client type
                         </mat-error>
                       </mat-form-field>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <section class="example-section">
-                        <label class="example-margin">Gender:</label>
-                        <mat-radio-group formControlName="gender">
-                          <mat-radio-button class="example-margin" value="male">Male</mat-radio-button>
-                          <mat-radio-button class="example-margin" value="female">Female</mat-radio-button>
-                        </mat-radio-group>
-                      </section>
-
-                      <mat-error *ngIf="
-                          mngForm.get('gender').invalid &&
-                          mngForm.get('gender').touched
-                        ">
-                        Please select Gender
-                      </mat-error>
-                    </div>
 
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="disabled">Disabled</mat-checkbox>
-                    </div>
-
-                    <div *ngIf="mngForm.get('disabled').value" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Disabled Registration Number</mat-label>
-                        <input matInput formControlName="disabledRegNo" />
-                        <mat-error *ngIf="
-                            mngForm.get('disabledRegNo').invalid &&
-                            mngForm.get('disabledRegNo').touched
-                          ">
-                          Please enter a valid Disabled Registration Number
+                        <mat-label>Client ID</mat-label>
+                        <input matInput formControlName="ClientID" [readonly]="pageFunction !== 'Add'" />
+                        <mat-error *ngIf="mngForm.get('ClientID')?.invalid && mngForm.get('ClientID')?.touched">
+                          Client ID is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Application ID</mat-label>
+                        <input matInput formControlName="ApplicationID" [disabled]="!isClientTypeSelected()" />
+                        <mat-error *ngIf="mngForm.get('ApplicationID')?.invalid">
+                          Application ID is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1" *ngIf="!isCorporateClient()">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Title</mat-label>
+                        <mat-select formControlName="TitleID" [disabled]="!isClientTypeSelected()">
+                          <mat-option *ngFor="let title of titleOptions" [value]="title">{{ title }}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="mngForm.get('TitleID')?.invalid">
+                          Please select a Title
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Base ID</mat-label>
+                        <input matInput formControlName="BaseID" [disabled]="!isClientTypeSelected()" />
+                        <mat-error *ngIf="mngForm.get('BaseID')?.invalid">
+                          Base ID is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Resident Status</mat-label>
+                        <mat-select formControlName="ResidentID" [disabled]="!isClientTypeSelected()">
+                          <mat-option *ngFor="let status of residentStatusOptions" [value]="status">{{ status }}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="mngForm.get('ResidentID')?.invalid">
+                          Please select resident status
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Relationship Manager</mat-label>
+                        <mat-select formControlName="RelationshipManager" [disabled]="!isClientTypeSelected()">
+                          <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
+                            {{ manager.name }}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="mngForm.get('RelationshipManager')?.invalid">
+                          Please select a relationship manager
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Identification Type</mat-label>
+                        <mat-select formControlName="IdentificationTypeID" [disabled]="!isClientTypeSelected()">
+                          <mat-option *ngFor="let idType of identificationTypeOptions" [value]="idType">{{ idType }}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="mngForm.get('IdentificationTypeID')?.invalid">
+                          Please select identification type
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Passport Number</mat-label>
+                        <input matInput formControlName="PassportNo" [disabled]="!isClientTypeSelected()" />
+                        <mat-error *ngIf="mngForm.get('PassportNo')?.invalid">
+                          Please enter a valid passport number
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Identification Expiry Date</mat-label>
+                        <input matInput [matDatepicker]="idExpiryPicker" formControlName="IDExpiryDate" [disabled]="!isClientTypeSelected()" />
+                        <mat-datepicker-toggle matSuffix [for]="idExpiryPicker"></mat-datepicker-toggle>
+                        <mat-datepicker #idExpiryPicker></mat-datepicker>
+                        <mat-error *ngIf="mngForm.get('IDExpiryDate')?.invalid">
+                          Please select a valid expiry date
                         </mat-error>
                       </mat-form-field>
                     </div>
@@ -364,158 +212,134 @@
                     <button mat-raised-button color="accent" (click)="cancel()">
                       Back
                     </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext [disabled]="!mngForm.get('ClientTypeID')?.value">
                       Next
                     </button>
                   </div>
                 </form>
               </mat-step>
-              <mat-step>
-  <ng-template matStepLabel>Addresses</ng-template>
-  <form [formGroup]="mngForm">
-    <div formArrayName="addresses" *ngIf="mngForm.get('addresses')">
-      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-section">
-        <h3>Address {{i + 1}} <span *ngIf="address.get('isPrimary')?.value">(Primary)</span></h3>
-        
-        <div class="row">
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Address Type</mat-label>
-              <mat-select formControlName="addressType">
-                <mat-option value="Home">Home</mat-option>
-                <mat-option value="Work">Work</mat-option>
-                <mat-option value="Mailing">Mailing</mat-option>
-                <mat-option value="Other">Other</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Residential Country</mat-label>
-              <mat-select formControlName="residentialCountry">
-                <mat-option *ngFor="let country of countries" [value]="country.name">
-                  {{ country.name }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
 
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Residential County</mat-label>
-              <input matInput formControlName="residentialCounty" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Residential Sub-County</mat-label>
-              <input matInput formControlName="residentialSubCounty" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>City</mat-label>
-              <input matInput formControlName="city" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Postal Address</mat-label>
-              <input matInput formControlName="postalAddress" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Postal Code</mat-label>
-              <input matInput formControlName="postalCode" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-checkbox formControlName="isPrimary">Primary Address</mat-checkbox>
-          </div>
-          
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1" *ngIf="addresses.length > 1">
-            <button mat-mini-fab color="warn" (click)="removeAddress(i)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <button mat-raised-button color="primary" (click)="addAddress()">
-      Add Another Address
-    </button>
-    
-    <div>
-      <button mat-raised-button color="accent" matStepperPrevious>
-        Back
-      </button>
-      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-        Next
-      </button>
-    </div>
-  </form>
-</mat-step>
-              <mat-step>
-                <ng-template matStepLabel>Contact Details</ng-template>
+              <mat-step *ngIf="!isCorporateClient()">
+                <ng-template matStepLabel>Personal Information</ng-template>
                 <form [formGroup]="mngForm">
                   <div class="row">
-                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Personal Phone Number</mat-label>
-                        <input matInput formControlName="personalPhone" />
-                        <mat-error *ngIf="
-                            mngForm.get('personalPhone').invalid &&
-                            mngForm.get('personalPhone').touched
-                          ">
-                          Please enter a valid Personal Phone Number
+                        <mat-label>First Name</mat-label>
+                        <input matInput formControlName="FirstName" />
+                        <mat-error *ngIf="mngForm.get('FirstName')?.invalid">
+                          Please enter a valid First Name
                         </mat-error>
                       </mat-form-field>
                     </div>
 
-                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Alternative Phone</mat-label>
-                        <input matInput formControlName="alternativePhone" />
-                        <mat-error *ngIf="
-                            mngForm.get('alternativePhone').invalid &&
-                            mngForm.get('alternativePhone').touched
-                          ">
-                          Please enter a valid Alternative Phone Number
+                        <mat-label>Middle Name</mat-label>
+                        <input matInput formControlName="MiddleName" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Last Name</mat-label>
+                        <input matInput formControlName="LastName" />
+                        <mat-error *ngIf="mngForm.get('LastName')?.invalid">
+                          Please enter a valid Last Name
                         </mat-error>
                       </mat-form-field>
                     </div>
 
-                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Personal Email Address</mat-label>
-                        <input matInput formControlName="personalEmail" />
-                        <mat-error *ngIf="
-                            mngForm.get('personalEmail').invalid &&
-                            mngForm.get('personalEmail').touched
-                          ">
-                          Please enter a valid Personal Email Address
+                        <mat-label>Date of Birth</mat-label>
+                        <input matInput [matDatepicker]="dobDatePicker" formControlName="DateOfBirth" />
+                        <mat-datepicker-toggle matSuffix [for]="dobDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #dobDatePicker></mat-datepicker>
+                        <mat-error *ngIf="mngForm.get('DateOfBirth')?.invalid">
+                          Please select a valid Date of Birth
                         </mat-error>
                       </mat-form-field>
                     </div>
 
-                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Alternative Email</mat-label>
-                        <input matInput formControlName="alternativeEmail" />
-                        <mat-error *ngIf="
-                            mngForm.get('alternativeEmail').invalid &&
-                            mngForm.get('alternativeEmail').touched
-                          ">
-                          Please enter a valid Alternative Email Address
+                        <mat-label>National ID</mat-label>
+                        <input matInput formControlName="NationalId" />
+                        <mat-error *ngIf="mngForm.get('NationalId')?.invalid">
+                          Please enter a valid National ID
                         </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>KRA Pin</mat-label>
+                        <input matInput formControlName="KRAPin" />
+                        <mat-error *ngIf="mngForm.get('KRAPin')?.invalid">
+                          Please enter a valid KRA Pin
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <section class="example-section">
+                        <label class="example-margin">Gender:</label>
+                        <mat-radio-group formControlName="GenderID">
+                          <mat-radio-button class="example-margin" value="M">Male</mat-radio-button>
+                          <mat-radio-button class="example-margin" value="F">Female</mat-radio-button>
+                        </mat-radio-group>
+                      </section>
+                      <mat-error *ngIf="mngForm.get('GenderID')?.invalid">
+                        Please select Gender
+                      </mat-error>
+                    </div>
+
+                      <!-- Add these to your personal info form section -->
+<div class="row" *ngIf="isIndividualClient()">
+  <!-- Number of House Members -->
+  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+    <mat-form-field class="example-full-width" appearance="outline">
+      <mat-label>Number of House Members</mat-label>
+      <input matInput type="number" formControlName="NumberOfHouseMembers" min="1" required/>
+      <mat-error *ngIf="mngForm.get('NumberOfHouseMembers')?.invalid">
+        Number of house members is required
+      </mat-error>
+    </mat-form-field>
+  </div>
+
+  <!-- Can Donate Blood -->
+  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+    <mat-checkbox formControlName="CanDonateBlood">Can Donate Blood</mat-checkbox>
+  </div>
+
+  <!-- Is Salaried -->
+  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+    <mat-checkbox formControlName="IsSalaried">Is Salaried</mat-checkbox>
+  </div>
+</div>
+
+  <input type="hidden" formControlName="WFClientStatusID" value="A">
+  <input type="hidden" formControlName="OpenedBy" [value]="currentUser">
+  <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
+  <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
+  <input type="hidden" formControlName="OpenedDate" [value]="currentDate">
+  <input type="hidden" formControlName="UpdateCount" [value]="0">
+
+                    <div *ngIf="mngForm.get('ClientTypeID')?.value === 'Minor'" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Parent Client ID 1</mat-label>
+                        <input matInput formControlName="ParentClientID1" />
+                        <mat-error *ngIf="mngForm.get('ParentClientID1')?.invalid">
+                          Parent Client ID 1 is required for minors
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div *ngIf="mngForm.get('ClientTypeID')?.value === 'Minor'" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Parent Client ID 2</mat-label>
+                        <input matInput formControlName="ParentClientID2" />
                       </mat-form-field>
                     </div>
                   </div>
@@ -530,111 +354,498 @@
                   </div>
                 </form>
               </mat-step>
-             
-              <mat-step>
-                <ng-template matStepLabel>Next of Kin Details</ng-template>
-                <ng-container>
-                  <form [formGroup]="nextOfKinForm">
-                    <ng-container *ngIf="showParTranForm1">
-                      <div class="row">
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Full Name</mat-label>
-                            <input matInput formControlName="name"/>
-                            <mat-error *ngIf="nextOfKinForm.get('name').invalid && nextOfKinForm.get('name').touched">
-                              Please enter a valid Full Name
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
-                        
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Phone Number</mat-label>
-                            <input matInput formControlName="phoneNumber" />
-                            <mat-error *ngIf="
-                                nextOfKinForm.get('phoneNumber').invalid &&
-                                nextOfKinForm.get('phoneNumber').touched
-                              ">
-                              Please enter a valid Phone Number
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
+                <mat-step *ngIf="isCorporateClient()">
+                <ng-template matStepLabel>Corporate Details</ng-template>
+                <form [formGroup]="corporateForm">
+                  <div class="row">
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Company Name</mat-label>
+                        <input matInput formControlName="CompanyName" />
+                        <mat-error *ngIf="corporateForm.get('CompanyName')?.invalid">
+                          Company Name is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Email</mat-label>
-                            <input matInput formControlName="email" />
-                            <mat-error *ngIf="
-                                nextOfKinForm.get('email').invalid &&
-                                nextOfKinForm.get('email').touched
-                              ">
-                              Please enter a valid Email Address
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Constitution</mat-label>
+                        <input matInput formControlName="Constitution" />
+                        <mat-error *ngIf="corporateForm.get('Constitution')?.invalid">
+                          Constitution is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Street Address</mat-label>
-                            <input matInput formControlName="address" />
-                            <mat-error *ngIf="
-                                nextOfKinForm.get('address').invalid &&
-                                nextOfKinForm.get('address').touched
-                              ">
-                              Please enter a valid Street Address
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Nature of Business</mat-label>
+                        <input matInput formControlName="NatureOfBusiness" />
+                        <mat-error *ngIf="corporateForm.get('NatureOfBusiness')?.invalid">
+                          Nature of Business is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Relationship</mat-label>
-                            <input matInput formControlName="relationship" />
-                            <mat-error *ngIf="
-                                nextOfKinForm.get('relationship').invalid &&
-                                nextOfKinForm.get('relationship').touched
-                              ">
-                              Please enter a valid Relationship
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Registration Number</mat-label>
+                        <input matInput formControlName="RegistrationNumber" />
+                        <mat-error *ngIf="corporateForm.get('RegistrationNumber')?.invalid">
+                          Registration Number is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Percentage Allocation</mat-label>
-                            <input matInput type="number" formControlName="percentageAllocation" (input)="calculateRemainingAllocation()"/>
-                            <mat-error *ngIf="nextOfKinForm.get('percentageAllocation')?.invalid && nextOfKinForm.get('percentageAllocation')?.touched">
-                              Please enter a valid percentage (0 - 100)
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Registered At</mat-label>
+                        <input matInput formControlName="RegisteredAt" />
+                        <mat-error *ngIf="corporateForm.get('RegisteredAt')?.invalid">
+                          Registered At is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
 
-                        <div class="col-md-4 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                              <mat-label>Remaining Allocation</mat-label>
-                              <input matInput type="number" formControlName="remainingAllocation" readonly />
-                          </mat-form-field>
-                        </div>
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>KRA Pin</mat-label>
+                        <input matInput formControlName="KRAPinNo" />
+                        <mat-error *ngIf="corporateForm.get('KRAPinNo')?.invalid">
+                          KRA Pin is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Date of Registration</mat-label>
+                        <input matInput [matDatepicker]="regDatePicker" formControlName="DateOfRegistration" />
+                        <mat-datepicker-toggle matSuffix [for]="regDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #regDatePicker></mat-datepicker>
+                        <mat-error *ngIf="corporateForm.get('DateOfRegistration')?.invalid">
+                          Date of Registration is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Registered Office</mat-label>
+                        <input matInput formControlName="RegisteredOffice" />
+                        <mat-error *ngIf="corporateForm.get('RegisteredOffice')?.invalid">
+                          Registered Office is required
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Comments</mat-label>
+                        <textarea matInput formControlName="Comments" rows="3"></textarea>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Website</mat-label>
+                        <input matInput formControlName="Website" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Opened By</mat-label>
+                        <input matInput formControlName="OpenedBy" [readonly]="true" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
+                      <mat-form-field class="example-full-width" appearance="outline">
+                        <mat-label>Opened On</mat-label>
+                        <input matInput [matDatepicker]="openedDatePicker" formControlName="OpenedOn" />
+                        <mat-datepicker-toggle matSuffix [for]="openedDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #openedDatePicker></mat-datepicker>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button mat-raised-button color="accent" matStepperPrevious>
+                      Back
+                    </button>
+                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+                      Next
+                    </button>
+                  </div>
+                </form>
+              </mat-step>
+
+      <mat-step *ngIf="isCorporateClient()">              
+      <ng-template matStepLabel>Directors</ng-template>
+      <form [formGroup]="directorsForm">
+        <ng-container *ngIf="showDirectorsForm">
+          <div class="row">
+            <div class="col-md-4 col-sm-12 mb-1">
+              <mat-form-field class="example-full-width" appearance="outline">
+                <mat-label>Client Name</mat-label>
+                <input matInput formControlName="clientName" />
+                <mat-error *ngIf="directorsForm.get('clientName')?.invalid && directorsForm.get('clientName')?.touched">
+                  Please enter a valid name
+                </mat-error>
+              </mat-form-field>
+            </div>
+          
+            <div class="col-md-4 col-sm-12 mb-1">
+              <mat-form-field class="example-full-width" appearance="outline">
+                <mat-label>Relation</mat-label>
+                <input matInput formControlName="relation" />
+                <mat-error *ngIf="directorsForm.get('relation')?.invalid && directorsForm.get('relation')?.touched">
+                  Please enter a valid relation
+                </mat-error>
+              </mat-form-field>
+            </div>
+          
+            <div class="col-md-4 col-sm-12 mb-1">
+              <mat-form-field class="example-full-width" appearance="outline">
+                <mat-label>Share (%)</mat-label>
+                <input matInput type="number" formControlName="share" />
+                <mat-error *ngIf="directorsForm.get('share')?.invalid && directorsForm.get('share')?.touched">
+                  Please enter a valid share percentage
+                </mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        
+          <div class="row">
+            <div class="col-12">
+              <div class="example-button-row">
+                <button mat-raised-button color="primary" [disabled]="!directorsForm.valid" (click)="addDirector()">
+                  {{ directorActionLabel }} Director
+                </button>
+                <button mat-raised-button color="warn" (click)="cancelDirectorEdit()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      
+        <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>group</mat-icon> All Directors
+      </ng-template>
+
+      <div class="row m-1">
+        <div class="col-12">
+          <div class="table-responsiv">
+            <div class="materialTableHeader">
+              <div class="row">
+                <div class="col-8">
+                  <ul class="header-buttons-left ms-0">
+                    <li><h2>Directors</h2></li>
+                    <li class="dropdown m-l-20">
+                      <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                      <input placeholder="Filter..." type="text" (keyup)="applyDirectorsFilter($event)"
+                        class="browser-default search-field" />
+                    </li>
+                    <li>
+                      <div class="m-l-10" matTooltip="ADD">
+                        <button mat-mini-fab color="primary" (click)="startAddDirector()">
+                          <mat-icon>add</mat-icon>
+                        </button>
                       </div>
-
-                      <div class="row">
-                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                          <div class="example-button-row" align="start">
-                            <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
-                              [disabled]="!nextOfKinForm.valid || posting" [hidden]="viewMode"
-                              (click)="pushToDataSource1()">
-                              {{ parTranAction1 }} Qualification
-                            </button>
-
-                            <button mat-raised-button color="warn" (click)="cancelParTran1()" tabindex="-1">
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
+                    </li>
+                    <li>
+                      <div class="m-l-10" matTooltip="REFRESH">
+                        <button mat-mini-fab color="primary" (click)="refreshDirectors()">
+                          <mat-icon>refresh</mat-icon>
+                        </button>
                       </div>
-                    </ng-container>
+                    </li>
+                  </ul>
+                </div>
 
+                <div class="col-4">
+                  <ul class="header-buttons">
+                    <li>
+                      <div class="export-button m-l-10" matTooltip="XLSX">
+                        <img src="assets/images/icons/xlsx.png" alt="" (click)="exporterDirectors.exportTable('xlsx', { fileName: 'directors-list', sheet: 'sheet1' })" />
+                      </div>
+                    </li>
+                    <li>
+                      <div class="export-button m-l-10" matTooltip="CSV">
+                        <img src="assets/images/icons/csv.png" alt="" (click)="exporterDirectors.exportTable('csv')" />
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <mat-table #table matTableExporter [dataSource]="dataSourceDirectors" matSort class="mat-cell" #exporterDirectors="matTableExporter">
+              <ng-container matColumnDef="id">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.id || '#' }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="clientName">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Client Name</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.clientName }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="relation">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Relation</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.relation }}</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="share">
+                <mat-header-cell *matHeaderCellDef mat-sort-header>Share (%)</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.share }}%</mat-cell>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+                <mat-cell *matCellDef="let row; let i = index">
+                  <button mat-icon-button color="accent" (click)="editDirector(row, i)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteDirector(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="displayedDirectorColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedDirectorColumns"></mat-row>
+            </mat-table>
+
+            <div *ngIf="dataSourceDirectors.data.length === 0" class="tbl-spinner">
+              <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate"></mat-progress-spinner>
+            </div>
+
+            <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20, 50, 100]"></mat-paginator>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</form>
+
+<div class="mt-2">
+  <button mat-raised-button color="accent" matStepperPrevious>Back</button>
+  <button mat-raised-button color="primary" matStepperNext>Next</button>
+</div>
+              
+</mat-step>
+
+          <mat-step>
+  <ng-template matStepLabel>Addresses</ng-template>
+  <form [formGroup]="mngForm">
+    <div formArrayName="Addresses">
+      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-section mb-3 p-3 border rounded">
+        <h4>Address {{i + 1}} <span *ngIf="address.get('IsMailingAddress')?.value">(Mailing Address)</span></h4>
+        
+        <div class="row">
+          <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
+          <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
+          <input type="hidden" formControlName="UpdateCount" [value]="0">
+          
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Address Type</mat-label>
+              <mat-select formControlName="AddressTypeID">
+                <mat-option value="H">Home</mat-option>
+                <mat-option value="W">Work</mat-option>
+                <mat-option value="M">Mailing</mat-option>
+                <mat-option value="O">Other</mat-option>
+              </mat-select>
+              <mat-error *ngIf="address.get('AddressTypeID')?.invalid">
+                Address Type is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Address Line 1</mat-label>
+              <input matInput formControlName="Address1" />
+              <mat-error *ngIf="address.get('Address1')?.invalid">
+                Address Line 1 is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Address Line 2</mat-label>
+              <input matInput formControlName="Address2" />
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="CityID" />
+              <mat-error *ngIf="address.get('CityID')?.invalid">
+                City is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Country</mat-label>
+              <mat-select formControlName="CountryID">
+                <mat-option *ngFor="let country of countries" [value]="country.code">
+                  {{ country.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="address.get('CountryID')?.invalid">
+                Country is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Mobile</mat-label>
+              <input matInput formControlName="Mobile" />
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="Email" type="email" />
+              <mat-error *ngIf="address.get('Email')?.invalid">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
+            <mat-checkbox formControlName="IsMailingAddress">Mailing Address</mat-checkbox>
+          </div>
+          
+          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1" *ngIf="addresses.length > 1">
+            <button mat-mini-fab color="warn" (click)="removeAddress(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button mat-raised-button color="primary" (click)="addAddress()" class="mb-3">
+      <mat-icon>add</mat-icon> Add Another Address
+    </button>
+    
+    <div>
+      <button mat-raised-button color="accent" matStepperPrevious>
+        Back
+      </button>
+      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
+        Next
+      </button>
+    </div>
+  </form>
+</mat-step>
+
+            
+<mat-step>
+  <ng-template matStepLabel>Next of Kin Details</ng-template>
+  <ng-container>
+    <form [formGroup]="nextOfKinForm">
+      <ng-container *ngIf="showParTranForm1">
+        <div class="row">
+          <!-- Hidden system fields -->
+          <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
+          <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
+          <input type="hidden" formControlName="UpdateCount" [value]="0">
+          <input type="hidden" formControlName="ClientID" [value]="mngForm.get('ClientID')?.value">
+          
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Related Client ID</mat-label>
+              <input matInput formControlName="RelatedClientID" required/>
+              <mat-error *ngIf="nextOfKinForm.get('RelatedClientID')?.invalid">
+                Related Client ID is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Relation ID</mat-label>
+              <mat-select formControlName="RelationID" required>
+                <mat-option value="S">Spouse</mat-option>
+                <mat-option value="P">Parent</mat-option>
+                <mat-option value="C">Child</mat-option>
+                <mat-option value="O">Other</mat-option>
+              </mat-select>
+              <mat-error *ngIf="nextOfKinForm.get('RelationID')?.invalid">
+                Relation is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Relation Reference No</mat-label>
+              <input matInput type="number" formControlName="RelationRefNo" [value]="1" required/>
+              <mat-error *ngIf="nextOfKinForm.get('RelationRefNo')?.invalid">
+                Reference number is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Remarks</mat-label>
+              <input matInput formControlName="Remarks" required/>
+              <mat-error *ngIf="nextOfKinForm.get('Remarks')?.invalid">
+                Remarks are required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Share Percentage</mat-label>
+              <input matInput type="number" formControlName="SharePercent" 
+                     min="0" max="100" (input)="calculateRemainingAllocation()" required/>
+              <mat-error *ngIf="nextOfKinForm.get('SharePercent')?.invalid">
+                Please enter a valid percentage (0 - 100)
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="col-md-4 col-sm-12 mb-1">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Remaining Allocation</mat-label>
+              <input matInput type="number" formControlName="remainingAllocation" readonly />
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
+            <div class="example-button-row" align="start">
+              <button class="btn-space" mat-raised-button color="primary" 
+                [disabled]="!nextOfKinForm.valid || posting" 
+                (click)="pushToDataSource1()">
+                {{ parTranAction1 }} Next of Kin
+              </button>
+
+              <button mat-raised-button color="warn" (click)="cancelParTran1()" tabindex="-1">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
                     <mat-tab-group>
                       <mat-tab>
                         <ng-template mat-tab-label>
@@ -698,96 +909,53 @@
                                 </div>
                               </div>
 
-                              <mat-table #table matTableExporter [dataSource]="dataSource1" matSort class="mat-cell"
-                                #exporter="matTableExporter">
-                                <!-- ID Column -->
-                                <ng-container matColumnDef="id">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-10">ID</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-10">
-                                    {{ row.id ? row.id : "#" }}
-                                  </mat-cell>
-                                </ng-container>
+                                                <mat-table #table [dataSource]="dataSource1" matSort class="mat-cell">
+                  <!-- ID Column -->
+                  <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.ID || '#' }}</mat-cell>
+                  </ng-container>
 
-                                <ng-container matColumnDef="name">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Name</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.name }}</mat-cell>
-                                </ng-container>
+                  <ng-container matColumnDef="RelatedClientID">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Related Client ID</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.RelatedClientID }}</mat-cell>
+                  </ng-container>
 
-                                <ng-container matColumnDef="phoneNumber">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Phone Number</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.phoneNumber }}</mat-cell>
-                                </ng-container>
+                  <ng-container matColumnDef="RelationID">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Relation</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                      {{ row.RelationID === 'S' ? 'Spouse' : 
+                         row.RelationID === 'P' ? 'Parent' : 
+                         row.RelationID === 'C' ? 'Child' : 'Other' }}
+                    </mat-cell>
+                  </ng-container>
 
-                                <ng-container matColumnDef="email">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Email</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.email }}</mat-cell>
-                                </ng-container>
-                                
+                  <ng-container matColumnDef="Remarks">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Remarks</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.Remarks }}</mat-cell>
+                  </ng-container>
 
-                                <ng-container matColumnDef="address">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Address</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.address }}</mat-cell>
-                                </ng-container>
+                  <ng-container matColumnDef="SharePercent">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Percentage</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.SharePercent }}%</mat-cell>
+                  </ng-container>
 
-                                <ng-container matColumnDef="relationship">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Relationship</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.relationship }}</mat-cell>
-                                </ng-container>
+                  <!-- Action Buttons -->
+                  <ng-container matColumnDef="action">
+                    <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index">
+                      <button mat-icon-button color="accent" (click)="editParTran1(row, i)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" (click)="deleteParTran1(i)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </mat-cell>
+                  </ng-container>
 
-                                 <ng-container matColumnDef="percentageAllocation">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Percentage</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.percentageAllocation }}%
-                                  </mat-cell>
-                                </ng-container>
-
-                                <!-- Action Buttons -->
-                                <ng-container matColumnDef="action">
-                                  <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-15 pr-0"
-                                    *matHeaderCellDef>
-                                    Action
-                                  </mat-header-cell>
-                                  <mat-cell *matCellDef="let row; let i = index"
-                                    class="column-nowrap psl-3 tbl-col-width-per-15 pr-0">
-                                    <!-- Edit Button -->
-                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                      (click)="editParTran1(row, i)" class="tbl-action-btn">
-                                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
-                                      </app-feather-icons>
-                                    </button>
-
-                                    <!-- Delete Button -->
-                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                      (click)="deleteParTran1(i)" class="tbl-action-btn">
-                                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
-                                      </app-feather-icons>
-                                    </button>
-                                  </mat-cell>
-                                </ng-container>
-
-                                <mat-header-row *matHeaderRowDef="displayedColumns1"></mat-header-row>
-                                <mat-row *matRowDef="
-                                    let row;
-                                    columns: displayedColumns1
-                                  " (click)="editParTran1(row, i)" [style.cursor]="'pointer'" matRipple>
-                                </mat-row>
-                                <mat-cell *matNoDataRow colspan="8">
-                                  No data matching the filter "{{
-                                  input1.value
-                                  }}"</mat-cell>
-                              </mat-table>
+                  <mat-header-row *matHeaderRowDef="['id', 'RelatedClientID', 'RelationID', 'Remarks', 'SharePercent', 'action']"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: ['id', 'RelatedClientID', 'RelationID', 'Remarks', 'SharePercent', 'action']"></mat-row>
+                </mat-table>
                               <div *ngIf="dataSource1.data.length === 0" class="tbl-spinner">
                                 <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
                                 </mat-progress-spinner>

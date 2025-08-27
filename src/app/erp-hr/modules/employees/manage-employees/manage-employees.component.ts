@@ -1,6 +1,6 @@
 import { DatePipe } from "@angular/common";
 import { HttpParams } from "@angular/common/http";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ValidationErrors, AbstractControl, FormArray } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
@@ -15,19 +15,131 @@ import { SnackbarService } from "src/app/shared/services/snackbar.service";
 import { COUNTRIES } from "./countries";
 import { MockDataService } from "../mock-data.service";
 
+interface Address {
+  AddressTypeID: string;
+  Address1: string;
+  Address2?: string;
+  CityID: string;
+  CountryID: string;
+  Mobile: string;
+  Email: string;
+  IsMailingAddress: boolean;
+  CreatedBy: string;
+  CreatedOn: string;
+  UpdateCount: number;
+}
+
+interface NextOfKin {
+  ID?: number;
+  ClientID: string;
+  RelatedClientID: string;
+  RelationID: string;
+  RelationRefNo: number;
+  Remarks: string;
+  SharePercent: number;
+  UpdateCount: number;
+  CreatedBy: string;
+  CreatedOn: string;
+}
+
+interface EmploymentDetail {
+  companyName: string;
+  workPosition: string;
+  startDate: string;
+  endDate: string;
+}
+
+interface Director {
+  id?: number;
+  clientName: string;
+  relation: string;
+  share: number;
+}
+
+interface ClientFormData {
+  ClientID: string;
+  ClientTypeID: string;
+  ID1: string;
+  Name: string;
+  TitleID: string;
+  FirstName: string;
+  MiddleName?: string;
+  LastName: string;
+  GenderID: string;
+  DateOfBirth: string;
+  IsDOBGiven: boolean;
+  NationalityID: string;
+  ResidentID: string;
+  PassportNo?: string;
+  IDExpiryDate?: string;
+  NumberOfHouseMembers: number;
+  IsSalaried: boolean;
+  OccupationID?: string;
+  CompanyName?: string;
+  RegistrationNumber?: string;
+  RegisteredAt?: string;
+  DateOfRegistration?: string;
+  NatureOfBusiness?: string;
+  Comments?: string;
+  OpenedBy: string;
+  OpenedOn: string;
+  CreatedBy: string;
+  CreatedOn: string;
+  RegistratedAt?: string;
+  RegisteredOffice?: string;
+  BusinessDescription?: string;
+  OpenedDate?: string;
+  NoOfEmployee?: number;
+  WFClientStatusID?: string;
+  UpdateCount?: number;
+  NationalId: string;
+  CanDonateBlood: boolean;
+  CanSendGreetings: boolean;
+  CanSendOurSpecialOffers: boolean;
+  CanSendAssociateSpecialOffer: boolean;
+  eStatementRequired: boolean;
+  MobileAlertRequired: boolean;
+  IdentificationTypeID: string;
+  KRAPin: string;
+  Email2?: string;
+  PhysicalAddress: string;
+  PersonalPhone?: string;
+  //PersonalEmail?: string;
+  AlternativePhone?: string;
+  AlternativeEmail?: string;
+  DisabledRegNo?: string;
+  Disabled?: boolean;
+  Addresses: Address[];
+  NextOfKin: NextOfKin[];
+  EmploymentDetails: EmploymentDetail[];
+  Directors?: Director[];
+  ParentClientID1?: string;
+  ParentClientID2?: string;
+  RelationshipManager?: string;
+  Website?: string;
+  Constitution?: string; 
+}
+
 @Component({
   selector: "app-manage-employees",
   templateUrl: "./manage-employees.component.html",
   styleUrls: ["./manage-employees.component.sass"],
 })
-export class ManageEmployeesComponent implements OnInit {
+export class ManageEmployeesComponent implements OnInit, OnDestroy {
   showForm = true;
   isLoading = true;
   pageFunction = "Add";
   mngForm: FormGroup;
+  corporateForm: FormGroup;
+  directorForm: FormGroup;
+  workExpForm: FormGroup; 
+  nextOfKinForm: FormGroup;
+  selectedParTranIndex1: number | null = null;
+  selectedParTranIndex4: number | null = null;
+  selectedDirectorIndex: number | null = null;
   currentUser: any;
   currentUserCode: any;
-  formData: any;
+  formData: ClientFormData;
   destroy$: Subject<boolean> = new Subject<boolean>();
   prefillClientId: string = '';
   downloadLoading: boolean = false;
@@ -36,17 +148,48 @@ export class ManageEmployeesComponent implements OnInit {
   approvalVisible: boolean = false;
   disableActions = false;
   requestCode: any;
-  requestId: any
+  requestId: any;
+  posting: boolean = false;
+  viewMode: boolean = false;
+  directorsForm: FormGroup;
+  showDirectorsForm = false;
+  directorActionLabel = 'Add';
+  editingDirectorIndex: number | null = null;
+  showParTranForm1: boolean = false;
+  showParTranForm4: boolean = false;
+  parTranAction1: string = 'Add';
+  parTranAction4: string = 'Add';
 
-  religionArray: any = [
-    "Christian",
-    "Islam",
-    "Irreligion",
-    "Atheist",
-    "Hindu",
-    "Other",
+  dataSource1 = new MatTableDataSource<NextOfKin>([]);
+  dataSource4 = new MatTableDataSource<EmploymentDetail>([]);
+  dataSourceDirectors = new MatTableDataSource<Director>([]);
+
+  @ViewChild(MatPaginator) paginator1!: MatPaginator;
+  @ViewChild(MatSort) sort1!: MatSort;
+  @ViewChild(MatPaginator) paginator4!: MatPaginator;
+  @ViewChild(MatSort) sort4!: MatSort;
+  @ViewChild(MatPaginator) paginatorDirectors!: MatPaginator;
+  @ViewChild(MatSort) sortDirectors!: MatSort;
+
+
+displayedColumns1: string[] = [
+  "RelatedClientID", 
+  "RelationID",
+  "Remarks",
+  "SharePercent",
+  "action",
+];
+
+    displayedColumns4: string[] = [
+    "id",
+    "companyName",
+    "workPosition",
+    "startDate",
+    "endDate",
+    "action",
   ];
 
+  displayedDirectorColumns: string[] = ['id', 'clientName', 'relation', 'share', 'action'];
 
   titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG'];
   clientTypeOptions = ['Corporate', 'Minor', 'Employee', 'Individual'];
@@ -59,6 +202,8 @@ export class ManageEmployeesComponent implements OnInit {
     'Minor - Local', 
     'Minor- Foreigner'
   ];
+  genderOptions = ['M', 'F'];
+  relationOptions = ['S', 'P', 'C', 'O']; 
   
   relationshipManagers = [
     { id: '020606', name: 'ANUP JANTILAL SOLANKI' },
@@ -67,7 +212,11 @@ export class ManageEmployeesComponent implements OnInit {
   ];
 
   countries = COUNTRIES;
-  previousAllocation: any;
+  cities = COUNTRIES; 
+  directorsInputFilter: string;
+  initialClientType: string = '';
+  nextOfKinArray: any;
+
   constructor(
     private fb: FormBuilder,
     private tokenStorageService: TokenStorageService,
@@ -79,43 +228,18 @@ export class ManageEmployeesComponent implements OnInit {
     private datePipe: DatePipe,
     private mockDataService: MockDataService,
   ) {
-    // this.currentUser = this.tokenStorageService.getUser().username;
-    // this.currentUserCode = this.tokenStorageService.getUser().empPfNo;
     this.currentUser = 'Jipheens';
     this.currentUserCode = 'CSK-00280';
-    this.mngForm = this.fb.group({});
-    this.generateSubForm1();
-    this.generateSubForm4();
+    this.initializeForms();
   }
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
-  // ngOnInit(): void {
-  //   this.getPage();
 
-  //   if (
-  //     this.route.queryParams &&
-  //     typeof this.route.queryParams.subscribe === "function"
-  //   ) {
-  //     this.route.queryParams.subscribe((params) => {
-  //       console.log("params: ", params);
-  //       if (params.requestId) {
-  //         this.requestCode = params.requestCode;
-  //         this.requestId = params.requestId;
-  //         this.getDataById();
-  //         this.pageFunction = params.action;
-  //       }
-  //     });
-  //     this.showForm = true;
-  //   } else {
-  //     this.showForm = true;
-  //   }
-  // }
 
 ngOnInit(): void {
   this.route.queryParams.subscribe((params) => {
     console.log("params: ", params);
+       if (params.ClientTypeID) {
+      this.initialClientType = params.ClientTypeID;
+    }
 
     if (params.prefillClientId && params.requestCode) {
       this.prefillClientId = params.requestCode;
@@ -132,7 +256,6 @@ ngOnInit(): void {
         console.log("Add mode with prefill - skipping data fetch, going straight to form");
         this.getPage();
       } else if (this.pageFunction === "View" || this.pageFunction === "Update") {
-        // Call getDataById for View or Update
         this.getDataById(this.requestCode);
       } else {
         this.getPage();
@@ -141,42 +264,59 @@ ngOnInit(): void {
       this.pageFunction = "Add";
       console.log("No valid clientId, setting pageFunction to Add");
       this.getPage();
+  this.generateSubForm1();
+  this.generateSubForm4();
     }
     this.showForm = true;
   });
 }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.dataSource1.paginator = this.paginator1;
+    this.dataSource1.sort = this.sort1;
+    this.dataSource4.paginator = this.paginator4;
+    this.dataSource4.sort = this.sort4;
+    this.dataSourceDirectors.paginator = this.paginatorDirectors;
+    this.dataSourceDirectors.sort = this.sortDirectors;
+  }
 
-  // getDataById() {
-  //   const params = new HttpParams().set("id", this.requestId);
-  //   this.employeeService
-  //     .readByEmployeeId(params)
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: (res) => {
-  //         if (res.entity) {
-  //           this.formData = res.entity;
-  //           console.log("getDataById this.formData: ", this.formData);
-  //           if (this.pageFunction === "View") {
-  //             this.activateViewMode();
-  //           }
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
+  }
 
-  //           this.onPopulateTables(res);
+  private initializeForms(): void {
+    this.mngForm = this.fb.group({});
+    this.corporateForm = this.fb.group({});
+    this.directorForm = this.fb.group({});
+    this.generateSubForm1();
+    this.generateSubForm4();
+    this.generateDirectorForm();
+  }
 
-  //           this.getPage();
+  private handleQueryParams(params: any): void {
+    if (params.prefillClientId && params.requestCode) {
+      this.prefillClientId = params.requestCode;
+    }
 
-  //           this.showForm = true;
-  //         } else {
-  //           this.snackbar.showNotification("snackbar-danger", res.message);
-  //         }
-  //       },
-  //       error: (err) => {
-  //         this.snackbar.showNotification("snackbar-danger", err.message);
-  //       },
-  //       complete: () => { },
-  //     });
-  // }
+    if (params.requestCode && params.requestCode.trim() !== '') {
+      this.requestCode = params.requestCode;
+      this.requestId = params.requestId;
+      this.pageFunction = params.action;
+
+      if (this.pageFunction === "Add" && params.prefillClientId) {
+        this.getPage();
+      } else if (this.pageFunction === "View" || this.pageFunction === "Update") {
+        this.getDataById(this.requestCode);
+      } else {
+        this.getPage();
+      }
+    } else {
+      this.pageFunction = "Add";
+      this.getPage();
+    }
+    this.showForm = true;
+  }
 
 getDataById(requestCode: string) {
   const formattedRequest = {
@@ -187,372 +327,472 @@ getDataById(requestCode: string) {
     RequestTime: new Date().toISOString(),
     AppName: "CLIENT_DATA"
   };
-  this.loading = true;
+  this.isLoading = true;
   console.log("Fetching data for Client ID:", requestCode, "with payload:", formattedRequest);
   this.employeeService.getClientById(formattedRequest).pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res) => {
-          if (res.entity) {
-            this.formData = res.entity;
+          if (res.Details) {
+            this.formData = res.Details;
             console.log("getDataById this.formData: ", this.formData);
             if (this.pageFunction === "View") {
               this.activateViewMode();
             }
 
+          this.getPage();
+          
+          setTimeout(() => {
             this.onPopulateTables(res);
-
-            this.getPage();
+          });
 
             this.showForm = true;
           } else {
-            this.snackbar.showNotification("snackbar-danger", res.message);
+            this.snackbar.showNotification("snackbar-danger", res.ResponseMessage);
           }
         },
         error: (err) => {
-          this.snackbar.showNotification("snackbar-danger", err.message);
+          this.snackbar.showNotification("snackbar-danger", err.ResponseMessage);
         },
         complete: () => { },
       });
   }
 
-  onPopulateTables(res) {
-    if (res) {
-      if (res.entity) {
-        if (res.entity.nextOfKins) {
-          this.dataSource1.data = res.entity.nextOfKins;
-          this.refresh1();
-        }
-        if (res.entity.employeeEducations) {
-          this.dataSource3.data = res.entity.employeeEducations;
-          this.refresh3();
-        }
-        if (res.entity.employeeWorkExperiences) {
-          this.dataSource4.data = res.entity.employeeWorkExperiences;
-          this.refresh4();
-        }
-
-      } else {
-        if (res.nextOfKins) {
-          this.dataSource1.data = res.nextOfKins;
-          this.refresh1();
-        }
-        if (res.employeeEducations) {
-          this.dataSource3.data = res.employeeEducations;
-          this.refresh3();
-        }
-        if (res.employeeWorkExperiences) {
-          this.dataSource4.data = res.employeeWorkExperiences;
-          this.refresh4();
-        }
-
-      }
+ onPopulateTables(res: any): void {
+    const entity = res.Details || res.entity || res;
+    
+    if (entity.NextOfKin) {
+      this.dataSource1.data = entity.NextOfKin;
+      this.refresh1();
     }
+    
+    if (entity.EmploymentDetails) {
+      this.dataSource4.data = entity.EmploymentDetails;
+      this.refresh4();
+    }
+    
+    if (entity.Directors) {
+      this.dataSourceDirectors.data = entity.Directors;
+      this.refreshDirectors();
+    }
+    if (entity.Addresses) {
+    this.populateAddresses(entity.Addresses);
+  }
   }
 
-  // getPage(): void {
-  //   if (this.pageFunction === "Add") {
-  //     this.generateForm();
-
-  //     this.hideApprovals = true;
-  //   } else if (this.pageFunction === "Update") {
-  //     this.generateForm(this.formData);
-  //     this.generateSubForm1();
-  //     this.hideApprovals = true;
-  //   } else if (this.pageFunction === "View") {
-  //     this.generateForm(this.formData);
-  //     this.generateSubForm1();
-  //     this.hideSubmit = true;
-  //     this.hideApprovals = true;
-  //   }
-  // }
-
-getPage(): void {
-  console.log("getPage called with pageFunction:", this.pageFunction);
+private populateAddresses(addresses: any[]): void {
+  while (this.addresses.length > 0) {
+    this.addresses.removeAt(0);
+  }
   
-  if (this.pageFunction === "Add") {
-    this.generateForm();
-    this.hideApprovals = true;
-  } else if (this.pageFunction === "Update") {
-    this.generateForm(this.formData);
-    this.generateSubForm1();
-    this.hideApprovals = true;
-  } else if (this.pageFunction === "View") {
-    this.generateForm(this.formData);
-    this.generateSubForm1();
-    this.hideSubmit = true;
-    this.hideApprovals = true;
-    this.activateViewMode(); 
+  if (addresses && addresses.length > 0) {
+    addresses.forEach(address => {
+      this.addAddress(address);
+    });
+  } else {
+    this.addAddress();
   }
 }
 
-  viewMode: boolean = false;
-  activateViewMode() {
-    this.viewMode = true;
-  }
+  getPage(): void {
+    if (this.pageFunction === "Add") {
+      this.generateForm();
+      this.generateCorporateForm();
+      this.hideApprovals = true;
 
-getDataByClientId() {
-  console.log("Getting data for Client ID:", this.requestCode, "with action:", this.pageFunction);
-  
-  if (!this.requestCode || this.requestCode.trim() === '') {
-    console.error("Invalid clientId:", this.requestCode);
-    this.snackbar.showNotification("snackbar-danger", "Invalid Client ID");
-    this.pageFunction = "Add"; 
-    this.getPage();
-    return;
-  }
-  
-  this.mockDataService.getByClientId(this.requestCode).subscribe({
-    next: (res) => {
-      if (res.entity) {
-        this.formData = res.entity.RequestData || res.entity;
-        console.log("getDataByClientId this.formData: ", this.formData);
-        
-        if (this.pageFunction === "View") {
-          this.activateViewMode();
-        }
-
-        this.onPopulateTables({ entity: this.formData });
-        this.getPage();
-        this.showForm = true;
-      } else {
-        this.snackbar.showNotification("snackbar-danger", res.message);
-      }
-    },
-    error: (err) => {
-      this.snackbar.showNotification("snackbar-danger", err.message);
-      this.pageFunction = "Add";
-      this.getPage();
+     if (this.initialClientType) {
+      this.mngForm.patchValue({
+        ClientTypeID: this.initialClientType
+      });
+      this.onClientTypeChange(); 
     }
+
+      if (this.isCorporateClient()) {
+        this.dataSourceDirectors.data = [];
+        this.refreshDirectors();
+      }
+    } else if (this.pageFunction === "Update") {
+      this.generateForm(this.formData);
+      this.generateCorporateForm(this.formData);
+      this.generateSubForm1();
+      this.hideApprovals = true;
+    } else if (this.pageFunction === "View") {
+      this.generateForm(this.formData);
+      this.generateCorporateForm(this.formData);
+      this.generateSubForm1();
+      this.hideSubmit = true;
+      this.hideApprovals = true;
+      this.activateViewMode();
+    }
+  }
+
+  activateViewMode(): void {
+    this.viewMode = true;
+    this.mngForm.disable();
+    this.corporateForm?.disable();
+    this.directorsForm?.disable();
+  }
+
+  generateForm(formData?: ClientFormData): void {
+   // const clientType = formData?.ClientTypeID || this.route.snapshot.queryParams.clientType || 'Individual';
+    const clientType = formData?.ClientTypeID || this.initialClientType || '';
+      const currentDate = new Date().toISOString();
+
+    this.mngForm = this.fb.group({
+      ClientID: [
+        this.pageFunction === "Add" && this.prefillClientId ? this.prefillClientId : formData?.ClientID || "",
+        Validators.required
+      ],
+      ClientTypeID: [clientType, Validators.required],
+      TitleID: [formData?.TitleID || "", Validators.required],
+      IdentificationTypeID: [formData?.IdentificationTypeID || "", Validators.required],
+      PassportNo: [formData?.PassportNo || ""],
+      IDExpiryDate: [formData?.IDExpiryDate || ""],
+      ResidentID: [formData?.ResidentID || "", Validators.required],
+      RelationshipManager: [formData?.RelationshipManager || "", Validators.required],
+      
+      FirstName: [
+        formData?.FirstName || "",
+        [Validators.required, Validators.minLength(3), Validators.maxLength(40)]
+      ],
+      MiddleName: [
+        formData?.MiddleName || "",
+        [Validators.minLength(3), Validators.maxLength(40)]
+      ],
+      LastName: [
+        formData?.LastName || "",
+        [Validators.required, Validators.minLength(3), Validators.maxLength(40)]
+      ],
+      DateOfBirth: [formData?.DateOfBirth || "", Validators.required],
+      IsDOBGiven: [!!formData?.DateOfBirth || false],
+      NationalId: [
+        formData?.NationalId || "",
+        [Validators.required, Validators.minLength(7), Validators.maxLength(10), Validators.pattern("[0-9]+")]
+      ],
+      GenderID: [formData?.GenderID || "M", Validators.required],
+      KRAPin: [
+        formData?.KRAPin || "",
+        [Validators.required, Validators.minLength(4), Validators.maxLength(20)]
+      ],
+      Disabled: [formData?.Disabled || false],
+      DisabledRegNo: [formData?.DisabledRegNo || ""],
+     NumberOfHouseMembers: [formData?.NumberOfHouseMembers || 1, Validators.required],
+    CanDonateBlood: [formData?.CanDonateBlood || false, Validators.required],
+    IsSalaried: [formData?.IsSalaried || false, Validators.required],
+      PersonalPhone: [formData?.PersonalPhone || ""],
+      AlternativePhone: [
+        formData?.AlternativePhone || "",
+        [Validators.minLength(10), Validators.maxLength(12), Validators.pattern("[0-9]+")]
+      ],
+      // PersonalEmail: [
+      //   formData?.PersonalEmail || "",
+      //   [Validators.required, Validators.pattern("[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}")]
+      // ],
+      AlternativeEmail: [
+        formData?.AlternativeEmail || "",
+        [Validators.pattern("[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}")]
+      ],
+          WFClientStatusID: [formData?.WFClientStatusID || "A", Validators.required],
+    OpenedBy: [formData?.OpenedBy || this.currentUser, Validators.required],
+    CreatedBy: [formData?.CreatedBy || this.currentUser, Validators.required],
+    CreatedOn: [formData?.CreatedOn || currentDate, Validators.required],
+    OpenedDate: [formData?.OpenedDate || currentDate, Validators.required],
+    UpdateCount: [formData?.UpdateCount || 0],
+      
+    CanSendGreetings: [formData?.CanSendGreetings || false],
+    CanSendAssociateSpecialOffer: [formData?.CanSendAssociateSpecialOffer || false],
+    CanSendOurSpecialOffers: [formData?.CanSendOurSpecialOffers || false],
+    eStatementRequired: [formData?.eStatementRequired || false],
+    MobileAlertRequired: [formData?.MobileAlertRequired || false],
+    
+    ParentClientID1: [formData?.ParentClientID1 ||  ""],
+    ParentClientID2: [formData?.ParentClientID2 || ""],
+      
+      Addresses: this.fb.array([]),
+      NextOfKin: [formData?.NextOfKin || []],
+      EmploymentDetails: [formData?.EmploymentDetails || []],
+    });
+
+  if (formData?.Addresses && formData.Addresses.length > 0) {
+    formData.Addresses.forEach(address => this.addAddress(address));
+  } else {
+    this.addAddress();
+  }
+
+  if (formData?.NextOfKin && formData.NextOfKin.length > 0) {
+    formData.NextOfKin.forEach(kin => this.addNextOfKin(kin));
+  }
+
+  if (formData?.EmploymentDetails && formData.EmploymentDetails.length > 0) {
+   // formData.EmploymentDetails.forEach(employment => this.addEmploymentDetail(employment));
+  }
+
+    if (this.pageFunction === "Add") {
+      this.setupFormPersistence();
+    }
+      if (!clientType) {
+    this.toggleFormFields('');
+  } else {
+    this.toggleFormFields(clientType);
+  }
+  }
+
+  generateCorporateForm(formData?: ClientFormData): void {
+    this.corporateForm = this.fb.group({
+      CompanyName: [formData?.CompanyName || "", Validators.required],
+      Constitution: [formData?.Constitution || "", Validators.required],
+      NatureOfBusiness: [formData?.NatureOfBusiness || "", Validators.required],
+      RegistrationNumber: [formData?.RegistrationNumber || "", Validators.required],
+      RegisteredAt: [formData?.RegisteredAt || "", Validators.required],
+      KRAPinNo: [formData?.KRAPin || "", Validators.required],
+      DateOfRegistration: [formData?.DateOfRegistration || "", Validators.required],
+      RegisteredOffice: [formData?.RegisteredOffice || "", Validators.required],
+      Comments: [formData?.Comments || ""],
+      Website: [formData?.Website || ""],
+      OpenedBy: [formData?.OpenedBy || this.currentUser],
+      OpenedOn: [formData?.OpenedOn || new Date().toISOString()],
+      RelationshipManager: [formData?.RelationshipManager || "", Validators.required]
+    });
+  }
+
+  get addresses(): FormArray {
+    return this.mngForm.get('Addresses') as FormArray;
+  }
+    validateDirectorsShareTotal(): boolean {
+    if (this.isCorporateClient()) {
+      const totalShare = this.dataSourceDirectors.data.reduce((sum, director) => sum + (director.share || 0), 0);
+      return totalShare <= 100;
+    }
+    return true;
+  }
+
+  startAddDirector(): void {
+    this.directorActionLabel = 'Add';
+    this.selectedDirectorIndex = -1;
+    this.generateDirectorForm();
+    this.showDirectorsForm = true;
+  }
+
+  editDirector(director: Director, index: number): void {
+    this.directorActionLabel = 'Update';
+    this.selectedDirectorIndex = index;
+    this.generateDirectorForm(director);
+    this.showDirectorsForm = true;
+  }
+
+  addDirector(): void {
+    if (this.directorsForm.invalid) {
+      this.directorsForm.markAllAsTouched();
+      return;
+    }
+
+    const directorData: Director = this.directorsForm.value;
+
+    if (this.directorActionLabel === 'Add') {
+      this.dataSourceDirectors.data.push(directorData);
+    } else if (this.directorActionLabel === 'Update' && this.selectedDirectorIndex !== -1) {
+      this.dataSourceDirectors.data[this.selectedDirectorIndex] = directorData;
+    }
+
+    this.refreshDirectors();
+    this.cancelDirectorEdit();
+  }
+
+  deleteDirector(index: number): void {
+    if (confirm('Are you sure you want to delete this director?')) {
+      this.dataSourceDirectors.data.splice(index, 1);
+      this.refreshDirectors();
+    }
+  }
+
+  cancelDirectorEdit(): void {
+    this.showDirectorsForm = false;
+    this.selectedDirectorIndex = -1;
+    this.directorsForm.reset();
+  }
+
+createAddress(address?: Address): FormGroup {
+  const currentDate = new Date().toISOString();
+  
+  return this.fb.group({
+    AddressTypeID: [address?.AddressTypeID || 'M', Validators.required],
+    Address1: [address?.Address1 || '', Validators.required],
+    Address2: [address?.Address2 || ''],
+    CityID: [address?.CityID || '', Validators.required],
+    CountryID: [address?.CountryID || 'KE', Validators.required],
+    Mobile: [address?.Mobile || ''],
+    Email: [address?.Email || '', Validators.email],
+    IsMailingAddress: [address?.IsMailingAddress || false],
+    CreatedBy: [address?.CreatedBy || this.currentUser, Validators.required],
+    CreatedOn: [address?.CreatedOn || currentDate, Validators.required],
+    UpdateCount: [address?.UpdateCount || 0]
   });
 }
 
-  generateForm(formData?): void {
-    console.log("generateForm formData :: ", formData);
-    this.mngForm = this.fb.group({
-      id: [formData?.id ?? ""],
-      clientId: [this.pageFunction === "Add" && this.prefillClientId? this.prefillClientId : formData?.clientId ?? "",Validators.required],
-    //  clientId: [formData?.clientId ?? "", Validators.required],
-      applicationId: [formData?.applicationId ?? "", Validators.required],
-      title: [formData?.title ?? "", Validators.required],
-      clientType: [formData?.clientType ?? "", Validators.required],
-      baseId: [formData?.baseId ?? "", Validators.required],
-      residentStatus: [formData?.residentStatus ?? "", Validators.required],
-      relationshipManager: [formData?.relationshipManager ?? "", Validators.required],
-      identificationType: [formData?.identificationType ?? "", Validators.required],
-      passportNumber: [formData?.passportNumber ?? ""],
-      idExpiryDate: [formData?.idExpiryDate ?? ""],
-      
-      canSendGreetings: [formData?.canSendGreetings ?? false],
-      canSendAssociateSpecialOffer: [formData?.canSendAssociateSpecialOffer ?? false],
-      canSendOurSpecialOffers: [formData?.canSendOurSpecialOffers ?? false],
-      statementOnline: [formData?.statementOnline ?? false],
-      mobileAlert: [formData?.mobileAlert ?? false],
-
-
-      empNo: [formData?.empNo ?? null],
-      firstName: [
-        formData?.firstName ?? "",
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(40),
-        ],
-      ],
-      middleName: [
-        formData?.middleName ?? "",
-        [Validators.minLength(3), Validators.maxLength(40)],
-      ],
-      lastName: [
-        formData?.lastName ?? "",
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(40),
-        ],
-      ],
-      dob: [formData?.dob ?? "", Validators.required],
-      nationalId: [
-        formData?.nationalId ?? "",
-        [
-          Validators.required,
-          Validators.minLength(7),
-          Validators.maxLength(10),
-          Validators.pattern("[0-9]+"),
-        ],
-      ],
-      religion: [formData?.religion ?? "", Validators.required],
-      gender: [formData?.gender ?? "male", Validators.required],
-      disabled: [formData?.disabled ?? false],
-      disabledRegNo: [
-        formData?.disabledRegNo ?? ""
-
-      ],
-      addresses: this.fb.array([]),
-      
-      //Contact Info
-      personalPhone: [
-        formData?.personalPhone ?? ""
-
-      ],
-      alternativePhone: [
-        formData?.alternativePhone ?? "",
-        [
-          Validators.minLength(10),
-          Validators.maxLength(12),
-          Validators.pattern("[0-9]+"),
-        ],
-      ],
-      personalEmail: [
-        formData?.personalEmail ?? "",
-        [
-          Validators.required,
-          Validators.pattern(
-            "[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}"
-          ),
-        ],
-      ],
-      alternativeEmail: [
-        formData?.alternativeEmail ?? "",
-        [
-          Validators.pattern(
-            "[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}"
-          ),
-        ],
-      ],
-
-      nextOfKins: [formData?.nextOfKins ?? []],
-
-     employeeWorkExperiences: [formData?.employeeWorkExperiences ?? []],
-
-
-      kraNo: [
-        formData?.kraNo ?? "",
-        [
-          Validators.required,
-          Validators.minLength(4),
-          Validators.maxLength(20),
-        ],
-      ],
-      
-    });
-    
-    if (this.pageFunction === "Add" && this.prefillClientId) {
-    console.log("Applying prefill to clientId:", this.prefillClientId);
-    this.mngForm.patchValue({
-      clientId: this.prefillClientId
-    });
-    
-    setTimeout(() => {
-      console.log("Verified clientId value:", this.mngForm.get('clientId')?.value);
-    }, 100);
-  }
-
-     if (formData?.addresses && formData.addresses.length > 0) {
-      formData.addresses.forEach(address => {
-        this.addAddress(address);
-      });
-    } else {
-      this.addAddress();
-    }
-    if (this.pageFunction === "Add") {
-      const storedData = localStorage.getItem("mngFormDataEmployee");
-      if (storedData) {
-       // this.mngForm.patchValue(JSON.parse(storedData));
-
-        this.onPopulateTables(JSON.parse(storedData));
-
-        console.log("storedData:: ", storedData);
-      }
-      this.mngForm.valueChanges.subscribe((value) => {
-        localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
-      });
-    }
-    
-    
-  }
-
-    get addresses(): FormArray {
-    return this.mngForm.get('addresses') as FormArray;
-  }
-
-  createAddress(address?: any): FormGroup {
-    return this.fb.group({
-      addressType: [address?.addressType || 'Home', Validators.required],
-      residentialCountry: [address?.residentialCountry || 'Kenya', Validators.required],
-      residentialCounty: [address?.residentialCounty || '', Validators.required],
-      residentialSubCounty: [address?.residentialSubCounty || ''],
-      city: [address?.city || ''],
-      postalAddress: [address?.postalAddress || ''],
-      postalCode: [address?.postalCode || ''],
-      isPrimary: [address?.isPrimary || false]
-    });
-  }
-
-  addAddress(address?: any): void {
+  addAddress(address?: Address): void {
     this.addresses.push(this.createAddress(address));
   }
 
   removeAddress(index: number): void {
     this.addresses.removeAt(index);
   }
-
-generateTempId(): string {
-  return 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+createNextOfKin(kin?: NextOfKin): FormGroup {
+  const currentDate = new Date().toISOString();
+  
+  return this.fb.group({
+    ID: [kin?.ID || null],
+    ClientID: [kin?.ClientID || ''],
+    RelatedClientID: [kin?.RelatedClientID || '', Validators.required],
+    RelationID: [kin?.RelationID || '', Validators.required],
+    RelationRefNo: [kin?.RelationRefNo || 1, Validators.required],
+    Remarks: [kin?.Remarks || '', Validators.required],
+    SharePercent: [kin?.SharePercent || 0, [Validators.required, Validators.min(0), Validators.max(100)]],
+    UpdateCount: [kin?.UpdateCount || 0],
+    CreatedBy: [kin?.CreatedBy || this.currentUser, Validators.required],
+    CreatedOn: [kin?.CreatedOn || currentDate, Validators.required]
+  });
 }
 
-  nextOfKinForm: FormGroup;
-  dataSource1 = new MatTableDataSource<any>([]);
-  @ViewChild(MatPaginator) paginator1!: MatPaginator;
-  @ViewChild(MatSort) sort1!: MatSort;
+addNextOfKin(kin?: NextOfKin): void {
+  const nextOfKinArray = this.mngForm.get('NextOfKin') as FormArray;
+  nextOfKinArray.push(this.createNextOfKin(kin));
+}
 
-  displayedColumns1: string[] = [
-    "id",
-    "name",
-    "phoneNumber",
-    "email",
-    "address",
-    "relationship",
-     "percentageAllocation",
-    "action",
-  ];
-  showParTranForm1 = false;
-  parTranAction1: string = "";
-  selectedParTranIndex1: number;
 
-  input1: any;
-  applyFilter1(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.input1 = filterValue;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource1.paginator) {
-      this.dataSource1.paginator.firstPage();
-    }
+addParTran1(): void {
+  this.showParTranForm1 = true;
+  this.parTranAction1 = 'Add';
+  this.selectedParTranIndex1 = null;
+  this.generateSubForm1(); 
+}
+
+editParTran1(row: NextOfKin, index: number): void {
+  this.showParTranForm1 = true;
+  this.parTranAction1 = 'Update';
+  this.selectedParTranIndex1 = index;
+  this.generateSubForm1(row, true); 
+}
+
+cancelParTran1(): void {
+  this.showParTranForm1 = false;
+  this.selectedParTranIndex1 = null;
+  this.nextOfKinForm.reset();
+}
+
+addParTran4(): void {
+  this.showParTranForm4 = true;
+  this.parTranAction4 = 'Add';
+  this.selectedParTranIndex4 = null;
+  this.generateSubForm4(); 
+}
+
+editParTran4(row: EmploymentDetail, index: number): void {
+  this.showParTranForm4 = true;
+  this.parTranAction4 = 'Update';
+  this.selectedParTranIndex4 = index;
+  this.generateSubForm4(row); 
+}
+
+cancelParTran4(): void {
+  this.showParTranForm4 = false;
+  this.selectedParTranIndex4 = null;
+  this.workExpForm.reset();
+}
+
+
+
+
+
+
+
+pushToDataSource1(): void {
+  // if (this.nextOfKinForm.invalid) {
+  //   this.nextOfKinForm.markAllAsTouched();
+  //   return;
+  // }
+
+  const nextOfKinData: NextOfKin = {
+    ...this.nextOfKinForm.value,
+    CreatedBy: this.currentUser,
+    CreatedOn: new Date().toISOString(),
+    UpdateCount: 0
+  };
+
+  if (this.parTranAction1 === 'Add') {
+    this.nextOfKinArray.push(this.fb.group(nextOfKinData));
+  } else if (this.parTranAction1 === 'Update' && this.selectedParTranIndex1 !== null) {
+    this.nextOfKinArray.at(this.selectedParTranIndex1).patchValue(nextOfKinData);
   }
 
-generateSubForm1(formData?, isEdit = false): void {
+  this.refresh1();
+  this.cancelParTran1();
+}
+
+pushToDataSource4(): void {
+  if (this.workExpForm.invalid) {
+    this.workExpForm.markAllAsTouched();
+    return;
+  }
+
+  const employmentData: EmploymentDetail = this.workExpForm.value;
+
+  if (this.parTranAction4 === 'Add') {
+    this.dataSource4.data.push(employmentData);
+  } else if (this.parTranAction4 === 'Update' && this.selectedParTranIndex4 !== null) {
+    this.dataSource4.data[this.selectedParTranIndex4] = employmentData;
+  }
+
+  this.refresh4();
+  this.cancelParTran4();
+}
+deleteParTran1(index: number): void {
+  if (confirm('Are you sure you want to delete this next of kin?')) {
+    this.dataSource1.data.splice(index, 1);
+    this.refresh1();
+  }
+}
+
+deleteParTran4(index: number): void {
+  if (confirm('Are you sure you want to delete this employment detail?')) {
+    this.dataSource4.data.splice(index, 1);
+    this.refresh4();
+  }
+}
+applyFilter1(event: Event): void {
+  const filterValue = (event.target as HTMLInputElement).value;
+  this.dataSource1.filter = filterValue.trim().toLowerCase();
+  
+  if (this.dataSource1.paginator) {
+    this.dataSource1.paginator.firstPage();
+  }
+}
+
+applyFilter4(event: Event): void {
+  const filterValue = (event.target as HTMLInputElement).value;
+  this.dataSource4.filter = filterValue.trim().toLowerCase();
+  
+  if (this.dataSource4.paginator) {
+    this.dataSource4.paginator.firstPage();
+  }
+}
+
+generateSubForm1(formData?: NextOfKin, isEdit = false): void {
   this.nextOfKinForm = this.fb.group({
-    name: [formData?.name ?? "", [Validators.required]],
-    phoneNumber: [
-      formData?.phoneNumber ?? "",
-      [Validators.minLength(10), Validators.maxLength(12), Validators.pattern("[0-9]+")],
+    ClientID: [formData?.ClientID || "", Validators.required],
+    RelatedClientID: [formData?.RelatedClientID || "", Validators.required],
+    RelationID: [formData?.RelationID || "", Validators.required],
+    RelationRefNo: [formData?.RelationRefNo || null, Validators.required],
+    Remarks: [formData?.Remarks || "", Validators.required],
+    SharePercent: [
+      formData?.SharePercent || 0,
+      [Validators.required, Validators.min(0), Validators.max(100)]
     ],
-    email: [
-      formData?.email ?? "",
-      [Validators.pattern("[a-zA-Z0-9.-_]+@[a-zA-Z.-]+\\.[a-zA-Z]{2,}")],
-    ],
-    address: [
-      formData?.address ?? "",
-      [Validators.minLength(5), Validators.maxLength(50)],
-    ],
-    relationship: [formData?.relationship ?? "", [Validators.required]],
-    percentageAllocation: [
-      formData?.percentageAllocation ?? 0,
-      [Validators.required, Validators.min(0), Validators.max(100)],
-    ],
-    remainingAllocation: [{ value: formData?.remainingAllocation ?? 100, disabled: true }],
+    remainingAllocation: [{ value: 100 - (formData?.SharePercent || 0), disabled: true }],
+    UpdateCount: [formData?.UpdateCount || 0],
+    CreatedBy: [formData?.CreatedBy || ""],
+    CreatedOn: [formData?.CreatedOn || ""]
   });
 
-  this.nextOfKinForm.get("percentageAllocation")?.valueChanges.subscribe(() => {
+  this.nextOfKinForm.get("SharePercent")?.valueChanges.subscribe(() => {
     this.calculateRemainingAllocation(isEdit);
   });
 
@@ -560,602 +800,336 @@ generateSubForm1(formData?, isEdit = false): void {
 }
 
 
- calculateRemainingAllocation(isEdit: boolean = false): void {
-  const currentAllocation = this.nextOfKinForm.get('percentageAllocation')?.value || 0;
-
-  let totalAllocated = this.dataSource1.data.reduce((sum, kin, index) => {
-    if (isEdit && index === this.selectedParTranIndex1) {
-      return sum;
-    }
-    return sum + (kin.percentageAllocation || 0);
-  }, 0);
-
-  const remaining = 100 - totalAllocated - currentAllocation;
-
-  const control = this.nextOfKinForm.get('remainingAllocation');
-  if (control) {
-    control.setValue(remaining >= 0 ? remaining : 0);
-  }
-
-  if ((totalAllocated + currentAllocation) > 100) {
+  calculateRemainingAllocation(isEdit: boolean = false): void {
+    const currentAllocation = this.nextOfKinForm.get('SharePercent')?.value || 0;
     
-  }
-}
-  resetFormAndHide1() {
-    this.mngForm.patchValue({
-      nextOfKins: this.dataSource1.data,
-    });
-    this.nextOfKinForm.reset();
-    this.showParTranForm1 = false;
-  }
-
-  addParTran1() {
-    this.parTranAction1 = "Add";
-    this.showParTranForm1 = true;
-  }
-
-  refresh1() {
-    this.dataSource1.data = [...this.dataSource1.data];
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
-  }
-
-  editParTran1(data: any, index: number) {
-  this.parTranAction1 = "Update";
-  this.selectedParTranIndex1 = index;
-  this.previousAllocation = data.percentageAllocation || 0; 
-  this.generateSubForm1(data,true);
-  this.showParTranForm1 = true;
-}
-
-
-  pushToDataSource1() {
-    if (this.parTranAction1 === "Add") {
-      this.dataSource1.data.push(this.nextOfKinForm.value);
-    } else if (this.parTranAction1 === "Update") {
-      let indexToUpdate: number;
-
-      if (this.nextOfKinForm.value.id) {
-        indexToUpdate = this.dataSource1.data.findIndex(
-          (item) => item.id === this.nextOfKinForm.value.id
-        );
-      } else {
-        indexToUpdate = this.selectedParTranIndex1;
+    let totalAllocated = this.dataSource1.data.reduce((sum, kin, index) => {
+      if (isEdit && index === this.selectedParTranIndex1) {
+        return sum;
       }
+      return sum + (kin.SharePercent || 0);
+    }, 0);
 
-      if (indexToUpdate !== -1) {
-        this.dataSource1.data[indexToUpdate] = this.nextOfKinForm.value;
-      }
-    }
-
-    this.resetFormAndHide1();
-    this.refresh1();
+    const remaining = 100 - totalAllocated - currentAllocation;
+    
+    this.nextOfKinForm.get('remainingAllocation')?.setValue(remaining >= 0 ? remaining : 0);
   }
 
-  cancelParTran1() {
-    this.resetFormAndHide1();
-  }
-
-  deleteParTran1(index: number) {
-    this.dataSource1.data.splice(index, 1);
-    this.refresh1();
-  }
-
-  dataSource2 = new MatTableDataSource<any>([]);
-  @ViewChild(MatPaginator) paginator2!: MatPaginator;
-  @ViewChild(MatSort) sort2!: MatSort;
-
-  showParTranForm2 = false;
-  parTranAction2: string = "";
-  selectedParTranIndex2: number;
-
-  input2: any;
-  applyFilter2(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.input1 = filterValue;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource2.paginator) {
-      this.dataSource2.paginator.firstPage();
-    }
-  }
-
-  addParTran2() {
-    this.parTranAction2 = "Add";
-    this.showParTranForm2 = true;
-  }
-
-  refresh2() {
-    this.dataSource2.data = [...this.dataSource2.data];
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
-  }
-
-  editParTran2(data: any, index: number) {
-    this.parTranAction2 = "Update";
-    this.selectedParTranIndex2 = index;
-    this.showParTranForm2 = true;
-  }
-
-  dataSource3 = new MatTableDataSource<any>([]);
-  @ViewChild(MatPaginator) paginator3!: MatPaginator;
-  @ViewChild(MatSort) sort3!: MatSort;
-
-  displayedColumns3: string[] = [
-    "id",
-    "institutionName",
-    "awardCertificate",
-    "certNo",
-    "gpaScore",
-    "enrollOn",
-    "graduatedOn",
-    "action",
-  ];
-  showParTranForm3 = false;
-  parTranAction3: string = "";
-  selectedParTranIndex3: number;
-
-  input3: any;
-  applyFilter3(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.input1 = filterValue;
-    this.dataSource3.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource3.paginator) {
-      this.dataSource3.paginator.firstPage();
-    }
-  }
-
-  addParTran3() {
-    this.parTranAction3 = "Add";
-    this.showParTranForm3 = true;
-  }
-
-  refresh3() {
-    this.dataSource3.data = [...this.dataSource3.data];
-    this.dataSource3.paginator = this.paginator3;
-    this.dataSource3.sort = this.sort3;
-  }
-
-  editParTran3(data: any, index: number) {
-    this.parTranAction3 = "Update";
-    this.selectedParTranIndex3 = index;
-    this.showParTranForm3 = true;
-  }
-
-  workExpForm: FormGroup;
-  dataSource4 = new MatTableDataSource<any>([]);
-  @ViewChild(MatPaginator) paginator4!: MatPaginator;
-  @ViewChild(MatSort) sort4!: MatSort;
-
-  displayedColumns4: string[] = [
-    "id",
-    "companyName",
-    "workPosition",
-    "startDate",
-    "endDate",
-    "action",
-  ];
-  showParTranForm4 = false;
-  parTranAction4: string = "";
-  selectedParTranIndex4: number;
-
-  input4: any;
-  applyFilter4(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.input1 = filterValue;
-    this.dataSource4.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource4.paginator) {
-      this.dataSource4.paginator.firstPage();
-    }
-  }
-
-  generateSubForm4(formData?): void {
+  generateSubForm4(formData?: EmploymentDetail): void {
     this.workExpForm = this.fb.group({
-      companyName: [formData?.companyName ?? "", Validators.required],
-      workPosition: [formData?.workPosition ?? "", Validators.required],
-      startDate: [formData?.startDate ?? "", Validators.required],
-      endDate: [formData?.endDate ?? "", Validators.required],
+      companyName: [formData?.companyName || "", Validators.required],
+      workPosition: [formData?.workPosition || "", Validators.required],
+      startDate: [formData?.startDate || "", Validators.required],
+      endDate: [formData?.endDate || "", Validators.required],
     });
   }
 
-  resetFormAndHide4() {
-    this.mngForm.patchValue({
-      employeeWorkExperiences: this.dataSource4.data,
+  generateDirectorForm(director?: Director): void {
+    this.directorsForm = this.fb.group({
+      clientName: [director?.clientName || '', [Validators.required, Validators.minLength(2)]],
+      relation: [director?.relation || '', [Validators.required]],
+      share: [
+        director?.share || 0,
+        [Validators.required, Validators.min(0), Validators.max(100)]
+      ]
     });
-    this.workExpForm.reset();
-    this.showParTranForm4 = false;
   }
 
-  addParTran4() {
-    this.parTranAction4 = "Add";
-    this.showParTranForm4 = true;
+
+
+onClientTypeChange(): void {
+  const clientType = this.mngForm.get('ClientTypeID')?.value;
+  
+  this.toggleFormFields(clientType);
+  
+  if (clientType === 'Corporate' || clientType === 'Bank') {
+    this.mngForm.get('TitleID')?.reset();
+    this.mngForm.get('FirstName')?.reset();
+    this.mngForm.get('LastName')?.reset();
+    this.mngForm.get('GenderID')?.reset();
   }
+}
 
-  refresh4() {
-    this.dataSource4.data = [...this.dataSource4.data];
-    this.dataSource4.paginator = this.paginator4;
-    this.dataSource4.sort = this.sort4;
-  }
+isClientTypeSelected(): boolean {
+  return !!this.mngForm.get('ClientTypeID')?.value;
+}
 
-  editParTran4(data: any, index: number) {
-    this.parTranAction4 = "Update";
-    this.selectedParTranIndex4 = index;
-    this.generateSubForm4(data);
-    this.showParTranForm4 = true;
-  }
+isCorporateClient(): boolean {
+  const clientType = this.mngForm.get('ClientTypeID')?.value;
+  return clientType === 'Corporate' || clientType === 'Bank';
+}
 
-  pushToDataSource4() {
-    if (this.parTranAction4 === "Add") {
-      this.dataSource4.data.push(this.workExpForm.value);
-    } else if (this.parTranAction4 === "Update") {
-      let indexToUpdate: number;
+isIndividualClient(): boolean {
+  const clientType = this.mngForm.get('ClientTypeID')?.value;
+  return clientType === 'Individual' || clientType === 'Employee' || clientType === 'Minor';
+}
 
-      if (this.workExpForm.value.id) {
-        indexToUpdate = this.dataSource4.data.findIndex(
-          (item) => item.id === this.workExpForm.value.id
-        );
+toggleFormFields(clientType: string): void {
+  const fieldsToToggle = [
+    'ApplicationID', 'BaseID', 'ResidentID', 'RelationshipManager', 
+    'IdentificationTypeID', 'PassportNo', 'IDExpiryDate'
+  ];
+
+  fieldsToToggle.forEach(field => {
+    const control = this.mngForm.get(field);
+    if (control) {
+      if (clientType) {
+        control.enable();
       } else {
-        indexToUpdate = this.selectedParTranIndex4;
-      }
-
-      if (indexToUpdate !== -1) {
-        this.dataSource4.data[indexToUpdate] = this.workExpForm.value;
+        control.disable();
+        control.reset();
       }
     }
+  });
 
-    this.resetFormAndHide4();
-    this.refresh4();
-  }
-
-  cancelParTran4() {
-    this.resetFormAndHide4();
-  }
-
-  deleteParTran4(index: number) {
-    this.dataSource4.data.splice(index, 1);
-    this.resetFormAndHide4();
-    this.refresh4();
-  }
-  file_name: any;
-  base64File: string;
-  loading: boolean = false;
-  handleFileInput(event: any) {
-    const file: File = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      this.base64File = reader.result as string;
-      this.file_name = file.name;
-      this.mngForm.patchValue({
-       // marriageCertificate: this.base64File,
-      });
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
+  const titleControl = this.mngForm.get('TitleID');
+  if (titleControl) {
+    if (clientType && !this.isCorporateClient()) {
+      titleControl.enable();
+    } else {
+      titleControl.disable();
+      titleControl.reset();
     }
   }
-  getDocument() {
+}
 
-  }
+  // onSubmit(): void {
+  //   this.posting = true;
 
-  downloadDocument() {
-    let fileName = "Document";
+  //  // const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
+  //      const totalAllocation = 100;
 
-    fetch(this.formData.marriageCertificate)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${fileName}`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      });
-  }
+  //   if (totalAllocation !== 100) {
+  //     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
+  //     this.posting = false;
+  //     return;
+  //   }
 
-  selectedItem: any;
-  employeeLookup() {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.disableClose = false;
-    dialogConfig.disableClose = true;
-    dialogConfig.width = "800px";
-    dialogConfig.data = {
-      action: "SingleEmployee",
-      selected: this.selectedItem,
-    };
-    const dialogRef = this.dialog.open(EmployeesLookupComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe((res) => {
-      if (res && res.data && res.data.length > 0) {
-        this.mngForm.patchValue({
-          reportingToPf: res.data[0].empNo,
-          reportingToFullname:
-            res.data[0].firstName +
-            " " +
-            res.data[0].middleName +
-            " " +
-            res.data[0].lastName,
-        });
-      }
-    });
-  }
-  posting: boolean = false;
- 
-//   onSubmit() {
-//   this.posting = true;
-
-//   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
-//     return sum + (kin.percentageAllocation || 0);
-//   }, 0);
-
-//   if (totalAllocation !== 100) {
-//     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
-//     this.posting = false; 
-//     return; 
-//   }
-
-//   let formValue = this.mngForm.value;
-//   if (!formValue.empNo) {
-//     delete formValue.empNo;
-//   }
-
-//   console.log("this.mngForm.value: ", formValue);
-
-//   if (this.mngForm.valid) {
-//     const formattedRequest = {
-//       RequestID: this.generateRandomId(), 
-//       //RequestData: JSON.stringify(formValue), 
-//       RequestData: formValue,
-//       RequestTime: new Date().toISOString(), 
-//       AppName: "CLIENT_DATA" 
-//     };
-
-//     console.log("Formatted Request: ", formattedRequest);
-
-//     if (this.pageFunction == "Add") {
-//       this.employeeService
-//         .create(formattedRequest) 
-//         .pipe(takeUntil(this.destroy$))
-//         .subscribe({
-//           next: (res) => {
-//             console.log("res: ", res);
-
-//             if (res.statusCode == 201) {
-//               this.snackbar.showNotification("snackbar-success", res.message);
-//               this.cancel();
-//             } else {
-//               this.snackbar.showNotification("snackbar-danger", res.message);
-//             }
-//           },
-//           error: (err) => {
-//             this.snackbar.showNotification("snackbar-danger", err.message);
-//             this.posting = false;
-//           },
-//           complete: () => {
-//             this.posting = false;
-//           },
-//         });
-//     } else if (this.pageFunction == "Update") {
-//       this.employeeService
-//         .update(formattedRequest) 
-//         .pipe(takeUntil(this.destroy$))
-//         .subscribe({
-//           next: (res) => {
-//             if (res.statusCode == 200) {
-//               this.snackbar.showNotification("snackbar-success", res.message);
-//               this.cancel();
-//             } else {
-//               this.snackbar.showNotification("snackbar-danger", res.message);
-//             }
-//           },
-//           error: (err) => {
-//             this.snackbar.showNotification("snackbar-danger", err.message);
-//             this.posting = false;
-//           },
-//           complete: () => {
-//             this.posting = false;
-//           },
-//         });
-//     }
-//   } else {
-//     this.displayInvalidFields();
-//     this.posting = false;
-//   }
-// }
-
-
-
-//second submit for testing mock api
-
-// onSubmit() {
-//   this.posting = true;
-
-//   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
-//     return sum + (kin.percentageAllocation || 0);
-//   }, 0);
-
-//   if (totalAllocation !== 100) {
-//     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
-//     this.posting = false; 
-//     return; 
-//   }
-
-//   let formValue = this.mngForm.value;
-//   if (!formValue.empNo) {
-//     delete formValue.empNo;
-//   }
-
-//   console.log("this.mngForm.value: ", formValue);
-
-//   if (this.mngForm.valid) {
-//     const formattedRequest = {
-//       RequestID: this.generateRandomId(), 
-//       RequestData: formValue,
-//       RequestTime: new Date().toISOString(), 
-//       AppName: "CLIENT_DATA" 
-//     };
-
-//     console.log("Formatted Request: ", formattedRequest);
-
-//     if (this.pageFunction == "Add") {
-//       this.mockDataService.create(formattedRequest).subscribe({
-//         next: (res) => {
-//           console.log("Mock response: ", res);
-//           if (res.statusCode == 201) {
-//             this.snackbar.showNotification("snackbar-success", res.message);
-//             this.cancel();
-//           } else {
-//             this.snackbar.showNotification("snackbar-danger", res.message);
-//           }
-//         },
-//         error: (err) => {
-//           this.snackbar.showNotification("snackbar-danger", err.message);
-//           this.posting = false;
-//         },
-//         complete: () => {
-//           this.posting = false;
-//         },
-//       });
-//     } else if (this.pageFunction == "Update") {
-//       this.mockDataService.update(formattedRequest).subscribe({
-//         next: (res) => {
-//           if (res.statusCode == 200) {
-//             this.snackbar.showNotification("snackbar-success", res.message);
-//             this.cancel();
-//           } else {
-//             this.snackbar.showNotification("snackbar-danger", res.message);
-//           }
-//         },
-//         error: (err) => {
-//           this.snackbar.showNotification("snackbar-danger", err.message);
-//           this.posting = false;
-//         },
-//         complete: () => {
-//           this.posting = false;
-//         },
-//       });
-//     }
-//   } else {
-//     this.displayInvalidFields();
-//     this.posting = false;
-//   }
-// }
-
-onSubmit() {
+  //   if (this.mngForm.valid && (this.isCorporateClient() ? this.corporateForm.valid : true)) {
+  //     const formValue = this.prepareFormData();
+  //     this.submitFormData(formValue);
+  //   } else {
+  //     this.displayInvalidFields();
+  //     this.posting = false;
+  //   }
+  // }
+onSubmit(): void {
   this.posting = true;
 
-  const totalAllocation = this.dataSource1.data.reduce((sum, kin) => {
-    return sum + (kin.percentageAllocation || 0);
-  }, 0);
+  // Validate required system fields
+  const requiredFields = [
+    'WFClientStatusID', 'OpenedBy', 'CreatedBy', 'CreatedOn', 'OpenedDate',
+    'NumberOfHouseMembers', 'CanDonateBlood', 'IsSalaried'
+  ];
+  
+  const missingFields = requiredFields.filter(field => {
+    const value = this.mngForm.get(field)?.value;
+    return value === null || value === undefined || value === '';
+  });
+
+  if (missingFields.length > 0) {
+    this.snackbar.showNotification("snackbar-danger", 
+      `Missing required fields: ${missingFields.join(', ')}`);
+    this.posting = false;
+    return;
+  }
+
+  // Validate total allocation
+  // const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
+    const totalAllocation = 100;
 
   if (totalAllocation !== 100) {
-    this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
-    this.posting = false; 
-    return; 
+    this.snackbar.showNotification("snackbar-danger", 
+      "Next Of Kin Total percentage allocation must be exactly 100%.");
+    this.posting = false;
+    return;
   }
 
-  let formValue = this.mngForm.value;
-  if (!formValue.empNo) {
-    delete formValue.empNo;
-  }
-
-  console.log("this.mngForm.value: ", formValue);
-
-  if (this.mngForm.valid) {
-    let requestId: string;
-    let clientId: string;
-
-    if (this.pageFunction === "Update") {
-      requestId = this.requestId || this.formData?.id || this.generateRandomId();
-      clientId = this.requestCode || this.formData?.clientId || formValue.clientId;
-    } else {
-      requestId = this.generateRandomId();
-      clientId = formValue.clientId || this.generateClientId();
-    }
-
-    const formattedRequest = {
-      RequestID: requestId, 
-      RequestData: {
-        ...formValue,
-        id: requestId, 
-        clientId: clientId 
-      },
-      RequestTime: new Date().toISOString(), 
-      AppName: "CLIENT_DATA" 
-    };
-
-    console.log("Formatted Request: ", formattedRequest);
-
-    if (this.pageFunction == "Add") {
-      this.mockDataService.create(formattedRequest).subscribe({
-        next: (res) => {
-          console.log("Mock response: ", res);
-          if (res.statusCode == 201) {
-            this.snackbar.showNotification("snackbar-success", res.message);
-            this.cancel();
-          } else {
-            this.snackbar.showNotification("snackbar-danger", res.message);
-          }
-        },
-        error: (err) => {
-          this.snackbar.showNotification("snackbar-danger", err.message);
-          this.posting = false;
-        },
-        complete: () => {
-          this.posting = false;
-        },
-      });
-    } else if (this.pageFunction == "Update") {
-      this.mockDataService.update(formattedRequest).subscribe({
-        next: (res) => {
-          if (res.statusCode == 200) {
-            this.snackbar.showNotification("snackbar-success", res.message);
-            this.cancel();
-          } else {
-            this.snackbar.showNotification("snackbar-danger", res.message);
-          }
-        },
-        error: (err) => {
-          this.snackbar.showNotification("snackbar-danger", err.message);
-          this.posting = false;
-        },
-        complete: () => {
-          this.posting = false;
-        },
-      });
-    }
+  if (this.mngForm.valid && (this.isCorporateClient() ? this.corporateForm.valid : true)) {
+    const formValue = this.prepareFormData();
+    this.submitFormData(formValue);
   } else {
     this.displayInvalidFields();
     this.posting = false;
   }
 }
+  private prepareFormData(): any {
+    const formValue = {
+      ...this.mngForm.value,
+      Name: `${this.mngForm.value.FirstName} ${this.mngForm.value.MiddleName || ''} ${this.mngForm.value.LastName}`.trim(),
+      IsDOBGiven: !!this.mngForm.value.DateOfBirth,
+      NextOfKin: this.dataSource1.data,
+      EmploymentDetails: this.dataSource4.data,
+          WFClientStatusID: this.mngForm.value.WFClientStatusID || 'A',
+    OpenedBy: this.mngForm.value.OpenedBy || this.currentUser,
+    CreatedBy: this.mngForm.value.CreatedBy || this.currentUser,
+    CreatedOn: this.mngForm.value.CreatedOn || new Date().toISOString(),
+    OpenedDate: this.mngForm.value.OpenedDate || new Date().toISOString(),
+    UpdateCount: this.mngForm.value.UpdateCount || 0,
+    NumberOfHouseMembers: this.mngForm.value.NumberOfHouseMembers || 1,
+    CanDonateBlood: this.mngForm.value.CanDonateBlood || false,
+    IsSalaried: this.mngForm.value.IsSalaried || false
+      
+    };
 
-generateClientId(): string {
-  return 'CL' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
-}
+      if (formValue.CreatedOn && typeof formValue.CreatedOn === 'string') {
+    formValue.CreatedOn = this.formatDateForBackend(formValue.CreatedOn);
+  }
+  
+  if (formValue.OpenedDate && typeof formValue.OpenedDate === 'string') {
+    formValue.OpenedDate = this.formatDateForBackend(formValue.OpenedDate);
+  }
+  
+  if (formValue.DateOfBirth && typeof formValue.DateOfBirth === 'string') {
+    formValue.DateOfBirth = this.formatDateForBackend(formValue.DateOfBirth);
+  }
 
-generateRandomId(): string {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
-}
-  displayInvalidFields() {
-    const invalidFields = [];
-    const controls = this.mngForm.controls;
-    for (const name in controls) {
-      if (controls[name].invalid) {
-        invalidFields.push(name);
-      }
+    if (this.isCorporateClient()) {
+      Object.assign(formValue, this.corporateForm.value);
+      formValue.Directors = this.dataSourceDirectors.data;
     }
-    const message = `Please fill in the following fields: ${invalidFields.join(
-      ", "
-    )}`;
+
+    return formValue;
+  }
+private formatDateForBackend(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return new Date().toISOString();
+    }
+    return date.toISOString();
+  } catch (error) {
+    return new Date().toISOString();
+  }
+}
+private submitFormData(formValue: any): void {
+  // Debug: log the complete payload
+  console.log('Complete form value being submitted:', formValue, null, 2);
+  
+  // Check if CreatedOn and OpenedDate are present
+  console.log('CreatedOn:', formValue.CreatedOn);
+  console.log('OpenedDate:', formValue.OpenedDate);
+  
+  const requestId = this.pageFunction === "Update" 
+    ? this.requestId || this.formData?.ClientID || this.generateRandomId()
+    : this.generateRandomId();
+
+  const clientId = this.pageFunction === "Update"
+    ? this.requestCode || this.formData?.ClientID || formValue.ClientID
+    : formValue.ClientID || this.generateClientId();
+
+  const formattedRequest = {
+    RequestID: requestId,
+    RequestData: {
+      ...formValue,
+      ClientID: clientId,
+      UpdateCount: this.pageFunction === "Update" ? (this.formData?.UpdateCount || 0) + 1 : 0
+    },
+    RequestTime: new Date().toISOString(),
+    AppName: "CLIENT_DATA"
+  };
+
+  console.log('Final request to backend:', formattedRequest, null, 2);
+  
+  const serviceCall = this.pageFunction === "Add"
+    ? this.employeeService.create(formattedRequest)
+    : this.employeeService.update(formattedRequest);
+
+  serviceCall.subscribe({
+    next: (res) => this.handleSubmitResponse(res),
+    error: (err) => this.handleSubmitError(err),
+    complete: () => this.posting = false
+  });
+}
+
+  private handleSubmitResponse(res: any): void {
+    const messageType = res.statusCode === (this.pageFunction === "Add" ? 201 : 200) 
+      ? "snackbar-success" 
+      : "snackbar-danger";
+    
+    this.snackbar.showNotification(messageType, res.ResponseMessage);
+    
+    if (messageType === "snackbar-success") {
+      this.cancel();
+    }
+  }
+
+  private handleSubmitError(err: any): void {
+    this.snackbar.showNotification("snackbar-danger", err.ResponseMessage);
+    this.posting = false;
+  }
+
+
+  private setupFormPersistence(): void {
+    const storedData = localStorage.getItem("mngFormDataEmployee");
+    if (storedData) {
+      this.mngForm.patchValue(JSON.parse(storedData));
+      this.onPopulateTables(JSON.parse(storedData));
+    }
+
+    this.mngForm.valueChanges.subscribe((value) => {
+      localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
+    });
+  }
+
+  private displayInvalidFields(): void {
+    const invalidFields = [];
+    const checkFormInvalid = (form: FormGroup, prefix: string = '') => {
+      Object.keys(form.controls).forEach(key => {
+        const control = form.get(key);
+        if (control?.invalid) {
+          invalidFields.push(prefix + key);
+        }
+      });
+    };
+
+    checkFormInvalid(this.mngForm);
+    if (this.isCorporateClient()) {
+      checkFormInvalid(this.corporateForm, 'Corporate ');
+    }
+
+    const message = `Please fill in the following fields: ${invalidFields.join(", ")}`;
     this.snackbar.showNotification("snackbar-danger", message);
   }
 
+  generateClientId(): string {
+    return 'CL' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
+  }
 
-  cancel() {
+  generateRandomId(): string {
+    return Math.random().toString(36).substring(2, 15) + 
+           Math.random().toString(36).substring(2, 15);
+  }
+
+  cancel(): void {
     this.router.navigate(["/erp-hr/employees/all-employees"]);
   }
 
+  refresh1(): void {
+    this.dataSource1.data = [...this.dataSource1.data];
+    this.dataSource1.paginator = this.paginator1;
+    this.dataSource1.sort = this.sort1;
+  }
 
+  refresh4(): void {
+    this.dataSource4.data = [...this.dataSource4.data];
+    this.dataSource4.paginator = this.paginator4;
+    this.dataSource4.sort = this.sort4;
+  }
+
+  applyDirectorsFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.directorsInputFilter = filterValue;
+    this.dataSourceDirectors.filter = filterValue.trim().toLowerCase();
+    
+    if (this.dataSourceDirectors.paginator) {
+      this.dataSourceDirectors.paginator.firstPage();
+    }
+  }
+
+  refreshDirectors(): void {
+    this.dataSourceDirectors.data = [...this.dataSourceDirectors.data];
+    this.dataSourceDirectors.paginator = this.paginatorDirectors;
+    this.dataSourceDirectors.sort = this.sortDirectors;
+  }
 }

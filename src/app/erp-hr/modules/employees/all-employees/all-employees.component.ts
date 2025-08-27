@@ -379,6 +379,7 @@ generateRandomId(): string {
     if (record && record.clientId) {
       queryParams.requestCode = record.clientId;
       queryParams.requestId = record.id || '';
+      queryParams.ClientTypeID = record.ClientTypeID || '';
     } else if (action === 'Add') {
       const typedClientId = this.Form.get('clientIdFilter')?.value;
       if (typedClientId && typedClientId.trim() !== '') {
