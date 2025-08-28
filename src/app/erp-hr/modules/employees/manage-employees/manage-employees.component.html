@@ -91,7 +91,7 @@
               
               <mat-step>
                 <ng-template matStepLabel>Client Identification</ng-template>
-                <form [formGroup]="mngForm">
+                <form *ngIf="mngForm" [formGroup]="mngForm">
                   <div class="row">
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
@@ -221,7 +221,7 @@
 
               <mat-step *ngIf="!isCorporateClient()">
                 <ng-template matStepLabel>Personal Information</ng-template>
-                <form [formGroup]="mngForm">
+                <form *ngIf="mngForm" [formGroup]="mngForm">
                   <div class="row">
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
@@ -357,7 +357,7 @@
 
                 <mat-step *ngIf="isCorporateClient()">
                 <ng-template matStepLabel>Corporate Details</ng-template>
-                <form [formGroup]="corporateForm">
+                <form *ngIf="corporateForm" [formGroup]="corporateForm">
                   <div class="row">
                     <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
                       <mat-form-field class="example-full-width" appearance="outline">
@@ -485,7 +485,7 @@
 
       <mat-step *ngIf="isCorporateClient()">              
       <ng-template matStepLabel>Directors</ng-template>
-      <form [formGroup]="directorsForm">
+      <form *ngIf="directorsForm" [formGroup]="directorsForm">
         <ng-container *ngIf="showDirectorsForm">
           <div class="row">
             <div class="col-md-4 col-sm-12 mb-1">
@@ -643,7 +643,7 @@
           <mat-step>
   <ng-template matStepLabel>Addresses</ng-template>
   <form [formGroup]="mngForm">
-    <div formArrayName="Addresses">
+    <div *ngIf="mngForm && mngForm.get('Addresses')" formArrayName="Addresses">
       <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-section mb-3 p-3 border rounded">
         <h4>Address {{i + 1}} <span *ngIf="address.get('IsMailingAddress')?.value">(Mailing Address)</span></h4>
         
@@ -757,7 +757,7 @@
 <mat-step>
   <ng-template matStepLabel>Next of Kin Details</ng-template>
   <ng-container>
-    <form [formGroup]="nextOfKinForm">
+    <form *ngIf="nextOfKinForm" [formGroup]="nextOfKinForm">
       <ng-container *ngIf="showParTranForm1">
         <div class="row">
           <!-- Hidden system fields -->
@@ -1222,8 +1222,184 @@
                     Next
                   </button>
                 </div>
-              </mat-step>
-                            <mat-step>
+   </mat-step>
+                  
+       <mat-step>
+       <ng-template matStepLabel>Client Documents</ng-template>
+        <div class="mt-3">
+          <form [formGroup]="documentsForm">
+            <div style="margin: 20px">
+              <div class="table-responsive">
+                <div class="materialTableHeader">
+                  <div class="row">
+                    <div class="col-8">
+                      <ul class="header-buttons-left ms-0">
+                        <li class="dropdown">
+                          <h2>Client Documents</h2>
+                        </li>
+                        <li class="dropdown m-l-20">
+                          <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                          <input placeholder="Filter..." type="text" (keyup)="applyFilter($event)" #filter
+                            class="browser-default search-field" aria-label="Search box" />
+                        </li>
+                        <li>
+                          <div class="m-l-10" matTooltip="ADD">
+                            <button mat-mini-fab color="primary" (click)="addDocumentRow()">
+                              <mat-icon class="col-white">add</mat-icon>
+                            </button>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-4"></div>
+                  </div>
+                </div>
+              
+                <mat-table #table matTableExporter [dataSource]="documentsDataSource"
+                  formArrayName="documentDetails" matSort class="mat-cell" #exporter="matTableExporter">
+
+                  <!-- ID Column -->
+                  <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-5">Id</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-5">
+                      {{ index + 1 }}
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Document Type Column -->
+                  <ng-container matColumnDef="documentType">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">Document Type</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <mat-form-field appearance="fill" class="w-100">
+                        <mat-label>Document Type</mat-label>
+                        <mat-select formControlName="DocumentID">
+                          <mat-option *ngFor="let docType of documentTypes" [value]="docType.SubCodeID">
+                            {{ docType.CodeDescription }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Document Type ID Column -->
+                  <ng-container matColumnDef="documentTypeId">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">Document Type ID</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <mat-form-field appearance="fill" class="w-100">
+                        <mat-label>Type ID</mat-label>
+                        <mat-select formControlName="DocumentTypeID">
+                          <mat-option *ngFor="let typeId of documentTypeIds" [value]="typeId.SubCodeID">
+                            {{ typeId.CodeDescription }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Description Column -->
+                  <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">Description</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <mat-form-field appearance="fill" class="w-100">
+                        <mat-label>Description</mat-label>
+                        <input matInput formControlName="Description" maxlength="100" />
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- MIME Type Column -->
+                  <ng-container matColumnDef="mimeType">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">MIME Type</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <mat-form-field appearance="fill" class="w-100">
+                        <mat-label>MIME Type</mat-label>
+                        <mat-select formControlName="MimeType">
+                          <mat-option *ngFor="let mimeType of mimeTypes" [value]="mimeType">
+                            {{ mimeType }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Remarks Column -->
+                  <ng-container matColumnDef="remarks">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">Remarks</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <mat-form-field appearance="fill" class="w-100">
+                        <mat-label>Remarks</mat-label>
+                        <input matInput formControlName="Remarks" maxlength="100" />
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Select File Column -->
+                  <ng-container matColumnDef="selectFile">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header
+                      class="column-nowrap psl-3 tbl-col-width-per-15">Select File</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                      <input #file type="file" [disabled]="isLoading | async"
+                        (change)="onSelectDocumentFile(file.files, row, index)" />
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Download Column -->
+                  <ng-container matColumnDef="download">
+                    <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
+                      *matHeaderCellDef>Download</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index"
+                      class="column-nowrap psl-3 tbl-col-width-per-10">
+                      <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
+                        (click)="downloadDocument(row)" class="tbl-action-btn">
+                        <mat-icon aria-label="Download">file_download</mat-icon>
+                      </button>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- Action Column -->
+                  <ng-container matColumnDef="action">
+                    <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
+                      *matHeaderCellDef>Action</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i = index"
+                      class="column-nowrap psl-3 tbl-col-width-per-10">
+                      <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                        (click)="deleteDocument(row)" class="tbl-action-btn">
+                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                      </button>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <mat-header-row *matHeaderRowDef="documentsDisplayColumns"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: documentsDisplayColumns" 
+                    [style.cursor]="'pointer'" matRipple></mat-row>
+                  <mat-cell *matNoDataRow colspan="4">No data matching the filter "{{ input.value }}"</mat-cell>
+                </mat-table>
+              
+                <div *ngIf="isDocumentDataLoading" class="tbl-spinner">
+                  <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                  </mat-progress-spinner>
+                </div>
+                <mat-paginator [pageSize]="10" [pageSizeOptions]="[2, 5, 10, 20, 30, 40, 50, 100]"
+                  aria-label="Select page of documents"></mat-paginator>
+              </div>
+            </div>
+          </form>
+        </div>
+    </mat-step>
+              <mat-step>
                 <ng-template matStepLabel>Special Offers</ng-template>
                 <form [formGroup]="mngForm">
                   <div class="row">

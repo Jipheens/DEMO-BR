@@ -286,10 +286,18 @@
                                         Client Type
                                     </mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
-                                        {{ row.ClientTypeID }}
+                                        {{ clientTypeMap[row.ClientTypeID] || row.ClientTypeID }}
                                     </mat-cell>
                                 </ng-container>
 
+                                <ng-container matColumnDef="Address">
+                                    <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-20">
+                                        Address
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">
+                                        {{ row.Address }}
+                                    </mat-cell>
+                                </ng-container>
                                 <ng-container matColumnDef="personalEmail">
                                     <mat-header-cell *matHeaderCellDef class="column-nowrap psl-3 tbl-col-width-per-20">
                                         Personal Email

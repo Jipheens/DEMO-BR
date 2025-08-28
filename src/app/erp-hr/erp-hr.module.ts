@@ -21,6 +21,9 @@ import { PayeReliefLookupComponent } from './hr-lookups/deductions-lookups/paye-
 import { JobLookupComponent } from './hr-lookups/jobs-lookups/job-lookup/job-lookup.component';
 import { AnnualLeaveBandsLookupComponent } from './hr-lookups/configurations-lookups/annual-leave-bands-lookup/annual-leave-bands-lookup.component';
 import { JobApplicationLookupComponent } from './hr-lookups/jobs-lookups/job-application-lookup/job-application-lookup.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 
 @NgModule({
@@ -49,6 +52,9 @@ import { JobApplicationLookupComponent } from './hr-lookups/jobs-lookups/job-app
 
     ComponentsModule,
     SharedModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
   ],
   exports: [
     EmployeesLookupComponent

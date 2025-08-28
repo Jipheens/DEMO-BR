@@ -7,13 +7,14 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router, ActivatedRoute } from "@angular/router";
-import { Subject, takeUntil, Subscription } from "rxjs";
+import { Subject, takeUntil, Subscription, BehaviorSubject } from "rxjs";
 import { TokenStorageService } from "src/app/core/service/token-storage.service";
 import { EmployeeService } from "src/app/erp-hr/data/employee-services/employee-management.service";
 import { EmployeesLookupComponent } from "src/app/erp-hr/hr-lookups/configurations-lookups/employees-lookup/employees-lookup.component";
 import { SnackbarService } from "src/app/shared/services/snackbar.service";
 import { COUNTRIES } from "./countries";
 import { MockDataService } from "../mock-data.service";
+import { FilesService } from "src/app/shared/services/files.service";
 
 interface Address {
   AddressTypeID: string;
@@ -191,7 +192,7 @@ displayedColumns1: string[] = [
 
   displayedDirectorColumns: string[] = ['id', 'clientName', 'relation', 'share', 'action'];
 
-  titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG'];
+  titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG','MS','US'];
   clientTypeOptions = ['Corporate', 'Minor', 'Employee', 'Individual'];
   identificationTypeOptions = ['ID', 'Alien ID', 'Passport', 'Military ID'];
   residentStatusOptions = [
@@ -211,11 +212,51 @@ displayedColumns1: string[] = [
     { id: '020608', name: 'JANE SMITH' },
   ];
 
+    documentTypes = [
+    { SubCodeID: "D", CodeDescription: "Document", DisplayOrder: 5 },
+    { SubCodeID: "F", CodeDescription: "Fingerprint", DisplayOrder: 6 },
+    { SubCodeID: "K", CodeDescription: "Tax Identification Number", DisplayOrder: 4 },
+    { SubCodeID: "L", CodeDescription: "Log Book", DisplayOrder: 0 },
+    { SubCodeID: "N", CodeDescription: "National ID", DisplayOrder: 1 },
+    { SubCodeID: "P", CodeDescription: "Passport Photo", DisplayOrder: 2 },
+    { SubCodeID: "S", CodeDescription: "Signature", DisplayOrder: 3 }
+  ];
+
+  documentTypeIds = [
+    { SubCodeID: "C", CodeDescription: "Copy", DisplayOrder: 1 },
+    { SubCodeID: "O", CodeDescription: "Original", DisplayOrder: 0 }
+  ];
+
+  mimeTypes = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ];
+
+  documentsDataSource = new BehaviorSubject<AbstractControl[]>([]);
+  documentsDisplayColumns = [
+    "id",
+    "documentType",
+    "documentTypeId",
+    "description",
+    "mimeType",
+    "remarks",
+    "selectFile",
+    "download",
+    "action",
+  ];
   countries = COUNTRIES;
   cities = COUNTRIES; 
   directorsInputFilter: string;
   initialClientType: string = '';
   nextOfKinArray: any;
+  documentRows: FormArray = this.fb.array([]);
+  documentsForm: FormGroup = this.fb.group({ documentDetails: this.documentRows });
+  isDocumentDataLoading: boolean = true;
+  isFileLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(
     private fb: FormBuilder,
@@ -227,6 +268,8 @@ displayedColumns1: string[] = [
     private dialog: MatDialog,
     private datePipe: DatePipe,
     private mockDataService: MockDataService,
+    private filesService: FilesService
+    
   ) {
     this.currentUser = 'Jipheens';
     this.currentUserCode = 'CSK-00280';
@@ -264,21 +307,25 @@ ngOnInit(): void {
       this.pageFunction = "Add";
       console.log("No valid clientId, setting pageFunction to Add");
       this.getPage();
-  this.generateSubForm1();
-  this.generateSubForm4();
     }
     this.showForm = true;
   });
 }
 
   ngAfterViewInit() {
+  if (this.paginator1 && this.sort1) {
     this.dataSource1.paginator = this.paginator1;
     this.dataSource1.sort = this.sort1;
+  }
+  if (this.paginator4 && this.sort4) {
     this.dataSource4.paginator = this.paginator4;
     this.dataSource4.sort = this.sort4;
+  }
+  if (this.paginatorDirectors && this.sortDirectors) {
     this.dataSourceDirectors.paginator = this.paginatorDirectors;
     this.dataSourceDirectors.sort = this.sortDirectors;
   }
+}
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
@@ -377,6 +424,9 @@ getDataById(requestCode: string) {
     if (entity.Addresses) {
     this.populateAddresses(entity.Addresses);
   }
+      if (entity.Documents) {
+      this.populateDocuments(entity.Documents);
+    }
   }
 
 private populateAddresses(addresses: any[]): void {
@@ -445,8 +495,8 @@ private populateAddresses(addresses: any[]): void {
       ClientTypeID: [clientType, Validators.required],
       TitleID: [formData?.TitleID || "", Validators.required],
       IdentificationTypeID: [formData?.IdentificationTypeID || "", Validators.required],
-      PassportNo: [formData?.PassportNo || ""],
-      IDExpiryDate: [formData?.IDExpiryDate || ""],
+      PassportNo: [formData?.PassportNo || ""] ,
+      IDExpiryDate: [formData?.IDExpiryDate || ""] ,
       ResidentID: [formData?.ResidentID || "", Validators.required],
       RelationshipManager: [formData?.RelationshipManager || "", Validators.required],
       
@@ -478,15 +528,12 @@ private populateAddresses(addresses: any[]): void {
      NumberOfHouseMembers: [formData?.NumberOfHouseMembers || 1, Validators.required],
     CanDonateBlood: [formData?.CanDonateBlood || false, Validators.required],
     IsSalaried: [formData?.IsSalaried || false, Validators.required],
-      PersonalPhone: [formData?.PersonalPhone || ""],
-      AlternativePhone: [
-        formData?.AlternativePhone || "",
-        [Validators.minLength(10), Validators.maxLength(12), Validators.pattern("[0-9]+")]
-      ],
-      // PersonalEmail: [
-      //   formData?.PersonalEmail || "",
-      //   [Validators.required, Validators.pattern("[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}")]
-      // ],
+      PersonalPhone: [formData?.PersonalPhone || ""] ,
+      AlternativePhone: (
+        [formData?.AlternativePhone || "",
+        [Validators.minLength(10), Validators.maxLength(12), Validators.pattern("[0-9]+")]]
+      ),
+
       AlternativeEmail: [
         formData?.AlternativeEmail || "",
         [Validators.pattern("[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}")]
@@ -508,8 +555,8 @@ private populateAddresses(addresses: any[]): void {
     ParentClientID2: [formData?.ParentClientID2 || ""],
       
       Addresses: this.fb.array([]),
-      NextOfKin: [formData?.NextOfKin || []],
-      EmploymentDetails: [formData?.EmploymentDetails || []],
+      NextOfKin: this.fb.array(formData?.NextOfKin?.map(kin => this.createNextOfKin(kin)) || []),
+      EmploymentDetails: this.fb.array(formData?.EmploymentDetails?.map(emp => this.createEmploymentDetail(emp)) || []),
     });
 
   if (formData?.Addresses && formData.Addresses.length > 0) {
@@ -535,8 +582,17 @@ private populateAddresses(addresses: any[]): void {
     this.toggleFormFields(clientType);
   }
   }
-
+createEmploymentDetail(emp?: EmploymentDetail): FormGroup {
+  return this.fb.group({
+    companyName: [emp?.companyName || "", Validators.required],
+    workPosition: [emp?.workPosition || "", Validators.required],
+    startDate: [emp?.startDate || "", Validators.required],
+    endDate: [emp?.endDate || "", Validators.required],
+  });
+}
   generateCorporateForm(formData?: ClientFormData): void {
+    const currentDate = new Date().toISOString();
+
     this.corporateForm = this.fb.group({
       CompanyName: [formData?.CompanyName || "", Validators.required],
       Constitution: [formData?.Constitution || "", Validators.required],
@@ -546,10 +602,10 @@ private populateAddresses(addresses: any[]): void {
       KRAPinNo: [formData?.KRAPin || "", Validators.required],
       DateOfRegistration: [formData?.DateOfRegistration || "", Validators.required],
       RegisteredOffice: [formData?.RegisteredOffice || "", Validators.required],
-      Comments: [formData?.Comments || ""],
-      Website: [formData?.Website || ""],
+      Comments: [formData?.Comments || ""] ,
+      Website: [formData?.Website || ""] ,
       OpenedBy: [formData?.OpenedBy || this.currentUser],
-      OpenedOn: [formData?.OpenedOn || new Date().toISOString()],
+      OpenedOn: [formData?.OpenedOn || currentDate, Validators.required],
       RelationshipManager: [formData?.RelationshipManager || "", Validators.required]
     });
   }
@@ -698,18 +754,11 @@ cancelParTran4(): void {
   this.workExpForm.reset();
 }
 
-
-
-
-
-
-
 pushToDataSource1(): void {
-  // if (this.nextOfKinForm.invalid) {
-  //   this.nextOfKinForm.markAllAsTouched();
-  //   return;
-  // }
-
+  if (this.nextOfKinForm.invalid) {
+    this.nextOfKinForm.markAllAsTouched();
+    return;
+  }
   const nextOfKinData: NextOfKin = {
     ...this.nextOfKinForm.value,
     CreatedBy: this.currentUser,
@@ -718,9 +767,11 @@ pushToDataSource1(): void {
   };
 
   if (this.parTranAction1 === 'Add') {
-    this.nextOfKinArray.push(this.fb.group(nextOfKinData));
+    this.dataSource1.data = [...this.dataSource1.data, nextOfKinData];
+    (this.mngForm.get('NextOfKin') as FormArray).push(this.createNextOfKin(nextOfKinData));
   } else if (this.parTranAction1 === 'Update' && this.selectedParTranIndex1 !== null) {
-    this.nextOfKinArray.at(this.selectedParTranIndex1).patchValue(nextOfKinData);
+    this.dataSource1.data[this.selectedParTranIndex1] = nextOfKinData;
+    (this.mngForm.get('NextOfKin') as FormArray).at(this.selectedParTranIndex1).setValue(nextOfKinData);
   }
 
   this.refresh1();
@@ -777,10 +828,10 @@ applyFilter4(event: Event): void {
 
 generateSubForm1(formData?: NextOfKin, isEdit = false): void {
   this.nextOfKinForm = this.fb.group({
-    ClientID: [formData?.ClientID || "", Validators.required],
+    ClientID: [formData?.ClientID || this.mngForm.get('ClientID')?.value || "", Validators.required],
     RelatedClientID: [formData?.RelatedClientID || "", Validators.required],
     RelationID: [formData?.RelationID || "", Validators.required],
-    RelationRefNo: [formData?.RelationRefNo || null, Validators.required],
+    RelationRefNo: [formData?.RelationRefNo || 1, Validators.required],
     Remarks: [formData?.Remarks || "", Validators.required],
     SharePercent: [
       formData?.SharePercent || 0,
@@ -788,8 +839,8 @@ generateSubForm1(formData?: NextOfKin, isEdit = false): void {
     ],
     remainingAllocation: [{ value: 100 - (formData?.SharePercent || 0), disabled: true }],
     UpdateCount: [formData?.UpdateCount || 0],
-    CreatedBy: [formData?.CreatedBy || ""],
-    CreatedOn: [formData?.CreatedOn || ""]
+    CreatedBy: [formData?.CreatedBy || this.currentUser, Validators.required],
+    CreatedOn: [formData?.CreatedOn || new Date().toISOString(), Validators.required]
   });
 
   this.nextOfKinForm.get("SharePercent")?.valueChanges.subscribe(() => {
@@ -893,30 +944,139 @@ toggleFormFields(clientType: string): void {
   }
 }
 
-  // onSubmit(): void {
-  //   this.posting = true;
+//*************************file handling section******************************** */
 
-  //  // const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
-  //      const totalAllocation = 100;
+  createDocumentsForm() {
+    this.documentsForm = this.fb.group({
+      documentDetails: this.fb.array([]),
+    });
+    this.addDocumentRow();
+  }
 
-  //   if (totalAllocation !== 100) {
-  //     this.snackbar.showNotification("snackbar-danger", "Next Of Kin Total percentage allocation must be exactly 100%.");
-  //     this.posting = false;
-  //     return;
-  //   }
+  addDocumentRow() {
+    this.isDocumentDataLoading = false;
+    const currentDate = new Date().toISOString();
+    
+    const row = this.fb.group({
+      DocumentID: ["", Validators.required],
+      DocumentTypeID: ["", Validators.required],
+      MimeType: ["", Validators.required],
+      Description: [""],
+      ImageID: [0],
+      sImage: ["", Validators.required],
+      Remarks: [""],
+      CreatedOn: [currentDate],
+      CreatedBy: [this.currentUser],
+      ModifiedBy: [""],
+      ModifiedOn: [""],
+      UpdateCount: [0]
+    });
+    
+    this.documentRows.push(row);
+    this.documentsDataSource.next(this.documentRows.controls);
+  }
 
-  //   if (this.mngForm.valid && (this.isCorporateClient() ? this.corporateForm.valid : true)) {
-  //     const formValue = this.prepareFormData();
-  //     this.submitFormData(formValue);
-  //   } else {
-  //     this.displayInvalidFields();
-  //     this.posting = false;
-  //   }
-  // }
+  updateDocumentsView() {
+    this.documentsDataSource.next(this.documentRows.controls);
+  }
+
+  deleteDocument(row: AbstractControl) {
+    const dataArray = this.documentsDataSource.getValue();
+    const index = dataArray.indexOf(row);
+
+    if (index !== -1) {
+      dataArray.splice(index, 1);
+      this.documentsDataSource.next(dataArray);
+    }
+  }
+
+  onSelectDocumentFile(files, selectedRow, index) {
+    this.isFileLoading.next(true);
+    
+    this.filesService.toBase64(files, []).subscribe((res) => {
+      if (res && res.length > 0) {
+        this.isFileLoading.next(false);
+        
+        const selectedFile = res[0];
+        const fileName = selectedFile.name;
+        const fileParts = fileName.split(".");
+        const extension = fileParts[fileParts.length - 1];
+        
+        let mimeType = "application/octet-stream";
+        switch (extension.toLowerCase()) {
+          case "pdf": mimeType = "application/pdf"; break;
+          case "jpg": case "jpeg": mimeType = "image/jpeg"; break;
+          case "png": mimeType = "image/png"; break;
+          case "gif": mimeType = "image/gif"; break;
+          case "doc": mimeType = "application/msword"; break;
+          case "docx": mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; break;
+        }
+        
+        this.documentRows.at(index).patchValue({
+          sImage: selectedFile.base64,
+          MimeType: mimeType,
+          Description: fileName
+        });
+        
+        this.updateDocumentsView();
+      }
+    });
+  }
+
+  downloadDocument(row: any) {
+    let file = row.value.sImage;
+    let mimeType = row.value.MimeType;
+    let description = row.value.Description || "document";
+    
+    const link = document.createElement("a");
+    link.href = `data:${mimeType};base64,${file}`;
+    link.download = description;
+    link.click();
+  }
+
+
+  private populateDocuments(documents: any[]): void {
+    while (this.documentRows.length > 0) {
+      this.documentRows.removeAt(0);
+    }
+    
+    if (documents && documents.length > 0) {
+      documents.forEach(document => {
+        this.addDocument(document);
+      });
+    } else {
+      this.addDocumentRow();
+    }
+  }
+
+  addDocument(document?: any): void {
+    const currentDate = new Date().toISOString();
+    
+    const row = this.fb.group({
+      DocumentID: [document?.DocumentID || "", Validators.required],
+      DocumentTypeID: [document?.DocumentTypeID || "", Validators.required],
+      MimeType: [document?.MimeType || "", Validators.required],
+      Description: [document?.Description || ""],
+      ImageID: [document?.ImageID || 0],
+      sImage: [document?.sImage || "", Validators.required],
+      Remarks: [document?.Remarks || ""],
+      CreatedOn: [document?.CreatedOn || currentDate],
+      CreatedBy: [document?.CreatedBy || this.currentUser],
+      ModifiedBy: [document?.ModifiedBy || ""],
+      ModifiedOn: [document?.ModifiedOn || ""],
+      UpdateCount: [document?.UpdateCount || 0]
+    });
+    
+    this.documentRows.push(row);
+    this.documentsDataSource.next(this.documentRows.controls);
+  }
+
+
+//end of file handling section******************************** */
+
 onSubmit(): void {
   this.posting = true;
 
-  // Validate required system fields
   const requiredFields = [
     'WFClientStatusID', 'OpenedBy', 'CreatedBy', 'CreatedOn', 'OpenedDate',
     'NumberOfHouseMembers', 'CanDonateBlood', 'IsSalaried'
@@ -934,10 +1094,7 @@ onSubmit(): void {
     return;
   }
 
-  // Validate total allocation
-  // const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
-    const totalAllocation = 100;
-
+   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
   if (totalAllocation !== 100) {
     this.snackbar.showNotification("snackbar-danger", 
       "Next Of Kin Total percentage allocation must be exactly 100%.");
@@ -968,7 +1125,12 @@ onSubmit(): void {
     UpdateCount: this.mngForm.value.UpdateCount || 0,
     NumberOfHouseMembers: this.mngForm.value.NumberOfHouseMembers || 1,
     CanDonateBlood: this.mngForm.value.CanDonateBlood || false,
-    IsSalaried: this.mngForm.value.IsSalaried || false
+    IsSalaried: this.mngForm.value.IsSalaried || false,
+    Documents: this.documentsForm.value.documentDetails.map(doc => ({
+        ...doc,
+        CreatedOn: doc.CreatedOn || new Date().toISOString(),
+        CreatedBy: doc.CreatedBy || this.currentUser
+      }))
       
     };
 
@@ -983,6 +1145,10 @@ onSubmit(): void {
   if (formValue.DateOfBirth && typeof formValue.DateOfBirth === 'string') {
     formValue.DateOfBirth = this.formatDateForBackend(formValue.DateOfBirth);
   }
+
+    if (formValue.OpenedOn && typeof formValue.OpenedOn === 'string') {
+  formValue.OpenedOn = this.formatDateForBackend(formValue.OpenedOn);
+}
 
     if (this.isCorporateClient()) {
       Object.assign(formValue, this.corporateForm.value);
@@ -1003,10 +1169,8 @@ private formatDateForBackend(dateString: string): string {
   }
 }
 private submitFormData(formValue: any): void {
-  // Debug: log the complete payload
   console.log('Complete form value being submitted:', formValue, null, 2);
   
-  // Check if CreatedOn and OpenedDate are present
   console.log('CreatedOn:', formValue.CreatedOn);
   console.log('OpenedDate:', formValue.OpenedDate);
   

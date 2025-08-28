@@ -32,12 +32,22 @@ export class AllEmployeesComponent implements OnInit {
     "fullName",
     "nationalId",
     "clientType",
-    "personalEmail",
-    "gender",
+    //"personalEmail",
+    //"gender",
+    "Address",
     "age",
     "status",
     "action",
   ];
+  clientTypeMap: { [key: string]: string } = {
+  B: "Bank",
+  C: "Corporate Client",
+  E: "Employee",
+  I: "Individual Client",
+  M: "Minor",
+  N: "Non Resident",
+  NC: "Individual Non-Client"
+};
 
   loading: boolean = false;
   data: any[];
@@ -89,7 +99,6 @@ export class AllEmployeesComponent implements OnInit {
     clientIdFilter: [""]
   });
   
-  // Call getData initially to load the hardcoded data
   this.getData();
   
       this.Form.get('clientIdFilter')?.valueChanges
@@ -100,10 +109,7 @@ export class AllEmployeesComponent implements OnInit {
       .subscribe(clientId => {
         this.applyClientIdFilter(clientId);
       });
-  // Remove or comment out the valueChanges subscription since we're using hardcoded data
-  // this.Form.valueChanges.subscribe(() => {
-  //   this.getData();
-  // });
+
 }
   // hasPrivilege(componentName: string): boolean {
   //   return this.privilegeService.checkPrivilege(componentName);
@@ -145,53 +151,6 @@ export class AllEmployeesComponent implements OnInit {
     });
   }
 
-  // getData() {
-  //   this.loading = true;
-  //   this.dataSource = new MatTableDataSource([]);
-  //   this.dataSource.paginator = this.paginator;
-  //   this.dataSource.sort = this.sort;
-
-  //   this.selectedStatus = this.Form.value.status;
-
-  //   console.log(
-  //     "this.selectedEnrollmentStatus:: ",
-  //   );
-  //   let params = {
-  //     status: this.Form.value.status,
-  //     enrollmentStatus: this.Form.value.enrollmentStatus,
-  //     branchCode: this.Form.value.branchCode,
-  //     departmentCode: this.Form.value.departmentCode,
-  //   };
-
-  //   this.employeeService
-  //     .readByStatusAndEnrollment(params)
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: (res) => {
-  //         if (res.ResponseCode === 302) {
-  //           this.data = res.entity;
-  //           console.log("Data displayed on table", this.data);
-
-  //           this.loading = false;
-  //           this.dataSource = new MatTableDataSource(this.data);
-  //           this.dataSource.paginator = this.paginator;
-  //           this.dataSource.sort = this.sort;
-  //         } else {
-  //           this.loading = false;
-  //         }
-  //       },
-  //       error: (err) => {
-  //         this.loading = false;
-  //         this.notificationAPI.alertWarning("Server Error: " + err.message);
-  //       },
-  //       complete: () => {
-  //         this.selection = new SelectionModel<any>(true, []);
-  //         this.selection.clear();
-  //       },
-  //     });
-  // }
-
-
   getData() {
   this.loading = true;
       const formattedRequest = {
@@ -200,7 +159,7 @@ export class AllEmployeesComponent implements OnInit {
         SearchID: "clientId",
         Filter: `ClientTypeID = 'I'`,
         WhereStmt: `clientId like '%%'`,
-        SortBy: "clientId asc",
+        SortBy: "clientId desc",
         PrevOrNext: "1",
         Reference: "",
         LoggedInUserId: "jipheens",
@@ -229,9 +188,9 @@ export class AllEmployeesComponent implements OnInit {
       clientType: item.ClientType || item.clientType || '',
       personalEmail: item.PersonalEmail || item.personalEmail || '',
       gender: item.Gender || item.gender || '',
-      dob: item.DOB || item.dob || '',
-      status: item.Status || item.status || '',
-      age: item.DOB ? this.calculateAge(item.DOB) : (item.dob ? this.calculateAge(item.dob) : ''),
+      dob: item.DateOfBirth || item.DateOfBirth || '',
+      status: item.Status || item.status || 'ACTIVE',
+      age: item.DateOfBirth ? this.calculateAge(item.DateOfBirth) : (item.DateOfBirth ? this.calculateAge(item.DateOfBirth) : ''),
       ...item
     }));
     console.log("Table data after search:", this.data);
@@ -310,9 +269,9 @@ searchClient() {
       clientType: item.ClientType || item.clientType || '',
       personalEmail: item.PersonalEmail || item.personalEmail || '',
       gender: item.Gender || item.gender || '',
-      dob: item.DOB || item.dob || '',
-      status: item.Status || item.status || '',
-      age: item.DOB ? this.calculateAge(item.DOB) : (item.dob ? this.calculateAge(item.dob) : ''),
+      dob: item.DateOfBirth || item.DateOfBirth || '',
+      status: item.Status || item.status || 'ACTIVE',
+      age: item.DateOfBirth ? this.calculateAge(item.DateOfBirth) : (item.DateOfBirth ? this.calculateAge(item.DateOfBirth) : ''),
       ...item
     }));
     console.log("Table data after search:", this.data);
