@@ -210,7 +210,7 @@ displayedColumns1: string[] = [
   displayedDirectorColumns: string[] = ['id', 'clientName', 'relation', 'share', 'action'];
 
   titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG','MS','US'];
-  clientTypeOptions = ['Corporate', 'Minor', 'Employee', 'Individual'];
+  clientTypeOptions = ['C', 'M', 'E', 'I'];
   identificationTypeOptions = ['ID', 'Alien ID', 'Passport', 'Military ID'];
   residentStatusOptions = [
     'Kenyan - Resident', 
@@ -295,6 +295,7 @@ displayedColumns1: string[] = [
 
 
 ngOnInit(): void {
+  
   this.route.queryParams.subscribe((params) => {
     console.log("params: ", params);
        if (params.ClientTypeID) {
@@ -308,7 +309,7 @@ ngOnInit(): void {
 
     if (params.requestCode && params.requestCode.trim() !== '') {
       this.requestCode = params.requestCode;
-      this.requestId = params.requestId;
+      //this.requestId = params.requestId;
       this.pageFunction = params.action;
       console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
 
@@ -365,7 +366,7 @@ ngOnInit(): void {
 
     if (params.requestCode && params.requestCode.trim() !== '') {
       this.requestCode = params.requestCode;
-      this.requestId = params.requestId;
+      //this.requestId = params.requestId;
       this.pageFunction = params.action;
 
       if (this.pageFunction === "Add" && params.prefillClientId) {
@@ -591,7 +592,7 @@ private populateAddresses(addresses: any[]): void {
   }
 
     if (this.pageFunction === "Add") {
-      this.setupFormPersistence();
+     // this.setupFormPersistence();
     }
       if (!clientType) {
     this.toggleFormFields('');
@@ -910,7 +911,7 @@ onClientTypeChange(): void {
   
   this.toggleFormFields(clientType);
   
-  if (clientType === 'Corporate' || clientType === 'Bank') {
+  if (clientType === 'C' || clientType === 'B') {
     this.mngForm.get('TitleID')?.reset();
     this.mngForm.get('FirstName')?.reset();
     this.mngForm.get('LastName')?.reset();
@@ -924,12 +925,12 @@ isClientTypeSelected(): boolean {
 
 isCorporateClient(): boolean {
   const clientType = this.mngForm.get('ClientTypeID')?.value;
-  return clientType === 'Corporate' || clientType === 'Bank';
+  return clientType === 'C' || clientType === 'B';
 }
 
 isIndividualClient(): boolean {
   const clientType = this.mngForm.get('ClientTypeID')?.value;
-  return clientType === 'Individual' || clientType === 'Employee' || clientType === 'Minor';
+  return clientType === 'I' || clientType === 'E' || clientType === 'M';
 }
 
 toggleFormFields(clientType: string): void {
@@ -1489,17 +1490,17 @@ private submitFormData(formValue: any): void {
   }
 
 
-  private setupFormPersistence(): void {
-    const storedData = localStorage.getItem("mngFormDataEmployee");
-    if (storedData) {
-      this.mngForm.patchValue(JSON.parse(storedData));
-      this.onPopulateTables(JSON.parse(storedData));
-    }
+  // private setupFormPersistence(): void {
+  //   const storedData = localStorage.getItem("mngFormDataEmployee");
+  //   if (storedData) {
+  //     this.mngForm.patchValue(JSON.parse(storedData));
+  //     this.onPopulateTables(JSON.parse(storedData));
+  //   }
 
-    this.mngForm.valueChanges.subscribe((value) => {
-      localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
-    });
-  }
+  //   this.mngForm.valueChanges.subscribe((value) => {
+  //     localStorage.setItem("mngFormDataEmployee", JSON.stringify(value));
+  //   });
+  // }
 
   private displayInvalidFields(): void {
     const invalidFields = [];
@@ -1514,7 +1515,7 @@ private submitFormData(formValue: any): void {
 
     checkFormInvalid(this.mngForm);
     if (this.isCorporateClient()) {
-      checkFormInvalid(this.corporateForm, 'Corporate ');
+      checkFormInvalid(this.corporateForm, 'C');
     }
 
     const message = `Please fill in the following fields: ${invalidFields.join(", ")}`;
