@@ -219,7 +219,7 @@ displayedColumns1: string[] = [
     { SubCodeID: "L", CodeDescription: "Log Book", DisplayOrder: 0 },
     { SubCodeID: "N", CodeDescription: "National ID", DisplayOrder: 1 },
     { SubCodeID: "P", CodeDescription: "Passport Photo", DisplayOrder: 2 },
-    { SubCodeID: "S", CodeDescription: "Signature", DisplayOrder: 3 }
+   // { SubCodeID: "S", CodeDescription: "Signature", DisplayOrder: 3 }
   ];
 
   documentTypeIds = [
@@ -242,7 +242,7 @@ displayedColumns1: string[] = [
     "documentType",
     "documentTypeId",
     "description",
-    "mimeType",
+   // "mimeType",
     "remarks",
     "selectFile",
     "download",
