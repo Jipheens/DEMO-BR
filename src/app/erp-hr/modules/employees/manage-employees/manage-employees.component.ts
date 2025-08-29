@@ -231,12 +231,12 @@ displayedColumns1: string[] = [
 
     documentTypes = [
     { SubCodeID: "D", CodeDescription: "Document", DisplayOrder: 5 },
-    { SubCodeID: "F", CodeDescription: "Fingerprint", DisplayOrder: 6 },
+    //{ SubCodeID: "F", CodeDescription: "Fingerprint", DisplayOrder: 6 },
     { SubCodeID: "K", CodeDescription: "Tax Identification Number", DisplayOrder: 4 },
     { SubCodeID: "L", CodeDescription: "Log Book", DisplayOrder: 0 },
     { SubCodeID: "N", CodeDescription: "National ID", DisplayOrder: 1 },
     { SubCodeID: "P", CodeDescription: "Passport Photo", DisplayOrder: 2 },
-   // { SubCodeID: "S", CodeDescription: "Signature", DisplayOrder: 3 }
+    { SubCodeID: "S", CodeDescription: "Signature", DisplayOrder: 3 }
   ];
 
   documentTypeIds = [
@@ -1106,87 +1106,9 @@ private addExistingDocument(document: any): void {
     this.documentsDataSource.next(this.documentRows.controls);
   }
 
-previewDocument(row: any): void {
-  const fileData = row.value.sImage;
-  const mimeType = row.value.MimeType;
-  const fileName = row.value.fileName || row.value.Description || 'document';
-  
-  if (!fileData) {
-    this.snackbar.showNotification("snackbar-warning", "No file data available for preview");
-    return;
-  }
-  
-  if (mimeType.includes('pdf')) {
-    this.previewPdf(fileData, fileName);
-  } else if (mimeType.includes('image')) {
-    this.previewImage(fileData, fileName);
-  } else {
-    this.previewOtherFile(fileData, fileName, mimeType);
-  }
-}
-
-private previewPdf(base64Data: string, fileName: string): void {
-  const pdfWindow = window.open('', '_blank');
-  if (pdfWindow) {
-    pdfWindow.document.write(`
-      <html>
-        <head>
-          <title>${fileName}</title>
-          <style>
-            body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
-            embed { width: 100%; height: 100vh; }
-          </style>
-        </head>
-        <body>
-          <embed src="data:application/pdf;base64,${base64Data}" type="application/pdf" />
-        </body>
-      </html>
-    `);
-    pdfWindow.document.close();
-  }
-}
-
-private previewImage(base64Data: string, fileName: string): void {
-  const imageWindow = window.open('', '_blank');
-  if (imageWindow) {
-    imageWindow.document.write(`
-      <html>
-        <head>
-          <title>${fileName}</title>
-          <style>
-            body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
-            img { max-width: 100%; max-height: 100%; }
-          </style>
-        </head>
-        <body>
-          <img src="data:image/jpeg;base64,${base64Data}" alt="${fileName}" />
-        </body>
-      </html>
-    `);
-    imageWindow.document.close();
-  }
-}
-
-private previewOtherFile(base64Data: string, fileName: string, mimeType: string): void {
-  if (mimeType.includes('text')) {
-    this.dialog.open(DocumentPreviewDialogComponent, {
-      width: '80%',
-      height: '80%',
-      data: {
-        content: atob(base64Data.split(',')[1] || base64Data),
-        fileName: fileName,
-        mimeType: mimeType
-      }
-    });
-  } else {
-    this.snackbar.showNotification("snackbar-info", 
-    "Download is only available for supported file types.");
-  }
-}
-
 downloadDocument(row: any): void {
   const fileData = row.value.sImage;
-  const mimeType = row.value.MimeType;
+  const mimeType = row.value.MimeType || this.detectMimeTypeFromBase64(fileData);
   const fileName = row.value.fileName || row.value.Description || 'document';
   
   if (!fileData) {
@@ -1194,35 +1116,229 @@ downloadDocument(row: any): void {
     return;
   }
   
-  let base64Data = fileData;
-  if (fileData.includes(',')) {
-    base64Data = fileData.split(',')[1];
+  try {
+    // Handle both data URI format and raw base64
+    let base64Data = fileData;
+    if (fileData.includes(',')) {
+      base64Data = fileData.split(',')[1];
+    }
+    
+    // Check if base64 data is valid
+    if (!this.isValidBase64(base64Data)) {
+      this.snackbar.showNotification("snackbar-warning", "File data is corrupted or incomplete");
+      return;
+    }
+    
+    // Convert base64 to blob
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Add appropriate file extension
+    const fileExtension = this.getFileExtensionFromMimeType(mimeType);
+    link.download = `${fileName}${fileExtension}`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    
+    this.snackbar.showNotification("snackbar-success", "File downloaded successfully");
+    
+  } catch (error) {
+    console.error('Download error:', error);
+    this.snackbar.showNotification("snackbar-danger", "Failed to download file: " + error.message);
   }
-  
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: mimeType });
-  
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  
-  let fileExtension = '';
-  if (mimeType.includes('pdf')) fileExtension = '.pdf';
-  else if (mimeType.includes('jpeg')) fileExtension = '.jpg';
-  else if (mimeType.includes('png')) fileExtension = '.png';
-  else if (mimeType.includes('word')) fileExtension = '.docx';
-  
-  link.download = `${fileName}${fileExtension}`;
-  link.click();
-  
-  window.URL.revokeObjectURL(url);
-}  
+}
 
+// Helper method to detect MIME type from base64
+private detectMimeTypeFromBase64(base64Data: string): string {
+  if (!base64Data) return 'application/octet-stream';
+  
+  // Check for PDF signature
+  if (base64Data.startsWith('JVBERi') || base64Data.includes('JVBERi')) {
+    return 'application/pdf';
+  }
+  
+  // Check for PNG signature
+  if (base64Data.startsWith('iVBORw') || base64Data.includes('iVBORw')) {
+    return 'image/png';
+  }
+  
+  // Check for JPEG signature
+  if (base64Data.startsWith('/9j/') || base64Data.includes('/9j/')) {
+    return 'image/jpeg';
+  }
+  
+  // Check for GIF signature
+  if (base64Data.startsWith('R0lGOD') || base64Data.includes('R0lGOD')) {
+    return 'image/gif';
+  }
+  
+  return 'application/octet-stream';
+}
+
+// Helper method to validate base64
+private isValidBase64(str: string): boolean {
+  try {
+    return btoa(atob(str)) === str;
+  } catch (err) {
+    return false;
+  }
+}
+
+// Helper method to get file extension from MIME type
+private getFileExtensionFromMimeType(mimeType: string): string {
+  const extensionMap: { [key: string]: string } = {
+    'application/pdf': '.pdf',
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'application/msword': '.doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+    'text/plain': '.txt',
+    'application/vnd.ms-excel': '.xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx'
+  };
+  
+  return extensionMap[mimeType] || '';
+}
+previewDocument(row: any): void {
+  const fileData = row.value.sImage;
+  const mimeType = row.value.MimeType || this.detectMimeTypeFromBase64(fileData);
+  const fileName = row.value.fileName || row.value.Description || 'document';
+  
+  if (!fileData) {
+    this.snackbar.showNotification("snackbar-warning", "No file data available for preview");
+    return;
+  }
+  
+  try {
+    // Handle both data URI format and raw base64
+    let base64Data = fileData;
+    if (fileData.includes(',')) {
+      base64Data = fileData.split(',')[1];
+    }
+    
+    // Check if base64 data is valid
+    if (!this.isValidBase64(base64Data)) {
+      this.snackbar.showNotification("snackbar-warning", "File data is corrupted or incomplete");
+      return;
+    }
+    
+    if (mimeType.includes('pdf')) {
+      this.previewPdf(base64Data, fileName);
+    } else if (mimeType.includes('image')) {
+      this.previewImage(base64Data, fileName, mimeType);
+    } else if (mimeType.includes('text')) {
+      this.previewTextFile(base64Data, fileName);
+    } else {
+      this.snackbar.showNotification("snackbar-info", 
+        "This file type cannot be previewed. Please download it to view.");
+      this.downloadDocument(row);
+    }
+  } catch (error) {
+    console.error('Preview error:', error);
+    this.snackbar.showNotification("snackbar-danger", "Failed to preview file: " + error.message);
+  }
+}
+
+private previewPdf(base64Data: string, fileName: string): void {
+  // Create data URI
+  const dataUri = `data:application/pdf;base64,${base64Data}`;
+  
+  // Open in new tab
+  const pdfWindow = window.open('', '_blank');
+  if (pdfWindow) {
+    pdfWindow.document.write(`
+      <html>
+        <head>
+          <title>${fileName}</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; width: 100%; }
+            embed { width: 100%; height: 100vh; border: none; }
+            .error { padding: 20px; text-align: center; font-family: Arial, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <embed src="${dataUri}" type="application/pdf">
+          <script>
+            // Check if PDF loaded successfully
+            setTimeout(function() {
+              const embed = document.querySelector('embed');
+              if (embed && embed.offsetHeight === 0) {
+                document.body.innerHTML = 
+                  '<div class="error"><h3>PDF Preview Unavailable</h3>' +
+                  '<p>The PDF file may be corrupted or incomplete.</p>' +
+                  '<p>Please try downloading the file instead.</p></div>';
+              }
+            }, 2000);
+          </script>
+        </body>
+      </html>
+    `);
+    pdfWindow.document.close();
+  } else {
+    this.snackbar.showNotification("snackbar-warning", "Please allow pop-ups to preview PDF files");
+  }
+}
+
+private previewImage(base64Data: string, fileName: string, mimeType: string): void {
+  // Create data URI
+  const dataUri = `data:${mimeType};base64,${base64Data}`;
+  
+  // Open in new tab
+  const imageWindow = window.open('', '_blank');
+  if (imageWindow) {
+    imageWindow.document.write(`
+      <html>
+        <head>
+          <title>${fileName}</title>
+          <style>
+            body { margin: 0; display: flex; justify-content: center; align-items: center; 
+                   height: 100vh; background: #f5f5f5; }
+            img { max-width: 100%; max-height: 100%; }
+            .error { padding: 20px; text-align: center; font-family: Arial, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <img src="${dataUri}" alt="${fileName}" onerror="this.parentNode.innerHTML='<div class=error><h3>Image Preview Unavailable</h3><p>The image may be corrupted or incomplete.</p></div>'" />
+        </body>
+      </html>
+    `);
+    imageWindow.document.close();
+  }
+}
+
+private previewTextFile(base64Data: string, fileName: string): void {
+  try {
+    const textContent = atob(base64Data);
+    this.dialog.open(DocumentPreviewDialogComponent, {
+      width: '80%',
+      height: '80%',
+      data: {
+        content: textContent,
+        fileName: fileName,
+        mimeType: 'text/plain'
+      }
+    });
+  } catch (error) {
+    this.snackbar.showNotification("snackbar-warning", "Cannot preview text file: Invalid encoding");
+  }
+}
 
 //end of file handling section******************************** */
 
