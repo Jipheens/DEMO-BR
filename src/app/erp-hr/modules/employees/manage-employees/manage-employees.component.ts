@@ -15,6 +15,7 @@ import { SnackbarService } from "src/app/shared/services/snackbar.service";
 import { COUNTRIES } from "./countries";
 import { MockDataService } from "../mock-data.service";
 import { FilesService } from "src/app/shared/services/files.service";
+import { DocumentPreviewDialogComponent } from "../document-preview-dialog/document-preview-dialog.component";
 
 interface Address {
   AddressTypeID: string;
@@ -119,6 +120,22 @@ interface ClientFormData {
   RelationshipManager?: string;
   Website?: string;
   Constitution?: string; 
+}
+interface ClientDocument {
+  DocumentID: string;
+  DocumentTypeID: string;
+  MimeType: string;
+  Description: string;
+  ImageID: number;
+  sImage: string; 
+  Remarks: string;
+  CreatedOn: string;
+  CreatedBy: string;
+  ModifiedBy: string;
+  ModifiedOn: string;
+  UpdateCount: number;
+  isExistingFile?: boolean;
+  fileName?: string; 
 }
 
 @Component({
@@ -990,64 +1007,82 @@ toggleFormFields(clientType: string): void {
     }
   }
 
-  onSelectDocumentFile(files, selectedRow, index) {
-    this.isFileLoading.next(true);
-    
-    this.filesService.toBase64(files, []).subscribe((res) => {
-      if (res && res.length > 0) {
-        this.isFileLoading.next(false);
-        
-        const selectedFile = res[0];
-        const fileName = selectedFile.name;
-        const fileParts = fileName.split(".");
-        const extension = fileParts[fileParts.length - 1];
-        
-        let mimeType = "application/octet-stream";
-        switch (extension.toLowerCase()) {
-          case "pdf": mimeType = "application/pdf"; break;
-          case "jpg": case "jpeg": mimeType = "image/jpeg"; break;
-          case "png": mimeType = "image/png"; break;
-          case "gif": mimeType = "image/gif"; break;
-          case "doc": mimeType = "application/msword"; break;
-          case "docx": mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; break;
-        }
-        
-        this.documentRows.at(index).patchValue({
-          sImage: selectedFile.base64,
-          MimeType: mimeType,
-          Description: fileName
-        });
-        
-        this.updateDocumentsView();
+onSelectDocumentFile(files, selectedRow, index) {
+  this.isFileLoading.next(true);
+  
+  this.filesService.toBase64(files, []).subscribe((res) => {
+    if (res && res.length > 0) {
+      this.isFileLoading.next(false);
+      
+      const selectedFile = res[0];
+      const fileName = selectedFile.name;
+      const fileParts = fileName.split(".");
+      const extension = fileParts[fileParts.length - 1];
+      
+      let mimeType = "application/octet-stream";
+      switch (extension.toLowerCase()) {
+        case "pdf": mimeType = "application/pdf"; break;
+        case "jpg": case "jpeg": mimeType = "image/jpeg"; break;
+        case "png": mimeType = "image/png"; break;
+        case "gif": mimeType = "image/gif"; break;
+        case "doc": mimeType = "application/msword"; break;
+        case "docx": mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; break;
+        case "txt": mimeType = "text/plain"; break;
       }
-    });
-  }
-
-  downloadDocument(row: any) {
-    let file = row.value.sImage;
-    let mimeType = row.value.MimeType;
-    let description = row.value.Description || "document";
-    
-    const link = document.createElement("a");
-    link.href = `data:${mimeType};base64,${file}`;
-    link.download = description;
-    link.click();
-  }
-
-
-  private populateDocuments(documents: any[]): void {
-    while (this.documentRows.length > 0) {
-      this.documentRows.removeAt(0);
-    }
-    
-    if (documents && documents.length > 0) {
-      documents.forEach(document => {
-        this.addDocument(document);
+      
+      this.documentRows.at(index).patchValue({
+        sImage: selectedFile.base64,
+        MimeType: mimeType,
+        Description: fileName,
+        fileName: fileName,
+        isExistingFile: false 
       });
-    } else {
-      this.addDocumentRow();
+      
+      this.updateDocumentsView();
     }
+  });
+}
+
+private populateDocuments(documents: any[]): void {
+  while (this.documentRows.length > 0) {
+    this.documentRows.removeAt(0);
   }
+  
+  if (documents && documents.length > 0) {
+    documents.forEach(document => {
+      this.addExistingDocument(document);
+    });
+  } else {
+    this.addDocumentRow();
+  }
+  this.updateDocumentsView();
+}
+
+private addExistingDocument(document: any): void {
+  const currentDate = new Date().toISOString();
+  
+  const fileName = document.Description || `document_${new Date().getTime()}`;
+  
+  const row = this.fb.group({
+    DocumentID: [document.DocumentID || "", Validators.required],
+    DocumentTypeID: [document.DocumentTypeID || "", Validators.required],
+    MimeType: [document.MimeType || "", Validators.required],
+    Description: [document.Description || ""],
+    ImageID: [document.ImageID || 0],
+    sImage: [document.sImage || "", Validators.required],
+    Remarks: [document.Remarks || ""],
+    CreatedOn: [document.CreatedOn || currentDate],
+    CreatedBy: [document.CreatedBy || this.currentUser],
+    ModifiedBy: [document.ModifiedBy || ""],
+    ModifiedOn: [document.ModifiedOn || ""],
+    UpdateCount: [document.UpdateCount || 0],
+    isExistingFile: [true], 
+    fileName: [fileName] 
+  });
+  
+  this.documentRows.push(row);
+  this.documentsDataSource.next(this.documentRows.controls);
+}
 
   addDocument(document?: any): void {
     const currentDate = new Date().toISOString();
@@ -1070,6 +1105,123 @@ toggleFormFields(clientType: string): void {
     this.documentRows.push(row);
     this.documentsDataSource.next(this.documentRows.controls);
   }
+
+previewDocument(row: any): void {
+  const fileData = row.value.sImage;
+  const mimeType = row.value.MimeType;
+  const fileName = row.value.fileName || row.value.Description || 'document';
+  
+  if (!fileData) {
+    this.snackbar.showNotification("snackbar-warning", "No file data available for preview");
+    return;
+  }
+  
+  if (mimeType.includes('pdf')) {
+    this.previewPdf(fileData, fileName);
+  } else if (mimeType.includes('image')) {
+    this.previewImage(fileData, fileName);
+  } else {
+    this.previewOtherFile(fileData, fileName, mimeType);
+  }
+}
+
+private previewPdf(base64Data: string, fileName: string): void {
+  const pdfWindow = window.open('', '_blank');
+  if (pdfWindow) {
+    pdfWindow.document.write(`
+      <html>
+        <head>
+          <title>${fileName}</title>
+          <style>
+            body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
+            embed { width: 100%; height: 100vh; }
+          </style>
+        </head>
+        <body>
+          <embed src="data:application/pdf;base64,${base64Data}" type="application/pdf" />
+        </body>
+      </html>
+    `);
+    pdfWindow.document.close();
+  }
+}
+
+private previewImage(base64Data: string, fileName: string): void {
+  const imageWindow = window.open('', '_blank');
+  if (imageWindow) {
+    imageWindow.document.write(`
+      <html>
+        <head>
+          <title>${fileName}</title>
+          <style>
+            body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f5f5f5; }
+            img { max-width: 100%; max-height: 100%; }
+          </style>
+        </head>
+        <body>
+          <img src="data:image/jpeg;base64,${base64Data}" alt="${fileName}" />
+        </body>
+      </html>
+    `);
+    imageWindow.document.close();
+  }
+}
+
+private previewOtherFile(base64Data: string, fileName: string, mimeType: string): void {
+  if (mimeType.includes('text')) {
+    this.dialog.open(DocumentPreviewDialogComponent, {
+      width: '80%',
+      height: '80%',
+      data: {
+        content: atob(base64Data.split(',')[1] || base64Data),
+        fileName: fileName,
+        mimeType: mimeType
+      }
+    });
+  } else {
+    this.snackbar.showNotification("snackbar-info", 
+    "Download is only available for supported file types.");
+  }
+}
+
+downloadDocument(row: any): void {
+  const fileData = row.value.sImage;
+  const mimeType = row.value.MimeType;
+  const fileName = row.value.fileName || row.value.Description || 'document';
+  
+  if (!fileData) {
+    this.snackbar.showNotification("snackbar-warning", "No file data available for download");
+    return;
+  }
+  
+  let base64Data = fileData;
+  if (fileData.includes(',')) {
+    base64Data = fileData.split(',')[1];
+  }
+  
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: mimeType });
+  
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  
+  let fileExtension = '';
+  if (mimeType.includes('pdf')) fileExtension = '.pdf';
+  else if (mimeType.includes('jpeg')) fileExtension = '.jpg';
+  else if (mimeType.includes('png')) fileExtension = '.png';
+  else if (mimeType.includes('word')) fileExtension = '.docx';
+  
+  link.download = `${fileName}${fileExtension}`;
+  link.click();
+  
+  window.URL.revokeObjectURL(url);
+}  
 
 
 //end of file handling section******************************** */

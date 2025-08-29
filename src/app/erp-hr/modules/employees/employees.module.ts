@@ -10,6 +10,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { DashboardModule } from '../dashboard/dashboard.module';
 import { AllEmployeeDocumentsComponent } from './all-employee-documents/all-employee-documents.component';
 import { CreateEmployeePortalAccountComponent } from './create-employee-portal-account/create-employee-portal-account.component';
+import { DocumentPreviewDialogComponent } from './document-preview-dialog/document-preview-dialog.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { CreateEmployeePortalAccountComponent } from './create-employee-portal-a
     ManageEmployeesComponent,
     ManageEmployeeDocumentsComponent,
     AllEmployeeDocumentsComponent,
-    CreateEmployeePortalAccountComponent
+    CreateEmployeePortalAccountComponent,
+    DocumentPreviewDialogComponent
   ],
   imports: [
     CommonModule,

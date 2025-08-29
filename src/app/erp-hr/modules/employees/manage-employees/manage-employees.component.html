@@ -1332,7 +1332,6 @@
                     </mat-cell>
                   </ng-container>
                 
-                  <!-- Remarks Column -->
                   <ng-container matColumnDef="remarks">
                     <mat-header-cell *matHeaderCellDef mat-sort-header
                       class="column-nowrap psl-3 tbl-col-width-per-15">Remarks</mat-header-cell>
@@ -1345,31 +1344,43 @@
                     </mat-cell>
                   </ng-container>
                 
-                  <!-- Select File Column -->
                   <ng-container matColumnDef="selectFile">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">Select File</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header
+                    class="column-nowrap psl-3 tbl-col-width-per-15">Select File</mat-header-cell>
+                  <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
+                    class="column-nowrap psl-3 tbl-col-width-per-15">
+
+                    <div *ngIf="row.value.isExistingFile" class="existing-file-info">
+                      <mat-icon>description</mat-icon>
+                      <span class="file-name">{{ row.value.fileName }}</span>
+                      <span class="file-type">({{ row.value.MimeType }})</span>
+                    </div>
+
+                    <div *ngIf="!row.value.isExistingFile">
                       <input #file type="file" [disabled]="isLoading | async"
                         (change)="onSelectDocumentFile(file.files, row, index)" />
-                    </mat-cell>
+                    </div>
+                  </mat-cell>
                   </ng-container>
                 
-                  <!-- Download Column -->
-                  <ng-container matColumnDef="download">
+                    <ng-container matColumnDef="download">
                     <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
-                      *matHeaderCellDef>Download</mat-header-cell>
+                      *matHeaderCellDef>Download/View</mat-header-cell>
                     <mat-cell *matCellDef="let row; let i = index"
                       class="column-nowrap psl-3 tbl-col-width-per-10">
+
                       <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
-                        (click)="downloadDocument(row)" class="tbl-action-btn">
+                        (click)="previewDocument(row)" class="tbl-action-btn" matTooltip="Preview">
+                        <mat-icon aria-label="Preview">visibility</mat-icon>
+                      </button>
+
+                      <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
+                        (click)="downloadDocument(row)" class="tbl-action-btn" matTooltip="Download">
                         <mat-icon aria-label="Download">file_download</mat-icon>
                       </button>
                     </mat-cell>
                   </ng-container>
                 
-                  <!-- Action Column -->
                   <ng-container matColumnDef="action">
                     <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
                       *matHeaderCellDef>Action</mat-header-cell>
