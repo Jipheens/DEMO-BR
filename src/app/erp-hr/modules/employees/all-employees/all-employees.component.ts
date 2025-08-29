@@ -157,7 +157,7 @@ export class AllEmployeesComponent implements OnInit {
       RequestID: this.generateRandomId(),
       RequestData: {
         SearchID: "clientId",
-        Filter: `ClientTypeID = 'I'`,
+        Filter: `ClientTypeID = 'E'`,
         WhereStmt: `clientId like '%%'`,
         SortBy: "clientId desc",
         PrevOrNext: "1",
@@ -236,7 +236,7 @@ searchClient() {
       RequestID: this.generateRandomId(),
       RequestData: {
         SearchID: "clientId",
-        Filter: `ClientTypeID = 'I'`,
+        Filter: `ClientTypeID = 'E'`,
         WhereStmt: `clientId like '%${clientId}%'`,
         SortBy: "clientId asc",
         PrevOrNext: "1",

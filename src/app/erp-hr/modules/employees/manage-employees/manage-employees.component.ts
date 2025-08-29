@@ -1207,16 +1207,13 @@ private submitFormData(formValue: any): void {
 }
 
   private handleSubmitResponse(res: any): void {
-    const messageType = res.statusCode === (this.pageFunction === "Add" ? 201 : 200) 
-      ? "snackbar-success" 
-      : "snackbar-danger";
-    
-    this.snackbar.showNotification(messageType, res.ResponseMessage);
-    
-    if (messageType === "snackbar-success") {
-      this.cancel();
-    }
+    const messageType = res.ResponseCode === "00" ? "snackbar-success" : "snackbar-danger";
+  this.snackbar.showNotification(messageType, res.ResponseMessage);
+
+  if (messageType === "snackbar-success") {
+    this.cancel();
   }
+}
 
   private handleSubmitError(err: any): void {
     this.snackbar.showNotification("snackbar-danger", err.ResponseMessage);
