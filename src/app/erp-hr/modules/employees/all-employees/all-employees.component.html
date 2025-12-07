@@ -369,17 +369,22 @@
                                         class="column-nowrap psl-3 tbl-col-width-per-40"  colspan="2">Action</mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-40"  colspan="2">
                                         <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
-                                            (click)="mngRecord('View', row)">
+                                            (click)="mngRecord('View', row)" matTooltip="View">
                                             <mat-icon>remove_red_eye</mat-icon>
                                         </button>
 
                                         <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                            (click)="mngRecord('Update', row)" class="tbl-action-btn">
+                                            (click)="mngRecord('Update', row)" class="tbl-action-btn" matTooltip="Edit">
                                             <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
                                             </app-feather-icons>
                                         </button>
 
-                                        <button mat-icon-button color="warn" (click)="$event.stopPropagation(); deleteRecordByClientId(row.clientId)">
+                                        <button mat-icon-button style="color: #28a745;" (click)="$event.stopPropagation()"
+                                            (click)="superviseRecord(row)" matTooltip="Supervise/Approve">
+                                            <mat-icon>check_circle</mat-icon>
+                                        </button>
+
+                                        <button mat-icon-button color="warn" (click)="$event.stopPropagation(); deleteRecordByClientId(row.clientId)" matTooltip="Delete">
                                             <mat-icon>delete</mat-icon>
                                         </button>
                                     </mat-cell>

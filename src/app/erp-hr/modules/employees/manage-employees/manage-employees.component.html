@@ -1,7 +1,7 @@
 <section class="content">
   <div class="content-block">
-    <div class="block-header">
-      <app-breadcrumb [title]="'Manage Client'" [items]="['Clients']" [active_item]="'Manage Client'">
+    <div class="block-header" *ngIf="!dialogMode">
+      <app-breadcrumb [title]="'Client Maintenance'" [items]="['Clients']" [active_item]="'Client Maintenance'">
       </app-breadcrumb>
     </div>
 
@@ -14,1457 +14,1155 @@
             </h2>
           </div>
           <div class="body" *ngIf="showForm">
-            <div class="row" *ngIf="pageFunction !== 'Add' && formData">
-              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="bg-color">
-                  <div class="chat">
-                    <div class="chat-header clearfix">
-                      <div class="row">
-                        <div class="col-6">
-                          <div class="row">
-                            <div class="col-6">
-                              <div class="chat-about">
-                                <div class="chat-with">Posted By</div>
-                                <div class="chat-num-messages mt-2">
-                                  <div class="badge badge-hod">
-                                    {{ formData.CreatedBy }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-6">
-                              <div class="chat-about">
-                                <div class="chat-with">Approved By</div>
-                                <div class="chat-num-messages mt-2">
-                                  <div class="badge badge-hod-approved">
-                                    {{ formData.hodVerifierBy }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col-12">
-                              <div class="chat-about mt-1">
-                                <div class="chat-with remarks">
-                                  <strong>Remarks:</strong>
-                                  <span class="remarks-content mx-2">{{
-                                    formData.hodVerifierRemarks
-                                    }}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-6">
-                          <div class="row">
-                            <div class="col-6">
-                              <div class="chat-about">
-                                <div class="chat-with">Posted Date</div>
-                                <div class="chat-num-messages mt-2">
-                                  <div class="badge badge-finance">
-                                    {{ formData.CreatedOn | date:'medium' }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-6">
-                              <div class="chat-about">
-                                <div class="chat-with">Approved Date</div>
-                                <div class="chat-num-messages mt-2">
-                                  <div class="badge badge-finance-approved">
-                                    {{ formData.hrVerifiedBy }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <mat-horizontal-stepper [linear]="false" #stepper>
-              
-              <mat-step>
-                <ng-template matStepLabel>Client Identification</ng-template>
-                <form *ngIf="mngForm" [formGroup]="mngForm">
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Client Type</mat-label>
-                        <mat-select formControlName="ClientTypeID" (selectionChange)="onClientTypeChange()">
-                          <mat-option *ngFor="let type of clientTypeOptions" [value]="type">{{ type }}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="mngForm.get('ClientTypeID')?.invalid">
-                          Please select a client type
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Client ID</mat-label>
-                        <input matInput formControlName="ClientID" [readonly]="pageFunction !== 'Add'" />
-                        <mat-error *ngIf="mngForm.get('ClientID')?.invalid && mngForm.get('ClientID')?.touched">
-                          Client ID is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Application ID</mat-label>
-                        <input matInput formControlName="ApplicationID" [disabled]="!isClientTypeSelected()" />
-                        <mat-error *ngIf="mngForm.get('ApplicationID')?.invalid">
-                          Application ID is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1" *ngIf="!isCorporateClient()">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Title</mat-label>
-                        <mat-select formControlName="TitleID" [disabled]="!isClientTypeSelected()">
-                          <mat-option *ngFor="let title of titleOptions" [value]="title">{{ title }}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="mngForm.get('TitleID')?.invalid">
-                          Please select a Title
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Base ID</mat-label>
-                        <input matInput formControlName="BaseID" [disabled]="!isClientTypeSelected()" />
-                        <mat-error *ngIf="mngForm.get('BaseID')?.invalid">
-                          Base ID is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Resident Status</mat-label>
-                        <mat-select formControlName="ResidentID" [disabled]="!isClientTypeSelected()">
-                          <mat-option *ngFor="let status of residentStatusOptions" [value]="status">{{ status }}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="mngForm.get('ResidentID')?.invalid">
-                          Please select resident status
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Relationship Manager</mat-label>
-                        <mat-select formControlName="RelationshipManager" [disabled]="!isClientTypeSelected()">
-                          <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
-                            {{ manager.name }}
-                          </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="mngForm.get('RelationshipManager')?.invalid">
-                          Please select a relationship manager
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Identification Type</mat-label>
-                        <mat-select formControlName="IdentificationTypeID" [disabled]="!isClientTypeSelected()">
-                          <mat-option *ngFor="let idType of identificationTypeOptions" [value]="idType">{{ idType }}</mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="mngForm.get('IdentificationTypeID')?.invalid">
-                          Please select identification type
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Passport Number</mat-label>
-                        <input matInput formControlName="PassportNo" [disabled]="!isClientTypeSelected()" />
-                        <mat-error *ngIf="mngForm.get('PassportNo')?.invalid">
-                          Please enter a valid passport number
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Identification Expiry Date</mat-label>
-                        <input matInput [matDatepicker]="idExpiryPicker" formControlName="IDExpiryDate" [disabled]="!isClientTypeSelected()" />
-                        <mat-datepicker-toggle matSuffix [for]="idExpiryPicker"></mat-datepicker-toggle>
-                        <mat-datepicker #idExpiryPicker></mat-datepicker>
-                        <mat-error *ngIf="mngForm.get('IDExpiryDate')?.invalid">
-                          Please select a valid expiry date
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button mat-raised-button color="accent" (click)="cancel()">
-                      Back
-                    </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext [disabled]="!mngForm.get('ClientTypeID')?.value">
-                      Next
-                    </button>
-                  </div>
-                </form>
-              </mat-step>
-
-              <mat-step *ngIf="!isCorporateClient()">
-                <ng-template matStepLabel>Personal Information</ng-template>
-                <form *ngIf="mngForm" [formGroup]="mngForm">
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>First Name</mat-label>
-                        <input matInput formControlName="FirstName" />
-                        <mat-error *ngIf="mngForm.get('FirstName')?.invalid">
-                          Please enter a valid First Name
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Middle Name</mat-label>
-                        <input matInput formControlName="MiddleName" />
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Last Name</mat-label>
-                        <input matInput formControlName="LastName" />
-                        <mat-error *ngIf="mngForm.get('LastName')?.invalid">
-                          Please enter a valid Last Name
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Date of Birth</mat-label>
-                        <input matInput [matDatepicker]="dobDatePicker" formControlName="DateOfBirth" />
-                        <mat-datepicker-toggle matSuffix [for]="dobDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #dobDatePicker></mat-datepicker>
-                        <mat-error *ngIf="mngForm.get('DateOfBirth')?.invalid">
-                          Please select a valid Date of Birth
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>National ID</mat-label>
-                        <input matInput formControlName="NationalId" />
-                        <mat-error *ngIf="mngForm.get('NationalId')?.invalid">
-                          Please enter a valid National ID
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>KRA Pin</mat-label>
-                        <input matInput formControlName="KRAPin" />
-                        <mat-error *ngIf="mngForm.get('KRAPin')?.invalid">
-                          Please enter a valid KRA Pin
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <section class="example-section">
-                        <label class="example-margin">Gender:</label>
-                        <mat-radio-group formControlName="GenderID">
-                          <mat-radio-button class="example-margin" value="M">Male</mat-radio-button>
-                          <mat-radio-button class="example-margin" value="F">Female</mat-radio-button>
-                        </mat-radio-group>
-                      </section>
-                      <mat-error *ngIf="mngForm.get('GenderID')?.invalid">
-                        Please select Gender
-                      </mat-error>
-                    </div>
-
-                      <!-- Add these to your personal info form section -->
-<div class="row" *ngIf="isIndividualClient()">
-  <!-- Number of House Members -->
-  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-    <mat-form-field class="example-full-width" appearance="outline">
-      <mat-label>Number of House Members</mat-label>
-      <input matInput type="number" formControlName="NumberOfHouseMembers" min="1" required/>
-      <mat-error *ngIf="mngForm.get('NumberOfHouseMembers')?.invalid">
-        Number of house members is required
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <!-- Can Donate Blood -->
-  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-    <mat-checkbox formControlName="CanDonateBlood">Can Donate Blood</mat-checkbox>
-  </div>
-
-  <!-- Is Salaried -->
-  <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-    <mat-checkbox formControlName="IsSalaried">Is Salaried</mat-checkbox>
-  </div>
-</div>
-
-  <input type="hidden" formControlName="WFClientStatusID" value="A">
-  <input type="hidden" formControlName="OpenedBy" [value]="currentUser">
-  <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
-  <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
-  <input type="hidden" formControlName="OpenedDate" [value]="currentDate">
-  <input type="hidden" formControlName="UpdateCount" [value]="0">
-
-                    <div *ngIf="mngForm.get('ClientTypeID')?.value === 'Minor'" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Parent Client ID 1</mat-label>
-                        <input matInput formControlName="ParentClientID1" />
-                        <mat-error *ngIf="mngForm.get('ParentClientID1')?.invalid">
-                          Parent Client ID 1 is required for minors
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div *ngIf="mngForm.get('ClientTypeID')?.value === 'Minor'" class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Parent Client ID 2</mat-label>
-                        <input matInput formControlName="ParentClientID2" />
-                      </mat-form-field>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button mat-raised-button color="accent" matStepperPrevious>
-                      Back
-                    </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                      Next
-                    </button>
-                  </div>
-                </form>
-              </mat-step>
-
-                <mat-step *ngIf="isCorporateClient()">
-                <ng-template matStepLabel>Corporate Details</ng-template>
-                <form *ngIf="corporateForm" [formGroup]="corporateForm">
-                  <div class="row">
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Company Name</mat-label>
-                        <input matInput formControlName="CompanyName" />
-                        <mat-error *ngIf="corporateForm.get('CompanyName')?.invalid">
-                          Company Name is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Constitution</mat-label>
-                        <input matInput formControlName="Constitution" />
-                        <mat-error *ngIf="corporateForm.get('Constitution')?.invalid">
-                          Constitution is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Nature of Business</mat-label>
-                        <input matInput formControlName="NatureOfBusiness" />
-                        <mat-error *ngIf="corporateForm.get('NatureOfBusiness')?.invalid">
-                          Nature of Business is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Registration Number</mat-label>
-                        <input matInput formControlName="RegistrationNumber" />
-                        <mat-error *ngIf="corporateForm.get('RegistrationNumber')?.invalid">
-                          Registration Number is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Registered At</mat-label>
-                        <input matInput formControlName="RegisteredAt" />
-                        <mat-error *ngIf="corporateForm.get('RegisteredAt')?.invalid">
-                          Registered At is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>KRA Pin</mat-label>
-                        <input matInput formControlName="KRAPinNo" />
-                        <mat-error *ngIf="corporateForm.get('KRAPinNo')?.invalid">
-                          KRA Pin is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Date of Registration</mat-label>
-                        <input matInput [matDatepicker]="regDatePicker" formControlName="DateOfRegistration" />
-                        <mat-datepicker-toggle matSuffix [for]="regDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #regDatePicker></mat-datepicker>
-                        <mat-error *ngIf="corporateForm.get('DateOfRegistration')?.invalid">
-                          Date of Registration is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Registered Office</mat-label>
-                        <input matInput formControlName="RegisteredOffice" />
-                        <mat-error *ngIf="corporateForm.get('RegisteredOffice')?.invalid">
-                          Registered Office is required
-                        </mat-error>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Comments</mat-label>
-                        <textarea matInput formControlName="Comments" rows="3"></textarea>
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Website</mat-label>
-                        <input matInput formControlName="Website" />
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Opened By</mat-label>
-                        <input matInput formControlName="OpenedBy" [readonly]="true" />
-                      </mat-form-field>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 mb-1">
-                      <mat-form-field class="example-full-width" appearance="outline">
-                        <mat-label>Opened On</mat-label>
-                        <input matInput [matDatepicker]="openedDatePicker" formControlName="OpenedOn" />
-                        <mat-datepicker-toggle matSuffix [for]="openedDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #openedDatePicker></mat-datepicker>
-                      </mat-form-field>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button mat-raised-button color="accent" matStepperPrevious>
-                      Back
-                    </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                      Next
-                    </button>
-                  </div>
-                </form>
-              </mat-step>
-
-      <mat-step *ngIf="isCorporateClient()">              
-      <ng-template matStepLabel>Directors</ng-template>
-      <form *ngIf="directorsForm" [formGroup]="directorsForm">
-        <ng-container *ngIf="showDirectorsForm">
-          <div class="row">
-            <div class="col-md-4 col-sm-12 mb-1">
-              <mat-form-field class="example-full-width" appearance="outline">
-                <mat-label>Client Name</mat-label>
-                <input matInput formControlName="clientName" />
-                <mat-error *ngIf="directorsForm.get('clientName')?.invalid && directorsForm.get('clientName')?.touched">
-                  Please enter a valid name
-                </mat-error>
-              </mat-form-field>
-            </div>
-          
-            <div class="col-md-4 col-sm-12 mb-1">
-              <mat-form-field class="example-full-width" appearance="outline">
-                <mat-label>Relation</mat-label>
-                <input matInput formControlName="relation" />
-                <mat-error *ngIf="directorsForm.get('relation')?.invalid && directorsForm.get('relation')?.touched">
-                  Please enter a valid relation
-                </mat-error>
-              </mat-form-field>
-            </div>
-          
-            <div class="col-md-4 col-sm-12 mb-1">
-              <mat-form-field class="example-full-width" appearance="outline">
-                <mat-label>Share (%)</mat-label>
-                <input matInput type="number" formControlName="share" />
-                <mat-error *ngIf="directorsForm.get('share')?.invalid && directorsForm.get('share')?.touched">
-                  Please enter a valid share percentage
-                </mat-error>
-              </mat-form-field>
-            </div>
-          </div>
-        
-          <div class="row">
-            <div class="col-12">
-              <div class="example-button-row">
-                <button mat-raised-button color="primary" [disabled]="!directorsForm.valid" (click)="addDirector()">
-                  {{ directorActionLabel }} Director
-                </button>
-                <button mat-raised-button color="warn" (click)="cancelDirectorEdit()">Cancel</button>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-      
-        <mat-tab-group>
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon>group</mat-icon> All Directors
-      </ng-template>
-
-      <div class="row m-1">
-        <div class="col-12">
-          <div class="table-responsiv">
-            <div class="materialTableHeader">
-              <div class="row">
-                <div class="col-8">
-                  <ul class="header-buttons-left ms-0">
-                    <li><h2>Directors</h2></li>
-                    <li class="dropdown m-l-20">
-                      <label for="search-input"><i class="material-icons search-icon">search</i></label>
-                      <input placeholder="Filter..." type="text" (keyup)="applyDirectorsFilter($event)"
-                        class="browser-default search-field" />
-                    </li>
-                    <li>
-                      <div class="m-l-10" matTooltip="ADD">
-                        <button mat-mini-fab color="primary" (click)="startAddDirector()">
-                          <mat-icon>add</mat-icon>
-                        </button>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="m-l-10" matTooltip="REFRESH">
-                        <button mat-mini-fab color="primary" (click)="refreshDirectors()">
-                          <mat-icon>refresh</mat-icon>
-                        </button>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="col-4">
-                  <ul class="header-buttons">
-                    <li>
-                      <div class="export-button m-l-10" matTooltip="XLSX">
-                        <img src="assets/images/icons/xlsx.png" alt="" (click)="exporterDirectors.exportTable('xlsx', { fileName: 'directors-list', sheet: 'sheet1' })" />
-                      </div>
-                    </li>
-                    <li>
-                      <div class="export-button m-l-10" matTooltip="CSV">
-                        <img src="assets/images/icons/csv.png" alt="" (click)="exporterDirectors.exportTable('csv')" />
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <mat-table #table matTableExporter [dataSource]="dataSourceDirectors" matSort class="mat-cell" #exporterDirectors="matTableExporter">
-              <ng-container matColumnDef="id">
-                <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{ row.id || '#' }}</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="clientName">
-                <mat-header-cell *matHeaderCellDef mat-sort-header>Client Name</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{ row.clientName }}</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="relation">
-                <mat-header-cell *matHeaderCellDef mat-sort-header>Relation</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{ row.relation }}</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="share">
-                <mat-header-cell *matHeaderCellDef mat-sort-header>Share (%)</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{ row.share }}%</mat-cell>
-              </ng-container>
-
-              <ng-container matColumnDef="action">
-                <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
-                <mat-cell *matCellDef="let row; let i = index">
-                  <button mat-icon-button color="accent" (click)="editDirector(row, i)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button mat-icon-button color="warn" (click)="deleteDirector(i)">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </mat-cell>
-              </ng-container>
-
-              <mat-header-row *matHeaderRowDef="displayedDirectorColumns"></mat-header-row>
-              <mat-row *matRowDef="let row; columns: displayedDirectorColumns"></mat-row>
-            </mat-table>
-
-            <div *ngIf="dataSourceDirectors.data.length === 0" class="tbl-spinner">
-              <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate"></mat-progress-spinner>
-            </div>
-
-            <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20, 50, 100]"></mat-paginator>
-          </div>
-        </div>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</form>
-
-<div class="mt-2">
-  <button mat-raised-button color="accent" matStepperPrevious>Back</button>
-  <button mat-raised-button color="primary" matStepperNext>Next</button>
-</div>
-              
-</mat-step>
-
-          <mat-step>
-  <ng-template matStepLabel>Addresses</ng-template>
-  <form [formGroup]="mngForm">
-    <div *ngIf="mngForm && mngForm.get('Addresses')" formArrayName="Addresses">
-      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-section mb-3 p-3 border rounded">
-        <h4>Address {{i + 1}} <span *ngIf="address.get('IsMailingAddress')?.value">(Mailing Address)</span></h4>
-        
-        <div class="row">
-          <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
-          <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
-          <input type="hidden" formControlName="UpdateCount" [value]="0">
-          
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Address Type</mat-label>
-              <mat-select formControlName="AddressTypeID">
-                <mat-option value="H">Home</mat-option>
-                <mat-option value="W">Work</mat-option>
-                <mat-option value="M">Mailing</mat-option>
-                <mat-option value="O">Other</mat-option>
-              </mat-select>
-              <mat-error *ngIf="address.get('AddressTypeID')?.invalid">
-                Address Type is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-          
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Address Line 1</mat-label>
-              <input matInput formControlName="Address1" />
-              <mat-error *ngIf="address.get('Address1')?.invalid">
-                Address Line 1 is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Address Line 2</mat-label>
-              <input matInput formControlName="Address2" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>City</mat-label>
-              <input matInput formControlName="CityID" />
-              <mat-error *ngIf="address.get('CityID')?.invalid">
-                City is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Country</mat-label>
-              <mat-select formControlName="CountryID">
-                <mat-option *ngFor="let country of countries" [value]="country.code">
-                  {{ country.name }}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="address.get('CountryID')?.invalid">
-                Country is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Mobile</mat-label>
-              <input matInput formControlName="Mobile" />
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="Email" type="email" />
-              <mat-error *ngIf="address.get('Email')?.invalid">
-                Please enter a valid email
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1">
-            <mat-checkbox formControlName="IsMailingAddress">Mailing Address</mat-checkbox>
-          </div>
-          
-          <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 mb-1" *ngIf="addresses.length > 1">
-            <button mat-mini-fab color="warn" (click)="removeAddress(i)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <button mat-raised-button color="primary" (click)="addAddress()" class="mb-3">
-      <mat-icon>add</mat-icon> Add Another Address
-    </button>
-    
-    <div>
-      <button mat-raised-button color="accent" matStepperPrevious>
-        Back
-      </button>
-      <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-        Next
-      </button>
-    </div>
-  </form>
-</mat-step>
-
             
-<mat-step>
-  <ng-template matStepLabel>Next of Kin Details</ng-template>
-  <ng-container>
-    <form *ngIf="nextOfKinForm" [formGroup]="nextOfKinForm">
-      <ng-container *ngIf="showParTranForm1">
-        <div class="row">
-          <!-- Hidden system fields -->
-          <input type="hidden" formControlName="CreatedBy" [value]="currentUser">
-          <input type="hidden" formControlName="CreatedOn" [value]="currentDate">
-          <input type="hidden" formControlName="UpdateCount" [value]="0">
-          <input type="hidden" formControlName="ClientID" [value]="mngForm.get('ClientID')?.value">
-          
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Related Client ID</mat-label>
-              <input matInput formControlName="RelatedClientID" required/>
-              <mat-error *ngIf="nextOfKinForm.get('RelatedClientID')?.invalid">
-                Related Client ID is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Relation ID</mat-label>
-              <mat-select formControlName="RelationID" required>
-                <mat-option value="S">Spouse</mat-option>
-                <mat-option value="P">Parent</mat-option>
-                <mat-option value="C">Child</mat-option>
-                <mat-option value="O">Other</mat-option>
-              </mat-select>
-              <mat-error *ngIf="nextOfKinForm.get('RelationID')?.invalid">
-                Relation is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Relation Reference No</mat-label>
-              <input matInput type="number" formControlName="RelationRefNo" [value]="1" required/>
-              <mat-error *ngIf="nextOfKinForm.get('RelationRefNo')?.invalid">
-                Reference number is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Remarks</mat-label>
-              <input matInput formControlName="Remarks" required/>
-              <mat-error *ngIf="nextOfKinForm.get('Remarks')?.invalid">
-                Remarks are required
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Share Percentage</mat-label>
-              <input matInput type="number" formControlName="SharePercent" 
-                     min="0" max="100" (input)="calculateRemainingAllocation()" required/>
-              <mat-error *ngIf="nextOfKinForm.get('SharePercent')?.invalid">
-                Please enter a valid percentage (0 - 100)
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="col-md-4 col-sm-12 mb-1">
-            <mat-form-field class="example-full-width" appearance="outline">
-              <mat-label>Remaining Allocation</mat-label>
-              <input matInput type="number" formControlName="remainingAllocation" readonly />
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-            <div class="example-button-row" align="start">
-              <button class="btn-space" mat-raised-button color="primary" 
-                [disabled]="!nextOfKinForm.valid || posting" 
-                (click)="pushToDataSource1()">
-                {{ parTranAction1 }} Next of Kin
-              </button>
-
-              <button mat-raised-button color="warn" (click)="cancelParTran1()" tabindex="-1">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-                    <mat-tab-group>
-                      <mat-tab>
-                        <ng-template mat-tab-label>
-                          <mat-icon>receipt</mat-icon> All Next of Kin
-                        </ng-template>
-
-                        <div class="row m-1">
-                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="table-responsiv">
-                              <div class="materialTableHeader">
-                                <div class="row">
-                                  <div class="col-8">
-                                    <ul class="header-buttons-left ms-0">
-                                      <li class="dropdown">
-                                        <h2>Next Of Kin</h2>
-                                      </li>
-                                      <li class="dropdown m-l-20">
-                                        <label for="search-input"><i
-                                            class="material-icons search-icon">search</i></label>
-                                        <input placeholder="Filter..." type="text" (keyup)="applyFilter1($event)"
-                                          #filter class="browser-default search-field" aria-label="Search box" />
-                                      </li>
-                                      <li>
-                                        <div class="m-l-10" matTooltip="ADD">
-                                          <button mat-mini-fab color="primary" (click)="addParTran1()">
-                                            <mat-icon class="col-white">add</mat-icon>
-                                          </button>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="m-l-10" matTooltip="REFRESH">
-                                          <button mat-mini-fab color="primary" (click)="refresh1()">
-                                            <mat-icon class="col-white">refresh</mat-icon>
-                                          </button>
-                                        </div>
-                                      </li>
-                                    </ul>
-                                  </div>
-
-                                  <div class="col-4">
-                                    <ul class="header-buttons">
-                                      <li>
-                                        <div class="export-button m-l-10" matTooltip="XLSX">
-                                          <img src="assets/images/icons/xlsx.png" alt="" (click)="
-                                              exporter.exportTable('xlsx', {
-                                                fileName: 'assets-list',
-                                                sheet: 'sheet1'
-                                              })
-                                            " />
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="export-button m-l-10" matTooltip="CSV">
-                                          <img src="assets/images/icons/csv.png" alt="" (click)="
-                                              exporter.exportTable('csv')
-                                            " />
-                                        </div>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-
-                                                <mat-table #table [dataSource]="dataSource1" matSort class="mat-cell">
-                  <!-- ID Column -->
-                  <ng-container matColumnDef="id">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>ID</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{ row.ID || '#' }}</mat-cell>
-                  </ng-container>
-
-                  <ng-container matColumnDef="RelatedClientID">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Related Client ID</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{ row.RelatedClientID }}</mat-cell>
-                  </ng-container>
-
-                  <ng-container matColumnDef="RelationID">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Relation</mat-header-cell>
-                    <mat-cell *matCellDef="let row">
-                      {{ row.RelationID === 'S' ? 'Spouse' : 
-                         row.RelationID === 'P' ? 'Parent' : 
-                         row.RelationID === 'C' ? 'Child' : 'Other' }}
-                    </mat-cell>
-                  </ng-container>
-
-                  <ng-container matColumnDef="Remarks">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Remarks</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{ row.Remarks }}</mat-cell>
-                  </ng-container>
-
-                  <ng-container matColumnDef="SharePercent">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Percentage</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{ row.SharePercent }}%</mat-cell>
-                  </ng-container>
-
-                  <!-- Action Buttons -->
-                  <ng-container matColumnDef="action">
-                    <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let i = index">
-                      <button mat-icon-button color="accent" (click)="editParTran1(row, i)">
-                        <mat-icon>edit</mat-icon>
+            <!-- Top Static Details Section -->
+            <form *ngIf="mngForm" [formGroup]="mngForm" style="margin: 0; padding: 0;">
+              <div class="top-section">
+                <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                  <!-- Client ID with Search -->
+                  <div class="cbs-field cbs-field--inline">
+                    <div class="cbs-label required">Client ID</div>
+                    <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                      <input matInput formControlName="ClientID" required (keyup.enter)="searchClientById()" />
+                      <button mat-icon-button matSuffix color="primary" type="button"
+                              (click)="mngForm.get('ClientID')?.value ? searchClientById() : openClientLookup()"
+                              matTooltip="Search Client">
+                        <mat-icon>search</mat-icon>
                       </button>
-                      <button mat-icon-button color="warn" (click)="deleteParTran1(i)">
-                        <mat-icon>delete</mat-icon>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Client Type -->
+                  <div class="cbs-field cbs-field--inline">
+                    <div class="cbs-label required">Client Type</div>
+                    <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                      <mat-select formControlName="ClientTypeID" (selectionChange)="onClientTypeChange()" required placeholder="--Select--">
+                        <mat-option *ngFor="let type of clientTypeOptions" [value]="type.value">
+                          {{ type.label }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Application ID (conditional) -->
+                  <div class="cbs-field cbs-field--inline" *ngIf="!isCorporateClient()">
+                    <div class="cbs-label">Application ID</div>
+                    <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                      <input matInput placeholder="--Select--" />
+                    </mat-form-field>
+                  </div>
+
+                  <!-- Base ID (conditional) -->
+                  <div class="cbs-field cbs-field--inline" *ngIf="!isCorporateClient()">
+                    <div class="cbs-label">Base ID</div>
+                    <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                      <mat-select placeholder="--Select--">
+                        <mat-option value="">--Select--</mat-option>
+                      </mat-select>
+                      <button mat-icon-button matSuffix color="primary" type="button" matTooltip="Add New">
+                        <mat-icon>add</mat-icon>
                       </button>
-                    </mat-cell>
-                  </ng-container>
+                    </mat-form-field>
+                  </div>
 
-                  <mat-header-row *matHeaderRowDef="['id', 'RelatedClientID', 'RelationID', 'Remarks', 'SharePercent', 'action']"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: ['id', 'RelatedClientID', 'RelationID', 'Remarks', 'SharePercent', 'action']"></mat-row>
-                </mat-table>
-                              <div *ngIf="dataSource1.data.length === 0" class="tbl-spinner">
-                                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
-                                </mat-progress-spinner>
-                              </div>
-                              <mat-paginator [pageSize]="10" [pageSizeOptions]="[
-                                  2, 5, 10, 20, 30, 40, 50, 100
-                                ]" aria-label="Select page of users"></mat-paginator>
-                            </div>
-                          </div>
-                        </div>
-                      </mat-tab>
-                    </mat-tab-group>
-                  </form>
-                </ng-container>
-
-                <div>
-                  <button mat-raised-button color="accent" matStepperPrevious>
-                    Back
-                  </button>
-                  <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                    Next
-                  </button>
-                </div>
-              </mat-step>
-
-            <mat-step>
-                <ng-template matStepLabel>Employment Details</ng-template>
-
-                <ng-container>
-                  <form [formGroup]="workExpForm">
-                    <ng-container *ngIf="showParTranForm4">
-                      <div class="row">
-                        <div class="col-md-3 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Company Name</mat-label>
-                            <input matInput formControlName="companyName" />
-                            <mat-error *ngIf="
-                                workExpForm.get('companyName').invalid &&
-                                workExpForm.get('companyName').touched
-                              ">
-                              Please enter a valid Company Name
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
-
-                        <div class="col-md-3 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Work Position</mat-label>
-                            <input matInput formControlName="workPosition" />
-                            <mat-error *ngIf="
-                                workExpForm.get('workPosition').invalid &&
-                                workExpForm.get('workPosition').touched
-                              ">
-                              Please enter a valid Work Position
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
-
-                        <div class="col-md-3 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>Start Date (MM/DD/YYYY)</mat-label>
-                            <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" />
-                            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-                            <mat-datepicker #startDatePicker></mat-datepicker>
-                            <mat-error *ngIf="
-                                workExpForm.get('startDate').invalid &&
-                                workExpForm.get('startDate').touched
-                              ">
-                              Please enter a valid Start Date
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
-
-                        <div class="col-md-3 col-sm-12 mb-1">
-                          <mat-form-field class="example-full-width" appearance="outline">
-                            <mat-label>End Date (MM/DD/YYYY)</mat-label>
-                            <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" />
-                            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-                            <mat-datepicker #endDatePicker></mat-datepicker>
-                            <mat-error *ngIf="
-                                workExpForm.get('endDate').invalid &&
-                                workExpForm.get('endDate').touched
-                              ">
-                              Please enter a valid End Date
-                            </mat-error>
-                          </mat-form-field>
-                        </div>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                          <div class="example-button-row" align="start">
-                            <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
-                              [disabled]="!workExpForm.valid || posting" [hidden]="viewMode"
-                              (click)="pushToDataSource4()">
-                              {{ parTranAction4 }} Experience
-                            </button>
-
-                            <button mat-raised-button color="warn" (click)="cancelParTran4()" tabindex="-1">
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </ng-container>
-
-                    <mat-tab-group>
-                      <mat-tab>
-                        <ng-template mat-tab-label>
-                          <mat-icon>receipt</mat-icon> All Employment Details
-                        </ng-template>
-
-                        <div class="row m-1">
-                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="table-responsiv">
-                              <div class="materialTableHeader">
-                                <div class="row">
-                                  <div class="col-8">
-                                    <ul class="header-buttons-left ms-0">
-                                      <li class="dropdown">
-                                        <h2>Experience</h2>
-                                      </li>
-                                      <li class="dropdown m-l-20">
-                                        <label for="search-input"><i
-                                            class="material-icons search-icon">search</i></label>
-                                        <input placeholder="Filter..." type="text" (keyup)="applyFilter4($event)"
-                                          #filter class="browser-default search-field" aria-label="Search box" />
-                                      </li>
-                                      <li>
-                                        <div class="m-l-10" matTooltip="ADD">
-                                          <button mat-mini-fab color="primary" (click)="addParTran4()">
-                                            <mat-icon class="col-white">add</mat-icon>
-                                          </button>
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="m-l-10" matTooltip="REFRESH">
-                                          <button mat-mini-fab color="primary" (click)="refresh4()">
-                                            <mat-icon class="col-white">refresh</mat-icon>
-                                          </button>
-                                        </div>
-                                      </li>
-                                    </ul>
-                                  </div>
-
-                                  <div class="col-4">
-                                    <ul class="header-buttons">
-                                      <li>
-                                        <div class="export-button m-l-10" matTooltip="XLSX">
-                                          <img src="assets/images/icons/xlsx.png" alt="" (click)="
-                                              exporter.exportTable('xlsx', {
-                                                fileName: 'assets-list',
-                                                sheet: 'sheet1'
-                                              })
-                                            " />
-                                        </div>
-                                      </li>
-                                      <li>
-                                        <div class="export-button m-l-10" matTooltip="CSV">
-                                          <img src="assets/images/icons/csv.png" alt="" (click)="
-                                              exporter.exportTable('csv')
-                                            " />
-                                        </div>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <mat-table #table matTableExporter [dataSource]="dataSource4" matSort class="mat-cell"
-                                #exporter="matTableExporter">
-                                <!-- ID Column -->
-                                <ng-container matColumnDef="id">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-10">ID</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-10">
-                                    {{ row.id ? row.id : "#" }}
-                                  </mat-cell>
-                                </ng-container>
-
-                                <ng-container matColumnDef="companyName">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Company Name</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.companyName }}</mat-cell>
-                                </ng-container>
-
-                                <ng-container matColumnDef="workPosition">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Work Position</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.workPosition }}</mat-cell>
-                                </ng-container>
-
-                                <ng-container matColumnDef="startDate">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">Start Date</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.startDate | date: 'short' }}</mat-cell>
-                                </ng-container>
-
-                                <ng-container matColumnDef="endDate">
-                                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                                    class="column-nowrap psl-3 tbl-col-width-per-20">End Date</mat-header-cell>
-                                  <mat-cell *matCellDef="let row" class="column-nowrap psl-3 tbl-col-width-per-20">{{
-                                    row.endDate| date: 'short' }}</mat-cell>
-                                </ng-container>
-
-                                <!-- Action Buttons -->
-                                <ng-container matColumnDef="action">
-                                  <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-15 pr-0"
-                                    *matHeaderCellDef>
-                                    Action
-                                  </mat-header-cell>
-                                  <mat-cell *matCellDef="let row; let i = index"
-                                    class="column-nowrap psl-3 tbl-col-width-per-15 pr-0">
-                                    <!-- Edit Button -->
-                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                      (click)="editParTran4(row, i)" class="tbl-action-btn">
-                                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
-                                      </app-feather-icons>
-                                    </button>
-
-                                    <!-- Delete Button -->
-                                    <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                      (click)="deleteParTran4(i)" class="tbl-action-btn">
-                                      <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
-                                      </app-feather-icons>
-                                    </button>
-                                  </mat-cell>
-                                </ng-container>
-
-                                <mat-header-row *matHeaderRowDef="displayedColumns4"></mat-header-row>
-                                <mat-row *matRowDef="
-                                    let row;
-                                    columns: displayedColumns4
-                                  " (click)="editParTran4(row, i)" [style.cursor]="'pointer'" matRipple>
-                                </mat-row>
-                                <mat-cell *matNoDataRow colspan="8">
-                                  No data matching the filter "{{
-                                  input4.value
-                                  }}"</mat-cell>
-                              </mat-table>
-                              <div *ngIf="dataSource4.data.length === 0" class="tbl-spinner">
-                                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
-                                </mat-progress-spinner>
-                              </div>
-                              <mat-paginator [pageSize]="10" [pageSizeOptions]="[
-                                  2, 5, 10, 20, 30, 40, 50, 100
-                                ]" aria-label="Select page of users"></mat-paginator>
-                            </div>
-                          </div>
-                        </div>
-                      </mat-tab>
-                    </mat-tab-group>
-                  </form>
-                </ng-container>
-
-                <div>
-                  <button mat-raised-button color="accent" matStepperPrevious>
-                    Back
-                  </button>
-                  <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                    Next
-                  </button>
-                </div>
-   </mat-step>
-                  
-       <mat-step>
-       <ng-template matStepLabel>Client Documents</ng-template>
-        <div class="mt-3">
-          <form [formGroup]="documentsForm">
-            <div style="margin: 20px">
-              <div class="table-responsive">
-                <div class="materialTableHeader">
-                  <div class="row">
-                    <div class="col-8">
-                      <ul class="header-buttons-left ms-0">
-                        <li class="dropdown">
-                          <h2>Client Documents</h2>
-                        </li>
-                        <li class="dropdown m-l-20">
-                          <label for="search-input"><i class="material-icons search-icon">search</i></label>
-                          <input placeholder="Filter..." type="text" (keyup)="applyFilter($event)" #filter
-                            class="browser-default search-field" aria-label="Search box" />
-                        </li>
-                        <li>
-                          <div class="m-l-10" matTooltip="ADD">
-                            <button mat-mini-fab color="primary" (click)="addDocumentRow()">
-                              <mat-icon class="col-white">add</mat-icon>
-                            </button>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="col-4"></div>
+                  <!-- Client Name (full width, auto-generated) -->
+                  <div class="cbs-field cbs-field--inline cbs-full">
+                    <div class="cbs-label">Client Name</div>
+                    <mat-form-field class="cbs-input client-name-field" appearance="outline" floatLabel="never">
+                      <input matInput
+                             *ngIf="!isCorporateClient()"
+                             [value]="(mngForm.get('FirstName')?.value || '') + ' ' + (mngForm.get('MiddleName')?.value || '') + ' ' + (mngForm.get('LastName')?.value || '')"
+                             readonly />
+                      <input matInput
+                             *ngIf="isCorporateClient() && corporateForm"
+                             [value]="corporateForm.get('CompanyName')?.value"
+                             readonly />
+                    </mat-form-field>
                   </div>
                 </div>
-              
-                <mat-table #table matTableExporter [dataSource]="documentsDataSource"
-                  formArrayName="documentDetails" matSort class="mat-cell" #exporter="matTableExporter">
-
-                  <!-- ID Column -->
-                  <ng-container matColumnDef="id">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-5">Id</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-5">
-                      {{ index + 1 }}
-                    </mat-cell>
-                  </ng-container>
-                
-                  <!-- Document Type Column -->
-                  <ng-container matColumnDef="documentType">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">Document Type</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
-                      <mat-form-field appearance="fill" class="w-100">
-                        <mat-label>Document Type</mat-label>
-                        <mat-select formControlName="DocumentID">
-                          <mat-option *ngFor="let docType of documentTypes" [value]="docType.SubCodeID">
-                            {{ docType.CodeDescription }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <!-- Document Type ID Column -->
-                  <ng-container matColumnDef="documentTypeId">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">Document Type ID</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
-                      <mat-form-field appearance="fill" class="w-100">
-                        <mat-label>Type ID</mat-label>
-                        <mat-select formControlName="DocumentTypeID">
-                          <mat-option *ngFor="let typeId of documentTypeIds" [value]="typeId.SubCodeID">
-                            {{ typeId.CodeDescription }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <!-- Description Column -->
-                  <ng-container matColumnDef="description">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">Description</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
-                      <mat-form-field appearance="fill" class="w-100">
-                        <mat-label>Description</mat-label>
-                        <input matInput formControlName="Description" maxlength="100" />
-                      </mat-form-field>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <!-- MIME Type Column -->
-                  <ng-container matColumnDef="mimeType">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">MIME Type</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
-                      <mat-form-field appearance="fill" class="w-100">
-                        <mat-label>MIME Type</mat-label>
-                        <mat-select formControlName="MimeType">
-                          <mat-option *ngFor="let mimeType of mimeTypes" [value]="mimeType">
-                            {{ mimeType }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <ng-container matColumnDef="remarks">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header
-                      class="column-nowrap psl-3 tbl-col-width-per-15">Remarks</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                      class="column-nowrap psl-3 tbl-col-width-per-15">
-                      <mat-form-field appearance="fill" class="w-100">
-                        <mat-label>Remarks</mat-label>
-                        <input matInput formControlName="Remarks" maxlength="100" />
-                      </mat-form-field>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <ng-container matColumnDef="selectFile">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header
-                    class="column-nowrap psl-3 tbl-col-width-per-15">Select File</mat-header-cell>
-                  <mat-cell *matCellDef="let row; let index = index" [formGroupName]="index"
-                    class="column-nowrap psl-3 tbl-col-width-per-15">
-
-                    <div *ngIf="row.value.isExistingFile" class="existing-file-info">
-                      <mat-icon>description</mat-icon>
-                      <span class="file-name">{{ row.value.fileName }}</span>
-                      <span class="file-type">({{ row.value.MimeType }})</span>
-                    </div>
-
-                    <div *ngIf="!row.value.isExistingFile">
-                      <input #file type="file" [disabled]="isLoading | async"
-                        (change)="onSelectDocumentFile(file.files, row, index)" />
-                    </div>
-                  </mat-cell>
-                  </ng-container>
-                
-                    <ng-container matColumnDef="download">
-                    <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
-                      *matHeaderCellDef>Download/View</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let i = index"
-                      class="column-nowrap psl-3 tbl-col-width-per-10">
-
-                      <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
-                        (click)="previewDocument(row)" class="tbl-action-btn" matTooltip="Preview">
-                        <mat-icon aria-label="Preview">visibility</mat-icon>
-                      </button>
-
-                      <button mat-icon-button color="primary" (click)="$event.stopPropagation()"
-                        (click)="downloadDocument(row)" class="tbl-action-btn" matTooltip="Download">
-                        <mat-icon aria-label="Download">file_download</mat-icon>
-                      </button>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <ng-container matColumnDef="action">
-                    <mat-header-cell class="column-nowrap psl-3 tbl-col-width-per-10"
-                      *matHeaderCellDef>Action</mat-header-cell>
-                    <mat-cell *matCellDef="let row; let i = index"
-                      class="column-nowrap psl-3 tbl-col-width-per-10">
-                      <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                        (click)="deleteDocument(row)" class="tbl-action-btn">
-                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
-                      </button>
-                    </mat-cell>
-                  </ng-container>
-                
-                  <mat-header-row *matHeaderRowDef="documentsDisplayColumns"></mat-header-row>
-                  <mat-row *matRowDef="let row; columns: documentsDisplayColumns" 
-                    [style.cursor]="'pointer'" matRipple></mat-row>
-                  <mat-cell *matNoDataRow colspan="4">No data matching the filter "{{ input.value }}"</mat-cell>
-                </mat-table>
-              
-                <div *ngIf="isDocumentDataLoading" class="tbl-spinner">
-                  <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
-                  </mat-progress-spinner>
-                </div>
-                <mat-paginator [pageSize]="10" [pageSizeOptions]="[2, 5, 10, 20, 30, 40, 50, 100]"
-                  aria-label="Select page of documents"></mat-paginator>
               </div>
-            </div>
-          </form>
-        </div>
-    </mat-step>
-              <mat-step>
-                <ng-template matStepLabel>Special Offers</ng-template>
-                <form [formGroup]="mngForm">
-                  <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="canSendGreetings">Can Send Greetings</mat-checkbox>
-                    </div>
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="canSendAssociateSpecialOffer">Can Send Associate Special Offer</mat-checkbox>
-                    </div>
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="canSendOurSpecialOffers">Can Send Our Special Offers</mat-checkbox>
-                    </div>
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="statementOnline">Statement Online</mat-checkbox>
-                    </div>
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-1">
-                      <mat-checkbox formControlName="mobileAlert">Mobile Alert</mat-checkbox>
+
+              <!-- Stepper Content -->
+              <mat-horizontal-stepper [linear]="false" #stepper style="margin-top: 2px !important;">
+                
+                <!-- Step 1: Personal Details (Only for Individual Clients) -->
+                <mat-step label="Personal" *ngIf="!isCorporateClient()">
+                  <div class="step-content" style="padding: 2px !important;">
+                    <div class="section-header" style="margin-bottom: 2px !important;">Personal Details</div>
+
+                    <!-- Individual Client Personal Details -->
+                    <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Title</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="TitleID" required placeholder="--Select--">
+                            <mat-option *ngFor="let title of titleOptions" [value]="title">{{ title }}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">First Name</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="FirstName" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Middle Name</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="MiddleName" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Last Name</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="LastName" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Gender</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="GenderID" required placeholder="--Select--">
+                            <mat-option value="M">Male</mat-option>
+                            <mat-option value="F">Female</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Date of Birth</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput type="date" formControlName="DateOfBirth" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Age</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput readonly />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Age As On</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput placeholder="--Select--" readonly />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Nationality</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <mat-select placeholder="--Select--">
+                            <mat-option value="KE">Kenyan</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Resident</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="ResidentID" required placeholder="--Select--">
+                            <mat-option *ngFor="let status of residentStatusOptions" [value]="status">{{ status }}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Identification Type</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="IdentificationTypeID" required placeholder="--Select--">
+                            <mat-option *ngFor="let type of identificationTypeOptions" [value]="type">{{ type }}</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Identification No</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="NationalId" required />
+                          <button mat-icon-button matSuffix color="primary" type="button">
+                            <mat-icon>search</mat-icon>
+                          </button>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Issued By</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Identification Expiry Date</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput type="date" formControlName="IDExpiryDate" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Literacy Level</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <mat-select placeholder="--Select--">
+                            <mat-option value="">--Select--</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Marital Status</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <mat-select placeholder="--Select--">
+                            <mat-option value="">--Select--</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Number Of House Members</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput type="number" formControlName="NumberOfHouseMembers" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Number Of Children</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput type="number" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Number Of Dependents</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput type="number" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Blood Group</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <mat-select placeholder="--Select--">
+                            <mat-option value="B -ve">B -ve</mat-option>
+                            <mat-option value="O +ve">O +ve</mat-option>
+                            <mat-option value="A +ve">A +ve</mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">&nbsp;</div>
+                        <mat-checkbox formControlName="CanDonateBlood">Can Donate Blood</mat-checkbox>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Opened By</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="OpenedBy" readonly required />
+                          <button mat-icon-button matSuffix color="primary" type="button">
+                            <mat-icon>search</mat-icon>
+                          </button>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Relationship Manager</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="RelationshipManager" required placeholder="--Select--">
+                            <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
+                              {{ manager.name }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Opened On</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput type="date" formControlName="OpenedDate" required />
+                        </mat-form-field>
+                      </div>
+
+                      <!-- Parent fields for Minor -->
+                      <div class="cbs-field cbs-field--inline" *ngIf="mngForm.get('ClientTypeID')?.value === 'M'">
+                        <div class="cbs-label">Parent Client ID 1</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="ParentClientID1" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline" *ngIf="mngForm.get('ClientTypeID')?.value === 'M'">
+                        <div class="cbs-label">Parent Client ID 2</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="ParentClientID2" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline cbs-full">
+                        <div class="cbs-label required">KRA PIN</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="KRAPin" required />
+                        </mat-form-field>
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <button mat-raised-button color="accent" matStepperPrevious>
-                      Back
-                    </button>
-                    <button class="mx-2" mat-raised-button color="primary" matStepperNext>
-                      Next
+                  <div class="mt-2">
+                    <button mat-raised-button color="primary" matStepperNext type="button">
+                      Next <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </div>
-                </form>
-              </mat-step>
-             <mat-step>
-                <ng-template matStepLabel>Submit</ng-template>
-                <div>
-                  <p>
-                    Review your information and click "Submit" to complete the
-                    process.
-                  </p>
+                </mat-step>
 
-                  <div>
-                    <button mat-raised-button color="accent" matStepperPrevious>
-                      Back
+                <!-- Step 1: Corporate Details (Only for Bank/Corporate Clients) -->
+                <mat-step label="Corporate" *ngIf="isCorporateClient()">
+                  <div class="step-content">
+                    <div class="section-header">Corporate Details</div>
+                    
+                    <!-- Corporate Client Details -->
+                    <div class="cbs-grid cbs-grid--four cbs-grid--tight" *ngIf="corporateForm" [formGroup]="corporateForm">
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Company Name</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="CompanyName" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Constitution</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="Constitution" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Nature of Business</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="NatureOfBusiness" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Registration Number</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="RegistrationNumber" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Registered At</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="RegisteredAt" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">KRA PIN No</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="KRAPinNo" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Date of Registration</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput type="date" formControlName="DateOfRegistration" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Registered Office</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="RegisteredOffice" required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Website</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="Website" />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline cbs-full">
+                        <div class="cbs-label">Comments</div>
+                        <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                          <textarea matInput formControlName="Comments" rows="2"></textarea>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Opened By</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <input matInput formControlName="OpenedBy" readonly required />
+                        </mat-form-field>
+                      </div>
+
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label required">Relationship Manager</div>
+                        <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                          <mat-select formControlName="RelationshipManager" required placeholder="--Select--">
+                            <mat-option *ngFor="let manager of relationshipManagers" [value]="manager.id">
+                              {{ manager.name }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="primary" matStepperNext type="button">
+                      Next <mat-icon>arrow_forward</mat-icon>
                     </button>
-                    <button class="mx-2" mat-raised-button color="warn" (click)="stepper.reset()">
-                      Reset
+                  </div>
+                </mat-step>
+
+                <!-- Step 2: Directors' Details (Only for Bank/Corporate Clients) -->
+                <mat-step label="Directors" *ngIf="isCorporateClient()">
+                  <div class="step-content">
+                    <div class="section-header">Directors' Details</div>
+                    
+                    <!-- Directors Section for Corporate -->
+                    <div class="row">
+                      <div class="col-12">
+                        <button mat-raised-button color="primary" (click)="startAddDirector()" type="button" class="mb-2">
+                          <mat-icon>add</mat-icon> Add Director
+                        </button>
+
+                        <div *ngIf="showDirectorsForm && directorsForm" [formGroup]="directorsForm" class="border p-2 mb-2 rounded">
+                          <div class="row">
+                            <div class="col-md-4">
+                              <mat-form-field class="example-full-width" appearance="outline">
+                                <mat-label>Client Name</mat-label>
+                                <input matInput formControlName="clientName" />
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                              <mat-form-field class="example-full-width" appearance="outline">
+                                <mat-label>Relation</mat-label>
+                                <input matInput formControlName="relation" />
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-4">
+                              <mat-form-field class="example-full-width" appearance="outline">
+                                <mat-label>Share %</mat-label>
+                                <input matInput type="number" formControlName="share" />
+                              </mat-form-field>
+                            </div>
+                          </div>
+                          <button mat-raised-button color="accent" (click)="addDirector()" type="button">
+                            {{ directorActionLabel }}
+                          </button>
+                          <button mat-raised-button (click)="cancelDirectorEdit()" type="button" class="ml-2">
+                            Cancel
+                          </button>
+                        </div>
+
+                        <table mat-table [dataSource]="dataSourceDirectors" class="mat-elevation-z2 w-100">
+                          <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef>ID</th>
+                            <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+                          </ng-container>
+                          <ng-container matColumnDef="clientName">
+                            <th mat-header-cell *matHeaderCellDef>Client Name</th>
+                            <td mat-cell *matCellDef="let row">{{ row.clientName }}</td>
+                          </ng-container>
+                          <ng-container matColumnDef="relation">
+                            <th mat-header-cell *matHeaderCellDef>Relation</th>
+                            <td mat-cell *matCellDef="let row">{{ row.relation }}</td>
+                          </ng-container>
+                          <ng-container matColumnDef="share">
+                            <th mat-header-cell *matHeaderCellDef>Share %</th>
+                            <td mat-cell *matCellDef="let row">{{ row.share }}%</td>
+                          </ng-container>
+                          <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef>Actions</th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                              <button mat-icon-button color="primary" (click)="editDirector(row, i)" type="button">
+                                <mat-icon>edit</mat-icon>
+                              </button>
+                              <button mat-icon-button color="warn" (click)="deleteDirector(i)" type="button">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </td>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="displayedDirectorColumns"></tr>
+                          <tr mat-row *matRowDef="let row; columns: displayedDirectorColumns"></tr>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
                     </button>
-                    <!-- [disabled]="!mngForm.valid || posting" -->
-                    <button class="btn-space" mat-raised-button color="primary" [class.auth-spinner]="posting"
-                      [disabled]="posting" [hidden]="viewMode" (click)="onSubmit()">
-                      {{ pageFunction }} Client
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
                     </button>
+                  </div>
+                </mat-step>
+
+                <!-- Step 2/3: Address (For All Client Types) -->
+                <mat-step label="Address">
+                  <div class="step-content">
+                    <div class="section-header">Mailing Address</div>
+                    
+                    <div formArrayName="Addresses">
+                      <div *ngFor="let address of addresses.controls; let i = index" [formGroupName]="i" class="address-card">
+                        <div class="address-card__header">Address {{ i + 1 }}</div>
+                        <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">Address Type</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <mat-select formControlName="AddressTypeID" required placeholder="--Select--">
+                                <mat-option value="M">Mailing</mat-option>
+                                <mat-option value="P">Physical</mat-option>
+                                <mat-option value="R">Residential</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">Address 1</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <input matInput formControlName="Address1" required />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline cbs-full">
+                            <div class="cbs-label">Address 2</div>
+                            <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                              <input matInput formControlName="Address2" />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">City</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <mat-select formControlName="CityID" required placeholder="--Select--">
+                                <mat-option *ngFor="let city of cities" [value]="city.code">{{ city.name }}</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">Country</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <mat-select formControlName="CountryID" required placeholder="--Select--">
+                                <mat-option *ngFor="let country of countries" [value]="country.code">{{ country.name }}</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label">Phone (Home)</div>
+                            <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                              <input matInput />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label">Phone (Work)</div>
+                            <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                              <input matInput />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">Mobile</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <input matInput formControlName="Mobile" required />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label">Fax No</div>
+                            <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                              <input matInput />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label">Zip Code</div>
+                            <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                              <input matInput />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline">
+                            <div class="cbs-label required">Email ID</div>
+                            <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                              <input matInput formControlName="Email" type="email" required />
+                            </mat-form-field>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline cbs-inline">
+                            <div class="cbs-label">&nbsp;</div>
+                            <mat-checkbox formControlName="IsMailingAddress">Mailing Address</mat-checkbox>
+                          </div>
+
+                          <div class="cbs-field cbs-field--inline cbs-inline">
+                            <div class="cbs-label">&nbsp;</div>
+                            <button mat-raised-button color="warn" (click)="removeAddress(i)" type="button" *ngIf="addresses.length > 1">
+                              <mat-icon>delete</mat-icon> Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <button mat-raised-button color="primary" (click)="addAddress()" type="button">
+                      <mat-icon>add</mat-icon> Add Address
+                    </button>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  </div>
+                </mat-step>
+
+                <!-- Step 3/4: Next of Kin Allocation (Individual Clients) -->
+                <mat-step label="Next of Kin" *ngIf="!isCorporateClient()">
+                  <div class="step-content">
+                    <div class="section-header">Next of Kin Allocation</div>
+                    <p class="text-muted">Ensure the combined allocation equals 100% before you proceed to submit.</p>
+
+                    <div class="cbs-grid cbs-grid--three cbs-grid--tight submit-summary">
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Records Added</div>
+                        <div class="cbs-value">{{ nextOfKinCount }}</div>
+                      </div>
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Allocated %</div>
+                        <div class="cbs-value">{{ totalNextOfKinShare | number:'1.0-2' }}%</div>
+                      </div>
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Remaining %</div>
+                        <div class="cbs-value" [ngClass]="{'cbs-value--alert': remainingNextOfKinShare !== 0}">
+                          {{ remainingNextOfKinShare | number:'1.0-2' }}%
+                        </div>
+                      </div>
+                    </div>
+
+                    <div *ngIf="remainingNextOfKinShare !== 0" class="allocation-warning">
+                      Remaining allocation must be 0% before final submission.
+                    </div>
+
+                    <button mat-raised-button color="primary" (click)="addParTran1()" type="button" class="mb-2">
+                      <mat-icon>add</mat-icon> Add Next of Kin
+                    </button>
+
+                    <div *ngIf="showParTranForm1 && nextOfKinForm" [formGroup]="nextOfKinForm" class="employment-card">
+                      <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                        <input type="hidden" formControlName="ClientID" />
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label required">Related Client ID</div>
+                          <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                            <input matInput formControlName="RelatedClientID" required />
+                            <mat-error *ngIf="nextOfKinForm.get('RelatedClientID')?.hasError('required')">
+                              Required
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label required">Relation</div>
+                          <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                            <mat-select formControlName="RelationID" required placeholder="--Select--">
+                              <mat-option *ngFor="let relation of relationSelections" [value]="relation.value">
+                                {{ relation.label }}
+                              </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="nextOfKinForm.get('RelationID')?.hasError('required')">
+                              Required
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label required">Reference #</div>
+                          <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                            <input matInput type="number" min="1" formControlName="RelationRefNo" required />
+                            <mat-error *ngIf="nextOfKinForm.get('RelationRefNo')?.hasError('required')">
+                              Required
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label required">Share %</div>
+                          <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                            <input matInput type="number" min="0" max="100" formControlName="SharePercent" required />
+                            <mat-hint align="end">Remaining {{ nextOfKinForm.get('remainingAllocation')?.value | number:'1.0-2' }}%</mat-hint>
+                            <mat-error *ngIf="nextOfKinForm.get('SharePercent')?.hasError('required')">
+                              Required
+                            </mat-error>
+                            <mat-error *ngIf="nextOfKinForm.get('SharePercent')?.hasError('max')">
+                              Cannot exceed 100%
+                            </mat-error>
+                            <mat-error *ngIf="nextOfKinForm.get('SharePercent')?.hasError('min')">
+                              Must be 0 or more
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline cbs-full">
+                          <div class="cbs-label required">Remarks</div>
+                          <mat-form-field class="cbs-input required-field" appearance="outline" floatLabel="never">
+                            <input matInput formControlName="Remarks" required />
+                            <mat-error *ngIf="nextOfKinForm.get('Remarks')?.hasError('required')">
+                              Required
+                            </mat-error>
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label">Remaining Allocation</div>
+                          <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                            <input matInput [value]="nextOfKinForm.get('remainingAllocation')?.value | number:'1.0-2'" readonly />
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="form-actions-inline">
+                        <button mat-raised-button color="accent" (click)="pushToDataSource1()" type="button">
+                          {{ parTranAction1 }}
+                        </button>
+                        <button mat-raised-button (click)="cancelParTran1()" type="button" class="ml-2">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+
+                    <table mat-table [dataSource]="dataSource1" class="mat-elevation-z2 w-100">
+                      <ng-container matColumnDef="RelatedClientID">
+                        <th mat-header-cell *matHeaderCellDef>Related Client ID</th>
+                        <td mat-cell *matCellDef="let row">{{ row.RelatedClientID }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="RelationID">
+                        <th mat-header-cell *matHeaderCellDef>Relation</th>
+                        <td mat-cell *matCellDef="let row">{{ getRelationLabel(row.RelationID) }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="Remarks">
+                        <th mat-header-cell *matHeaderCellDef>Remarks</th>
+                        <td mat-cell *matCellDef="let row">{{ row.Remarks }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="SharePercent">
+                        <th mat-header-cell *matHeaderCellDef>Share %</th>
+                        <td mat-cell *matCellDef="let row">{{ row.SharePercent }}%</td>
+                      </ng-container>
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <td mat-cell *matCellDef="let row; let i = index">
+                          <button mat-icon-button color="primary" (click)="editParTran1(row, i)" type="button" matTooltip="Edit">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-icon-button color="warn" (click)="deleteParTran1(i)" type="button" matTooltip="Delete">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns1"></tr>
+                      <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns1.length" style="text-align: center;">
+                          No next of kin details captured yet.
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  </div>
+                </mat-step>
+
+                <!-- Step 3/4: Employment Details (for Individual clients only) -->
+                <mat-step label="Employment" *ngIf="!isCorporateClient()">
+                  <div class="step-content">
+                    <div class="section-header">Employment Details</div>
+                    <p class="text-muted">* All Figures Are Monthly Based</p>
+                    
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <mat-radio-group class="d-flex">
+                          <mat-radio-button value="salaried" [checked]="mngForm.get('IsSalaried')?.value" class="mr-3">
+                            Salaried
+                          </mat-radio-button>
+                          <mat-radio-button value="self-employed" [checked]="!mngForm.get('IsSalaried')?.value">
+                            Self Employed
+                          </mat-radio-button>
+                        </mat-radio-group>
+                      </div>
+                    </div>
+
+                    <button mat-raised-button color="primary" (click)="addParTran4()" type="button" class="mb-2">
+                      <mat-icon>add</mat-icon> Add Employment Detail
+                    </button>
+
+                    <div *ngIf="showParTranForm4 && workExpForm" [formGroup]="workExpForm" class="employment-card">
+                      <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label">Company Name</div>
+                          <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                            <input matInput formControlName="companyName" />
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label">Work Position</div>
+                          <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                            <input matInput formControlName="workPosition" />
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label">Start Date</div>
+                          <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                            <input matInput type="date" formControlName="startDate" />
+                          </mat-form-field>
+                        </div>
+
+                        <div class="cbs-field cbs-field--inline">
+                          <div class="cbs-label">End Date</div>
+                          <mat-form-field class="cbs-input" appearance="outline" floatLabel="never">
+                            <input matInput type="date" formControlName="endDate" />
+                          </mat-form-field>
+                        </div>
+                      </div>
+                      <div class="form-actions-inline">
+                        <button mat-raised-button color="accent" (click)="pushToDataSource4()" type="button">
+                          {{ parTranAction4 }}
+                        </button>
+                        <button mat-raised-button (click)="cancelParTran4()" type="button" class="ml-2">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+
+                    <table mat-table [dataSource]="dataSource4" class="mat-elevation-z2 w-100">
+                      <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef>ID</th>
+                        <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="companyName">
+                        <th mat-header-cell *matHeaderCellDef>Company Name</th>
+                        <td mat-cell *matCellDef="let row">{{ row.companyName }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="workPosition">
+                        <th mat-header-cell *matHeaderCellDef>Position</th>
+                        <td mat-cell *matCellDef="let row">{{ row.workPosition }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="startDate">
+                        <th mat-header-cell *matHeaderCellDef>Start Date</th>
+                        <td mat-cell *matCellDef="let row">{{ row.startDate | date:'shortDate' }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="endDate">
+                        <th mat-header-cell *matHeaderCellDef>End Date</th>
+                        <td mat-cell *matCellDef="let row">{{ row.endDate | date:'shortDate' }}</td>
+                      </ng-container>
+                      <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef>Actions</th>
+                        <td mat-cell *matCellDef="let row; let i = index">
+                          <button mat-icon-button color="primary" (click)="editParTran4(row, i)" type="button">
+                            <mat-icon>edit</mat-icon>
+                          </button>
+                          <button mat-icon-button color="warn" (click)="deleteParTran4(i)" type="button">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </td>
+                      </ng-container>
+                      <tr mat-header-row *matHeaderRowDef="displayedColumns4"></tr>
+                      <tr mat-row *matRowDef="let row; columns: displayedColumns4"></tr>
+                    </table>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  </div>
+                </mat-step>
+
+                <!-- Step 4/5: Special Offers -->
+                <mat-step label="Special Offers">
+                  <div class="step-content">
+                    <div class="section-header">Special Offers</div>
+                    
+                    <div class="cbs-grid cbs-grid--four cbs-grid--tight">
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">Can Send Greetings</div>
+                        <mat-checkbox formControlName="CanSendGreetings" aria-label="Can Send Greetings"></mat-checkbox>
+                      </div>
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">Our Special Offers</div>
+                        <mat-checkbox formControlName="CanSendOurSpecialOffers" aria-label="Can Send Our Special Offers"></mat-checkbox>
+                      </div>
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">Associate Special Offer</div>
+                        <mat-checkbox formControlName="CanSendAssociateSpecialOffer" aria-label="Can Send Associate Special Offer"></mat-checkbox>
+                      </div>
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">E-Statement Required</div>
+                        <mat-checkbox formControlName="eStatementRequired" aria-label="E-Statement Required"></mat-checkbox>
+                      </div>
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">Mobile Alert</div>
+                        <mat-checkbox formControlName="MobileAlertRequired" aria-label="Mobile Alert"></mat-checkbox>
+                      </div>
+                      <div class="cbs-field cbs-field--inline cbs-inline">
+                        <div class="cbs-label">Is Salaried</div>
+                        <mat-checkbox formControlName="IsSalaried" aria-label="Is Salaried"></mat-checkbox>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  </div>
+                </mat-step>
+
+                <!-- Step 5/6: Client Documents -->
+                <mat-step label="Documents">
+                  <div class="step-content">
+                    <div class="section-header">Client Documents</div>
+                    
+                    <button mat-raised-button color="primary" (click)="addDocumentRow()" type="button" class="mb-2">
+                      <mat-icon>add</mat-icon> Add Document
+                    </button>
+
+                    <div [formGroup]="documentsForm">
+                      <div formArrayName="documentDetails">
+                        <table mat-table [dataSource]="documentsDataSource | async" class="mat-elevation-z2 w-100">
+                          <ng-container matColumnDef="id">
+                            <th mat-header-cell *matHeaderCellDef>ID</th>
+                            <td mat-cell *matCellDef="let row; let i = index">{{ i + 1 }}</td>
+                          </ng-container>
+                          <ng-container matColumnDef="documentType">
+                            <th mat-header-cell *matHeaderCellDef>Document Type</th>
+                            <td mat-cell *matCellDef="let row" [formGroup]="row">
+                              <mat-form-field appearance="outline" class="w-100">
+                                <mat-select formControlName="DocumentID">
+                                  <mat-option *ngFor="let type of documentTypes" [value]="type.SubCodeID">
+                                    {{ type.CodeDescription }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="documentTypeId">
+                            <th mat-header-cell *matHeaderCellDef>Document Type ID</th>
+                            <td mat-cell *matCellDef="let row" [formGroup]="row">
+                              <mat-form-field appearance="outline" class="w-100">
+                                <mat-select formControlName="DocumentTypeID">
+                                  <mat-option *ngFor="let typeId of documentTypeIds" [value]="typeId.SubCodeID">
+                                    {{ typeId.CodeDescription }}
+                                  </mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef>Description</th>
+                            <td mat-cell *matCellDef="let row" [formGroup]="row">
+                              <mat-form-field appearance="outline" class="w-100">
+                                <input matInput formControlName="Description" readonly />
+                              </mat-form-field>
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="remarks">
+                            <th mat-header-cell *matHeaderCellDef>Remarks</th>
+                            <td mat-cell *matCellDef="let row" [formGroup]="row">
+                              <mat-form-field appearance="outline" class="w-100">
+                                <input matInput formControlName="Remarks" />
+                              </mat-form-field>
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="selectFile">
+                            <th mat-header-cell *matHeaderCellDef>Select File</th>
+                            <td mat-cell *matCellDef="let row; let i = index">
+                              <input type="file" (change)="onSelectDocumentFile($event.target.files, row, i)" class="form-control-file" />
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="download">
+                            <th mat-header-cell *matHeaderCellDef>Actions</th>
+                            <td mat-cell *matCellDef="let row">
+                              <button mat-icon-button color="primary" (click)="previewDocument(row)" type="button" matTooltip="Preview">
+                                <mat-icon>visibility</mat-icon>
+                              </button>
+                              <button mat-icon-button color="accent" (click)="downloadDocument(row)" type="button" matTooltip="Download">
+                                <mat-icon>download</mat-icon>
+                              </button>
+                            </td>
+                          </ng-container>
+                          <ng-container matColumnDef="action">
+                            <th mat-header-cell *matHeaderCellDef>Delete</th>
+                            <td mat-cell *matCellDef="let row">
+                              <button mat-icon-button color="warn" (click)="deleteDocument(row)" type="button" matTooltip="Delete">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </td>
+                          </ng-container>
+                          <tr mat-header-row *matHeaderRowDef="documentsDisplayColumns"></tr>
+                          <tr mat-row *matRowDef="let row; columns: documentsDisplayColumns"></tr>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <button mat-raised-button color="primary" matStepperNext type="button" class="ml-2">
+                      Next <mat-icon>arrow_forward</mat-icon>
+                    </button>
+                  </div>
+                </mat-step>
+
+                <!-- Final Step: Submit & Actions -->
+                <mat-step label="Submit">
+                  <div class="step-content">
+                    <div class="section-header">Submit</div>
+                    <p class="text-muted mb-3">
+                      Review every section before completing this request. You can return to any step using the navigation above.
+                    </p>
+
+                    <div class="cbs-grid cbs-grid--two cbs-grid--tight submit-summary">
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Mode</div>
+                        <div class="cbs-value">{{ pageFunction }}</div>
+                      </div>
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Client ID</div>
+                        <div class="cbs-value">{{ mngForm.get('ClientID')?.value || '-' }}</div>
+                      </div>
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Client Type</div>
+                        <div class="cbs-value">{{ clientTypeLabel }}</div>
+                      </div>
+                      <div class="cbs-field cbs-field--inline">
+                        <div class="cbs-label">Relationship Manager</div>
+                        <div class="cbs-value">{{ relationshipManagerName }}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="submit-actions mt-3">
+                    <button mat-raised-button color="accent" matStepperPrevious type="button">
+                      <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                    <span class="flex-spacer"></span>
+                    <button
+                      mat-raised-button
+                      style="background-color: #28a745; color: white;"
+                      (click)="approveClient()"
+                      type="button"
+                      [disabled]="posting"
+                      *ngIf="pageFunction === 'Supervise'"
+                      class="ml-2">
+                      <mat-icon>check_circle</mat-icon> Approve Client
+                    </button>
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="onSubmit()"
+                      type="button"
+                      [disabled]="posting"
+                      *ngIf="pageFunction !== 'View' && pageFunction !== 'Supervise'"
+                      class="ml-2">
+                      <mat-icon>save</mat-icon> {{ pageFunction === 'Add' ? 'Add Client' : 'Save Changes' }}
+                    </button>
+                    <button
+                      mat-raised-button
+                      (click)="cancel()"
+                      type="button"
+                      class="ml-2">
+                      <mat-icon>cancel</mat-icon> {{ pageFunction === 'View' ? 'Close' : 'Cancel' }}
+                    </button>
+                    <button
+                      mat-raised-button
+                      (click)="mngForm.reset()"
+                      type="button"
+                      class="ml-2"
+                      *ngIf="pageFunction === 'Add'">
+                      <mat-icon>refresh</mat-icon> Clear
+                    </button>
+                  </div>
+                </mat-step>
+
+              </mat-horizontal-stepper>
+
+              <!-- Audit Trail Cards (Behind The Scene) - CBS Style with Color Coding -->
+              <div class="row mt-2 mb-2">
+                <div class="col-12 mb-2">
+                  <div class="section-header">Behind The Scene</div>
+                  <div class="d-flex flex-wrap" style="margin-top: 8px;">
+                    <div class="audit-card status-card">
+                      <div class="card-label">Status</div>
+                      <div class="card-value">{{ mngForm.get('WFClientStatusID')?.value || 'A' }}</div>
+                    </div>
+                    <div class="audit-card date-card">
+                      <div class="card-label">Open Date</div>
+                      <div class="card-value">{{ mngForm.get('OpenedDate')?.value | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                    <div class="audit-card date-card">
+                      <div class="card-label">Closed Date</div>
+                      <div class="card-value">-</div>
+                    </div>
+                    <div class="audit-card user-card">
+                      <div class="card-label">Created By</div>
+                      <div class="card-value">{{ mngForm.get('CreatedBy')?.value || '-' }}</div>
+                    </div>
+                    <div class="audit-card user-card">
+                      <div class="card-label">Modified By</div>
+                      <div class="card-value">-</div>
+                    </div>
+                    <div class="audit-card user-card">
+                      <div class="card-label">Supervised By</div>
+                      <div class="card-value">-</div>
+                    </div>
+                    <div class="audit-card timestamp-card">
+                      <div class="card-label">Created On</div>
+                      <div class="card-value">{{ mngForm.get('CreatedOn')?.value | date:'dd/MM/yy, HH:mm' }}</div>
+                    </div>
+                    <div class="audit-card timestamp-card">
+                      <div class="card-label">Modified On</div>
+                      <div class="card-value">-</div>
+                    </div>
+                    <div class="audit-card timestamp-card">
+                      <div class="card-label">Supervised On</div>
+                      <div class="card-value">-</div>
+                    </div>
                   </div>
                 </div>
-              </mat-step>
-            </mat-horizontal-stepper>
+              </div>
+
+            </form>
           </div>
         </div>
       </div>

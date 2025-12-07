@@ -1,0 +1,21 @@
+<div class="dialog-wrapper">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>{{ dialogTitle }}</h2>
+    <button mat-icon-button class="close-button" (click)="closeDialog()" matTooltip="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  
+  <mat-dialog-content class="dialog-content">
+    <div class="dialog-inner">
+    <app-manage-employees 
+      [dialogMode]="true"
+      [actionMode]="data.action"
+      [clientIdParam]="data.clientId"
+      [clientTypeIdParam]="data.clientTypeId"
+      [prefillClientIdParam]="data.prefillClientId"
+      (closeDialogEvent)="closeDialog()">
+    </app-manage-employees>
+    </div>
+  </mat-dialog-content>
+</div>

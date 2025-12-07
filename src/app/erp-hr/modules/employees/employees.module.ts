@@ -11,6 +11,9 @@ import { DashboardModule } from '../dashboard/dashboard.module';
 import { AllEmployeeDocumentsComponent } from './all-employee-documents/all-employee-documents.component';
 import { CreateEmployeePortalAccountComponent } from './create-employee-portal-account/create-employee-portal-account.component';
 import { DocumentPreviewDialogComponent } from './document-preview-dialog/document-preview-dialog.component';
+import { ClientLookupDialogComponent } from './client-lookup-dialog/client-lookup-dialog.component';
+import { ManageEmployeesDialogComponent } from './manage-employees-dialog/manage-employees-dialog.component';
+import { ManageEmployeesLauncherComponent } from './manage-employees-launcher/manage-employees-launcher.component';
 
 
 @NgModule({
@@ -20,7 +23,10 @@ import { DocumentPreviewDialogComponent } from './document-preview-dialog/docume
     ManageEmployeeDocumentsComponent,
     AllEmployeeDocumentsComponent,
     CreateEmployeePortalAccountComponent,
-    DocumentPreviewDialogComponent
+    DocumentPreviewDialogComponent,
+    ClientLookupDialogComponent,
+    ManageEmployeesDialogComponent,
+    ManageEmployeesLauncherComponent
   ],
   imports: [
     CommonModule,

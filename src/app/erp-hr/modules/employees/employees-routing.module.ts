@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AllEmployeesComponent } from './all-employees/all-employees.component';
 import { ManageEmployeesComponent } from './manage-employees/manage-employees.component';
+import { ManageEmployeesLauncherComponent } from './manage-employees-launcher/manage-employees-launcher.component';
 import { ManageEmployeeDocumentsComponent } from './manage-employee-documents/manage-employee-documents.component';
 import { AllEmployeeDocumentsComponent } from './all-employee-documents/all-employee-documents.component';
 import { RoutePrivilegeGuard } from '../../data/_AccessControlAuthGuard.service';
@@ -19,7 +20,7 @@ const routes: Routes = [
 
   {
     path: "manage-employees",
-    component: ManageEmployeesComponent,
+    component: ManageEmployeesLauncherComponent,
     canActivate: [RoutePrivilegeGuard],
     data: {
       clientName: "HumanResourceModule",

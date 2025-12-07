@@ -1,6 +1,6 @@
 import { DatePipe } from "@angular/common";
 import { HttpParams } from "@angular/common/http";
-import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild, Input, Output, EventEmitter } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ValidationErrors, AbstractControl, FormArray } from "@angular/forms";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
@@ -16,6 +16,8 @@ import { COUNTRIES } from "./countries";
 import { MockDataService } from "../mock-data.service";
 import { FilesService } from "src/app/shared/services/files.service";
 import { DocumentPreviewDialogComponent } from "../document-preview-dialog/document-preview-dialog.component";
+import { ClientLookupDialogComponent } from "../client-lookup-dialog/client-lookup-dialog.component";
+import Swal from "sweetalert2";
 
 interface Address {
   AddressTypeID: string;
@@ -115,6 +117,7 @@ interface ClientFormData {
   NextOfKin: NextOfKin[];
   EmploymentDetails: EmploymentDetail[];
   Directors?: Director[];
+  Documents?: ClientDocument[];
   ParentClientID1?: string;
   ParentClientID2?: string;
   RelationshipManager?: string;
@@ -144,6 +147,14 @@ interface ClientDocument {
   styleUrls: ["./manage-employees.component.sass"],
 })
 export class ManageEmployeesComponent implements OnInit, OnDestroy {
+  // Dialog mode inputs
+  @Input() dialogMode: boolean = false;
+  @Input() actionMode: string = '';
+  @Input() clientIdParam: string = '';
+  @Input() clientTypeIdParam: string = '';
+  @Input() prefillClientIdParam: boolean = false;
+  @Output() closeDialogEvent = new EventEmitter<void>();
+
   showForm = true;
   isLoading = true;
   pageFunction = "Add";
@@ -161,10 +172,6 @@ export class ManageEmployeesComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   prefillClientId: string = '';
   downloadLoading: boolean = false;
-  hideSubmit = false;
-  hideApprovals: boolean = true;
-  approvalVisible: boolean = false;
-  disableActions = false;
   requestCode: any;
   requestId: any;
   posting: boolean = false;
@@ -210,7 +217,17 @@ displayedColumns1: string[] = [
   displayedDirectorColumns: string[] = ['id', 'clientName', 'relation', 'share', 'action'];
 
   titleOptions = ['MR', 'MRS', 'MISS', 'DR', 'PROF', 'ENG','MS','US'];
-  clientTypeOptions = ['C', 'M', 'E', 'I'];
+  
+  clientTypeOptions = [
+    { value: 'B', label: 'Bank' },
+    { value: 'C', label: 'Corporate Client' },
+    { value: 'E', label: 'Employee' },
+    { value: 'I', label: 'Individual Client' },
+    { value: 'M', label: 'Minor' },
+    { value: 'N', label: 'Non Resident' },
+    { value: 'NC', label: 'Individual Non-Client' }
+  ];
+  
   identificationTypeOptions = ['ID', 'Alien ID', 'Passport', 'Military ID'];
   residentStatusOptions = [
     'Kenyan - Resident', 
@@ -221,7 +238,17 @@ displayedColumns1: string[] = [
     'Minor- Foreigner'
   ];
   genderOptions = ['M', 'F'];
-  relationOptions = ['S', 'P', 'C', 'O']; 
+  relationSelections = [
+    { value: 'S', label: 'Spouse' },
+    { value: 'P', label: 'Parent / Guardian' },
+    { value: 'C', label: 'Child' },
+    { value: 'O', label: 'Other' }
+  ];
+  relationOptions = this.relationSelections.map(option => option.value);
+  relationDisplayMap: Record<string, string> = this.relationSelections.reduce((acc, option) => {
+    acc[option.value] = option.label;
+    return acc;
+  }, {} as Record<string, string>);
   
   relationshipManagers = [
     { id: '020606', name: 'ANUP JANTILAL SOLANKI' },
@@ -254,6 +281,23 @@ displayedColumns1: string[] = [
   ];
 
   documentsDataSource = new BehaviorSubject<AbstractControl[]>([]);
+
+  private readonly individualFieldValidators: { [field: string]: any[] } = {
+    IdentificationTypeID: [Validators.required],
+    ResidentID: [Validators.required],
+    RelationshipManager: [Validators.required],
+    FirstName: [Validators.required, Validators.minLength(3), Validators.maxLength(40)],
+    LastName: [Validators.required, Validators.minLength(3), Validators.maxLength(40)],
+    DateOfBirth: [Validators.required],
+    NationalId: [
+      Validators.required,
+      Validators.minLength(7),
+      Validators.maxLength(10),
+      Validators.pattern("[0-9]+")
+    ],
+    GenderID: [Validators.required],
+    KRAPin: [Validators.required, Validators.minLength(4), Validators.maxLength(20)]
+  };
   documentsDisplayColumns = [
     "id",
     "documentType",
@@ -295,28 +339,25 @@ displayedColumns1: string[] = [
 
 
 ngOnInit(): void {
-  
-  this.route.queryParams.subscribe((params) => {
-    console.log("params: ", params);
-       if (params.ClientTypeID) {
-      this.initialClientType = params.ClientTypeID;
-    }
-
-    if (params.prefillClientId && params.requestCode) {
-      this.prefillClientId = params.requestCode;
+  // Check if in dialog mode
+  if (this.dialogMode) {
+    console.log("Dialog mode enabled");
+    this.pageFunction = this.actionMode || 'Add';
+    this.requestCode = this.clientIdParam || '';
+  this.initialClientType = this.normalizeClientType(this.clientTypeIdParam || '');
+    
+    if (this.prefillClientIdParam && this.clientIdParam) {
+      this.prefillClientId = this.clientIdParam;
       console.log("Prefill Client ID set to:", this.prefillClientId);
     }
 
-    if (params.requestCode && params.requestCode.trim() !== '') {
-      this.requestCode = params.requestCode;
-      //this.requestId = params.requestId;
-      this.pageFunction = params.action;
+    if (this.requestCode && this.requestCode.trim() !== '') {
       console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
 
-      if (this.pageFunction === "Add" && params.prefillClientId) {
-        console.log("Add mode with prefill - skipping data fetch, going straight to form");
+      if (this.pageFunction === "Add" && this.prefillClientIdParam) {
+        console.log("Add mode with prefill - going straight to form");
         this.getPage();
-      } else if (this.pageFunction === "View" || this.pageFunction === "Update") {
+      } else if (this.pageFunction === "View" || this.pageFunction === "Update" || this.pageFunction === "Supervise") {
         this.getDataById(this.requestCode);
       } else {
         this.getPage();
@@ -327,7 +368,42 @@ ngOnInit(): void {
       this.getPage();
     }
     this.showForm = true;
-  });
+  } else {
+    // Router mode
+    this.route.queryParams.subscribe((params) => {
+      console.log("params: ", params);
+      if (params.ClientTypeID) {
+        this.initialClientType = this.normalizeClientType(params.ClientTypeID);
+      }
+
+      if (params.prefillClientId && params.requestCode) {
+        this.prefillClientId = params.requestCode;
+        console.log("Prefill Client ID set to:", this.prefillClientId);
+      }
+
+      if (params.requestCode && params.requestCode.trim() !== '') {
+        this.requestCode = params.requestCode;
+        //this.requestId = params.requestId;
+        this.pageFunction = params.action;
+        console.log("Page function set to:", this.pageFunction, "with Client ID:", this.requestCode);
+
+        if (this.pageFunction === "Add" && params.prefillClientId) {
+          console.log("Add mode with prefill - skipping data fetch, going straight to form");
+          this.getPage();
+        } else if (this.pageFunction === "View" || this.pageFunction === "Update" || this.pageFunction === "Supervise") {
+          // Fetch data for View, Update, and Supervise modes
+          this.getDataById(this.requestCode);
+        } else {
+          this.getPage();
+        }
+      } else {
+        this.pageFunction = "Add";
+        console.log("No valid clientId, setting pageFunction to Add");
+        this.getPage();
+      }
+      this.showForm = true;
+    });
+  }
 }
 
   ngAfterViewInit() {
@@ -398,8 +474,9 @@ getDataById(requestCode: string) {
       .subscribe({
         next: (res) => {
           if (res.Details) {
-            this.formData = res.Details;
-            console.log("getDataById this.formData: ", this.formData);
+            const normalizedDetails = this.normalizeClientFormData(res.Details);
+            this.formData = normalizedDetails;
+            console.log("getDataById normalized formData: ", this.formData);
             if (this.pageFunction === "View") {
               this.activateViewMode();
             }
@@ -407,7 +484,7 @@ getDataById(requestCode: string) {
           this.getPage();
           
           setTimeout(() => {
-            this.onPopulateTables(res);
+            this.onPopulateTables({ Details: normalizedDetails });
           });
 
             this.showForm = true;
@@ -422,28 +499,244 @@ getDataById(requestCode: string) {
       });
   }
 
+  private normalizeClientFormData(data: ClientFormData): ClientFormData {
+    if (!data) {
+      return data;
+    }
+
+    const normalizedClientType = this.normalizeClientType(data.ClientTypeID);
+    const normalized: ClientFormData = {
+      ...data,
+      ClientTypeID: normalizedClientType,
+      TitleID: this.normalizeStringOption(data.TitleID, this.titleOptions) || '',
+      IdentificationTypeID: this.normalizeStringOption(data.IdentificationTypeID, this.identificationTypeOptions) || '',
+      ResidentID: this.normalizeStringOption(data.ResidentID, this.residentStatusOptions) || '',
+      RelationshipManager: this.normalizeRelationshipManager(data.RelationshipManager) || '',
+  Disabled: this.normalizeBoolean(data.Disabled),
+  IsDOBGiven: this.normalizeBoolean(data.IsDOBGiven, !!data.DateOfBirth),
+  CanDonateBlood: this.normalizeBoolean(data.CanDonateBlood),
+  CanSendGreetings: this.normalizeBoolean(data.CanSendGreetings),
+  CanSendAssociateSpecialOffer: this.normalizeBoolean(data.CanSendAssociateSpecialOffer),
+  CanSendOurSpecialOffers: this.normalizeBoolean(data.CanSendOurSpecialOffers),
+  eStatementRequired: this.normalizeBoolean(data.eStatementRequired),
+  MobileAlertRequired: this.normalizeBoolean(data.MobileAlertRequired),
+  IsSalaried: this.normalizeBoolean(data.IsSalaried),
+      Addresses: data.Addresses ? data.Addresses.map(address => this.normalizeAddress(address)) : [],
+      NextOfKin: data.NextOfKin ? data.NextOfKin.map(kin => this.normalizeNextOfKin(kin)) : [],
+      EmploymentDetails: data.EmploymentDetails ? data.EmploymentDetails.map(detail => ({ ...detail })) : [],
+      Directors: data.Directors ? data.Directors.map(director => ({ ...director })) : [],
+      Documents: this.normalizeDocuments((data as any).Documents || data.Documents || [])
+    };
+
+    return normalized;
+  }
+
+  private normalizeClientType(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+    const trimmed = value.toString().trim();
+    const match = this.clientTypeOptions.find(option =>
+      option.value.toLowerCase() === trimmed.toLowerCase() ||
+      option.label.toLowerCase() === trimmed.toLowerCase()
+    );
+    return match ? match.value : trimmed;
+  }
+
+  private normalizeStringOption(value: string | null | undefined, options: string[]): string | null | undefined {
+    if (value === null || value === undefined) {
+      return value;
+    }
+    const trimmed = value.toString().trim();
+    const match = options.find(option => option.toLowerCase() === trimmed.toLowerCase());
+    return match || trimmed;
+  }
+
+  private normalizeRelationshipManager(value: string | null | undefined): string | null | undefined {
+    if (value === null || value === undefined) {
+      return value;
+    }
+    const trimmed = value.toString().trim();
+    const match = this.relationshipManagers.find(manager =>
+      manager.id.toLowerCase() === trimmed.toLowerCase() ||
+      manager.name.toLowerCase() === trimmed.toLowerCase()
+    );
+    return match ? match.id : trimmed;
+  }
+
+  private normalizeAddress(address: Address): Address {
+    if (!address) {
+      return address;
+    }
+    return {
+      ...address,
+      AddressTypeID: this.normalizeAddressType(address.AddressTypeID),
+      CountryID: this.normalizeCountryCode(address.CountryID),
+      CityID: this.normalizeCountryCode(address.CityID),
+      IsMailingAddress: this.normalizeBoolean(address.IsMailingAddress),
+      UpdateCount: this.normalizeNumber(address.UpdateCount)
+    };
+  }
+
+  private normalizeAddressType(value: string | null | undefined): string {
+    if (!value) {
+      return 'M';
+    }
+    const trimmed = value.toString().trim();
+    const upper = trimmed.toUpperCase();
+    if (['M', 'P', 'R'].includes(upper)) {
+      return upper;
+    }
+    const map: Record<string, string> = {
+      mailing: 'M',
+      mail: 'M',
+      postal: 'M',
+      physical: 'P',
+      work: 'P',
+      business: 'P',
+      office: 'P',
+      residential: 'R',
+      residence: 'R',
+      home: 'R'
+    };
+    const key = trimmed.toLowerCase();
+    return map[key] || 'M';
+  }
+
+  private normalizeCountryCode(value: string | null | undefined): string {
+    if (!value) {
+      return 'KE';
+    }
+    const trimmed = value.toString().trim();
+    const matchByCode = this.countries.find(country => country.code.toLowerCase() === trimmed.toLowerCase());
+    if (matchByCode) {
+      return matchByCode.code;
+    }
+    const matchByName = this.countries.find(country => country.name.toLowerCase() === trimmed.toLowerCase());
+    return matchByName ? matchByName.code : trimmed;
+  }
+
+  private normalizeNextOfKin(kin: NextOfKin): NextOfKin {
+    if (!kin) {
+      return kin;
+    }
+    return {
+      ...kin,
+      RelationID: this.normalizeRelation(kin.RelationID),
+      SharePercent: this.normalizeNumber(kin.SharePercent),
+      RelationRefNo: this.normalizeNumber(kin.RelationRefNo, 1),
+      UpdateCount: this.normalizeNumber(kin.UpdateCount)
+    };
+  }
+
+  private normalizeRelation(value: string | null | undefined): string {
+    if (!value) {
+      return 'O';
+    }
+    const trimmed = value.toString().trim();
+    if (this.relationOptions.includes(trimmed)) {
+      return trimmed;
+    }
+    const relationMap: Record<string, string> = {
+      son: 'S',
+      daughter: 'S',
+      child: 'C',
+      spouse: 'P',
+      partner: 'P',
+      parent: 'P',
+      mother: 'P',
+      father: 'P',
+      guardian: 'O',
+      brother: 'O',
+      sister: 'O',
+      relative: 'O',
+      other: 'O'
+    };
+    const key = trimmed.toLowerCase();
+    return relationMap[key] || 'O';
+  }
+
+  private normalizeDocuments(documents: ClientDocument[]): ClientDocument[] {
+    if (!documents || documents.length === 0) {
+      return [];
+    }
+    return documents.map(document => ({
+      ...document,
+      DocumentID: this.normalizeDocumentType(document.DocumentID),
+      DocumentTypeID: this.normalizeDocumentTypeId(document.DocumentTypeID),
+      isExistingFile: this.normalizeBoolean(document.isExistingFile, true),
+      UpdateCount: this.normalizeNumber(document.UpdateCount)
+    }));
+  }
+
+  private normalizeDocumentType(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+    const trimmed = value.toString().trim();
+    const match = this.documentTypes.find(type =>
+      type.SubCodeID.toLowerCase() === trimmed.toLowerCase() ||
+      type.CodeDescription.toLowerCase() === trimmed.toLowerCase()
+    );
+    return match ? match.SubCodeID : trimmed;
+  }
+
+  private normalizeDocumentTypeId(value: string | null | undefined): string {
+    if (!value) {
+      return '';
+    }
+    const trimmed = value.toString().trim();
+    const match = this.documentTypeIds.find(type =>
+      type.SubCodeID.toLowerCase() === trimmed.toLowerCase() ||
+      type.CodeDescription.toLowerCase() === trimmed.toLowerCase()
+    );
+    return match ? match.SubCodeID : trimmed;
+  }
+
+  private normalizeBoolean(value: any, defaultValue: boolean = false): boolean {
+    if (value === null || value === undefined) {
+      return defaultValue;
+    }
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+    const normalized = value.toString().trim().toLowerCase();
+    return ['true', '1', 'y', 'yes', 't'].includes(normalized);
+  }
+
+  private normalizeNumber(value: any, defaultValue: number = 0): number {
+    if (value === null || value === undefined || value === '') {
+      return defaultValue;
+    }
+    const parsed = Number(value);
+    return isNaN(parsed) ? defaultValue : parsed;
+  }
+
  onPopulateTables(res: any): void {
     const entity = res.Details || res.entity || res;
     
     if (entity.NextOfKin) {
-      this.dataSource1.data = entity.NextOfKin;
+      this.dataSource1.data = entity.NextOfKin.map((kin: NextOfKin) => this.normalizeNextOfKin(kin));
       this.refresh1();
     }
     
     if (entity.EmploymentDetails) {
-      this.dataSource4.data = entity.EmploymentDetails;
+      this.dataSource4.data = entity.EmploymentDetails.map((detail: EmploymentDetail) => ({ ...detail }));
       this.refresh4();
     }
     
     if (entity.Directors) {
-      this.dataSourceDirectors.data = entity.Directors;
+      this.dataSourceDirectors.data = entity.Directors.map((director: Director) => ({ ...director }));
       this.refreshDirectors();
     }
     if (entity.Addresses) {
-    this.populateAddresses(entity.Addresses);
-  }
-      if (entity.Documents) {
-      this.populateDocuments(entity.Documents);
+      this.populateAddresses(entity.Addresses.map((address: Address) => this.normalizeAddress(address)));
+    }
+    if (entity.Documents) {
+      this.populateDocuments(this.normalizeDocuments(entity.Documents));
     }
   }
 
@@ -465,7 +758,6 @@ private populateAddresses(addresses: any[]): void {
     if (this.pageFunction === "Add") {
       this.generateForm();
       this.generateCorporateForm();
-      this.hideApprovals = true;
 
      if (this.initialClientType) {
       this.mngForm.patchValue({
@@ -482,14 +774,17 @@ private populateAddresses(addresses: any[]): void {
       this.generateForm(this.formData);
       this.generateCorporateForm(this.formData);
       this.generateSubForm1();
-      this.hideApprovals = true;
     } else if (this.pageFunction === "View") {
       this.generateForm(this.formData);
       this.generateCorporateForm(this.formData);
       this.generateSubForm1();
-      this.hideSubmit = true;
-      this.hideApprovals = true;
       this.activateViewMode();
+    } else if (this.pageFunction === "Supervise") {
+      // Supervise mode - populate form like View but enable Approve button
+      this.generateForm(this.formData);
+      this.generateCorporateForm(this.formData);
+      this.generateSubForm1();
+      this.activateViewMode(); // Make form read-only
     }
   }
 
@@ -599,6 +894,8 @@ private populateAddresses(addresses: any[]): void {
   } else {
     this.toggleFormFields(clientType);
   }
+
+    this.applyClientTypeValidators(this.mngForm.get('ClientTypeID')?.value || '');
   }
 createEmploymentDetail(emp?: EmploymentDetail): FormGroup {
   return this.fb.group({
@@ -784,6 +1081,11 @@ pushToDataSource1(): void {
     UpdateCount: 0
   };
 
+  const clientId = this.mngForm.get('ClientID')?.value;
+  if (clientId) {
+    nextOfKinData.ClientID = clientId;
+  }
+
   if (this.parTranAction1 === 'Add') {
     this.dataSource1.data = [...this.dataSource1.data, nextOfKinData];
     (this.mngForm.get('NextOfKin') as FormArray).push(this.createNextOfKin(nextOfKinData));
@@ -816,6 +1118,10 @@ pushToDataSource4(): void {
 deleteParTran1(index: number): void {
   if (confirm('Are you sure you want to delete this next of kin?')) {
     this.dataSource1.data.splice(index, 1);
+    const nextOfKinArray = this.mngForm.get('NextOfKin') as FormArray;
+    if (nextOfKinArray && nextOfKinArray.length > index) {
+      nextOfKinArray.removeAt(index);
+    }
     this.refresh1();
   }
 }
@@ -846,7 +1152,8 @@ applyFilter4(event: Event): void {
 
 generateSubForm1(formData?: NextOfKin, isEdit = false): void {
   this.nextOfKinForm = this.fb.group({
-    ClientID: [formData?.ClientID || this.mngForm.get('ClientID')?.value || "", Validators.required],
+    // Client ID can be blank in Add mode until the main form assigns it just before submit
+    ClientID: [formData?.ClientID || this.mngForm.get('ClientID')?.value || ""],
     RelatedClientID: [formData?.RelatedClientID || "", Validators.required],
     RelationID: [formData?.RelationID || "", Validators.required],
     RelationRefNo: [formData?.RelationRefNo || 1, Validators.required],
@@ -880,8 +1187,8 @@ generateSubForm1(formData?: NextOfKin, isEdit = false): void {
     }, 0);
 
     const remaining = 100 - totalAllocated - currentAllocation;
-    
-    this.nextOfKinForm.get('remainingAllocation')?.setValue(remaining >= 0 ? remaining : 0);
+    const roundedRemaining = Math.round(remaining * 100) / 100;
+    this.nextOfKinForm.get('remainingAllocation')?.setValue(roundedRemaining);
   }
 
   generateSubForm4(formData?: EmploymentDetail): void {
@@ -910,6 +1217,7 @@ onClientTypeChange(): void {
   const clientType = this.mngForm.get('ClientTypeID')?.value;
   
   this.toggleFormFields(clientType);
+  this.applyClientTypeValidators(clientType);
   
   if (clientType === 'C' || clientType === 'B') {
     this.mngForm.get('TitleID')?.reset();
@@ -960,6 +1268,31 @@ toggleFormFields(clientType: string): void {
       titleControl.reset();
     }
   }
+}
+
+private applyClientTypeValidators(clientType: string): void {
+  if (!this.mngForm) {
+    return;
+  }
+
+  const isCorporate = clientType === 'C' || clientType === 'B';
+
+  Object.entries(this.individualFieldValidators).forEach(([field, validators]) => {
+    const control = this.mngForm.get(field);
+    if (!control) {
+      return;
+    }
+
+    if (isCorporate) {
+      control.clearValidators();
+      control.disable({ emitEvent: false });
+    } else {
+      control.enable({ emitEvent: false });
+      control.setValidators(validators);
+    }
+
+    control.updateValueAndValidity({ emitEvent: false });
+  });
 }
 
 //*************************file handling section******************************** */
@@ -1363,12 +1696,14 @@ onSubmit(): void {
     return;
   }
 
-   const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
-  if (totalAllocation !== 100) {
-    this.snackbar.showNotification("snackbar-danger", 
-      "Next Of Kin Total percentage allocation must be exactly 100%.");
-    this.posting = false;
-    return;
+  if (!this.isCorporateClient()) {
+    const totalAllocation = this.dataSource1.data.reduce((sum, kin) => sum + (kin.SharePercent || 0), 0);
+    if (Math.abs(totalAllocation - 100) > 0.01) {
+      this.snackbar.showNotification("snackbar-danger", 
+        "Next Of Kin Total percentage allocation must be exactly 100%.");
+      this.posting = false;
+      return;
+    }
   }
 
   if (this.mngForm.valid && (this.isCorporateClient() ? this.corporateForm.valid : true)) {
@@ -1380,27 +1715,39 @@ onSubmit(): void {
   }
 }
   private prepareFormData(): any {
+    const rawForm = this.mngForm.getRawValue();
+    const firstName = rawForm.FirstName || '';
+    const middleName = rawForm.MiddleName || '';
+    const lastName = rawForm.LastName || '';
+    const companyName = this.corporateForm?.get('CompanyName')?.value || '';
+
+    const derivedName = this.isCorporateClient()
+      ? companyName
+      : `${firstName} ${middleName} ${lastName}`.trim();
+
     const formValue = {
-      ...this.mngForm.value,
-      Name: `${this.mngForm.value.FirstName} ${this.mngForm.value.MiddleName || ''} ${this.mngForm.value.LastName}`.trim(),
-      IsDOBGiven: !!this.mngForm.value.DateOfBirth,
-      NextOfKin: this.dataSource1.data,
+      ...rawForm,
+      Name: derivedName,
+      IsDOBGiven: !!rawForm.DateOfBirth,
+      NextOfKin: this.dataSource1.data.map(kin => ({
+        ...kin,
+        ClientID: rawForm.ClientID || kin.ClientID
+      })),
       EmploymentDetails: this.dataSource4.data,
-          WFClientStatusID: this.mngForm.value.WFClientStatusID || 'A',
-    OpenedBy: this.mngForm.value.OpenedBy || this.currentUser,
-    CreatedBy: this.mngForm.value.CreatedBy || this.currentUser,
-    CreatedOn: this.mngForm.value.CreatedOn || new Date().toISOString(),
-    OpenedDate: this.mngForm.value.OpenedDate || new Date().toISOString(),
-    UpdateCount: this.mngForm.value.UpdateCount || 0,
-    NumberOfHouseMembers: this.mngForm.value.NumberOfHouseMembers || 1,
-    CanDonateBlood: this.mngForm.value.CanDonateBlood || false,
-    IsSalaried: this.mngForm.value.IsSalaried || false,
-    Documents: this.documentsForm.value.documentDetails.map(doc => ({
+      WFClientStatusID: rawForm.WFClientStatusID || 'A',
+      OpenedBy: rawForm.OpenedBy || this.currentUser,
+      CreatedBy: rawForm.CreatedBy || this.currentUser,
+      CreatedOn: rawForm.CreatedOn || new Date().toISOString(),
+      OpenedDate: rawForm.OpenedDate || new Date().toISOString(),
+      UpdateCount: rawForm.UpdateCount || 0,
+      NumberOfHouseMembers: rawForm.NumberOfHouseMembers || 1,
+      CanDonateBlood: rawForm.CanDonateBlood || false,
+      IsSalaried: rawForm.IsSalaried || false,
+      Documents: this.documentsForm.value.documentDetails.map(doc => ({
         ...doc,
         CreatedOn: doc.CreatedOn || new Date().toISOString(),
         CreatedBy: doc.CreatedBy || this.currentUser
       }))
-      
     };
 
       if (formValue.CreatedOn && typeof formValue.CreatedOn === 'string') {
@@ -1489,6 +1836,85 @@ private submitFormData(formValue: any): void {
     this.posting = false;
   }
 
+  approveClient(): void {
+    if (!this.requestCode) {
+      this.snackbar.showNotification("snackbar-warning", "No client ID found for approval");
+      return;
+    }
+
+    Swal.fire({
+      title: '<span style="font-size: 20px;">Approve Client</span>',
+      html: '<p>You are about to approve this client record.</p><p>Please enter your verifier remarks below:</p>',
+      input: "textarea",
+      inputPlaceholder: "Type your approval remarks here...",
+      confirmButtonText: "Approve",
+      confirmButtonColor: "#28a745",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      icon: "question",
+      inputValidator: (value) => {
+        if (!value || value.trim() === '') {
+          return "Please enter your approval remarks";
+        }
+        return null;
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.posting = true;
+        const verifierRemarks = result.value;
+
+        // Prepare approval data with client ID and remarks
+        const approvalData = {
+          clientId: this.requestCode,
+          status: 'APPROVED',
+          verifierRemarks: verifierRemarks,
+          verifiedBy: this.currentUser,
+          verifiedOn: new Date().toISOString()
+        };
+
+        console.log('Approval data:', approvalData);
+
+        // Call the approval service method
+        this.employeeService.approve(this.requestCode)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (res) => {
+              console.log('Approval response:', res);
+              if (res.statusCode === 200 || res.statusCode === 201 || res.statusCode === 302) {
+                this.snackbar.showNotification(
+                  "snackbar-success",
+                  res.message || "Client approved successfully"
+                );
+                
+                // Navigate back or close dialog based on mode
+                setTimeout(() => {
+                  if (this.dialogMode) {
+                    this.closeDialogEvent.emit();
+                  } else {
+                    this.router.navigate(['/erp-hr/employees/all-employees']);
+                  }
+                }, 1500);
+              } else {
+                this.snackbar.showNotification(
+                  "snackbar-warning",
+                  res.message || "Approval completed with warnings"
+                );
+              }
+              this.posting = false;
+            },
+            error: (err) => {
+              console.error('Approval error:', err);
+              this.snackbar.showNotification(
+                "snackbar-danger",
+                err.message || "Failed to approve client"
+              );
+              this.posting = false;
+            }
+          });
+      }
+    });
+  }
+
 
   // private setupFormPersistence(): void {
   //   const storedData = localStorage.getItem("mngFormDataEmployee");
@@ -1522,6 +1948,39 @@ private submitFormData(formValue: any): void {
     this.snackbar.showNotification("snackbar-danger", message);
   }
 
+  get clientTypeLabel(): string {
+    const value = this.mngForm?.get('ClientTypeID')?.value;
+    const match = this.clientTypeOptions.find(option => option.value === value);
+    return match?.label || value || '-';
+  }
+
+  get relationshipManagerName(): string {
+    const value = this.isCorporateClient()
+      ? this.corporateForm?.get('RelationshipManager')?.value
+      : this.mngForm?.get('RelationshipManager')?.value;
+    const match = this.relationshipManagers.find(manager => manager.id === value);
+    return match?.name || value || '-';
+  }
+
+  get totalNextOfKinShare(): number {
+    return this.dataSource1.data.reduce((sum, kin) => sum + (Number(kin.SharePercent) || 0), 0);
+  }
+
+  get remainingNextOfKinShare(): number {
+    return 100 - this.totalNextOfKinShare;
+  }
+
+  get nextOfKinCount(): number {
+    return this.dataSource1?.data?.length || 0;
+  }
+
+  getRelationLabel(value: string | null | undefined): string {
+    if (!value) {
+      return '-';
+    }
+    return this.relationDisplayMap[value] || value;
+  }
+
   generateClientId(): string {
     return 'CL' + Date.now() + Math.random().toString(36).substr(2, 6).toUpperCase();
   }
@@ -1532,13 +1991,87 @@ private submitFormData(formValue: any): void {
   }
 
   cancel(): void {
-    this.router.navigate(["/erp-hr/employees/all-employees"]);
+    if (this.dialogMode) {
+      this.closeDialogEvent.emit();
+    } else {
+      this.router.navigate(["/erp-hr/employees/all-employees"]);
+    }
+  }
+
+  searchClientById(): void {
+    const clientId = this.mngForm.get('ClientID')?.value?.trim();
+    if (!clientId) {
+      this.snackbar.showNotification("snackbar-warning", "Please enter a Client ID");
+      return;
+    }
+
+    this.isLoading = true;
+    const formattedRequest = {
+      RequestID: this.generateRandomId(),
+      RequestData: {
+        ClientID: clientId
+      },
+      RequestTime: new Date().toISOString(),
+      AppName: "CLIENT_DATA"
+    };
+
+    this.employeeService.getClientById(formattedRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.Details) {
+            const normalizedDetails = this.normalizeClientFormData(res.Details);
+            this.formData = normalizedDetails;
+            this.pageFunction = "View";
+            this.getPage();
+            
+            setTimeout(() => {
+              this.onPopulateTables({ Details: normalizedDetails });
+            });
+            
+            this.snackbar.showNotification("snackbar-success", "Client found and data loaded");
+          } else {
+            this.snackbar.showNotification("snackbar-info", "Client not found");
+          }
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.snackbar.showNotification("snackbar-danger", "Error searching for client");
+          this.isLoading = false;
+        }
+      });
+  }
+
+  openClientLookup(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = '1200px';
+    dialogConfig.maxHeight = '90vh';
+    dialogConfig.panelClass = 'client-lookup-dialog';
+
+    const dialogRef = this.dialog.open(ClientLookupDialogComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.ClientID) {
+        // Set the selected Client ID
+        this.mngForm.patchValue({
+          ClientID: result.ClientID
+        });
+        
+        // Then search and load the client data
+        this.searchClientById();
+      }
+    });
   }
 
   refresh1(): void {
     this.dataSource1.data = [...this.dataSource1.data];
     this.dataSource1.paginator = this.paginator1;
     this.dataSource1.sort = this.sort1;
+    if (this.nextOfKinForm) {
+      this.calculateRemainingAllocation(this.parTranAction1 === 'Update');
+    }
   }
 
   refresh4(): void {

@@ -1,0 +1,657 @@
+// Mandatory field styling - blue labels like original CBS
+::ng-deep .mat-form-field-required
+  color: #0066cc !important
+  font-weight: 500
+
+::ng-deep .mat-form-field.required-field .mat-form-field-label
+  color: #0066cc !important
+  font-weight: 500
+
+::ng-deep .mat-form-field.required-field .mat-label
+  color: #0066cc !important
+  font-weight: 500
+
+// CBS-style section panels with borders
+.step-content
+  padding: 2px 12px !important
+  flex: 1 1 auto
+  display: flex
+  flex-direction: column
+  gap: 4px
+  width: 100%
+  max-width: 1200px
+  margin: 0 auto
+  box-sizing: border-box
+  align-items: stretch
+
+  p
+    margin: 0 0 4px 0
+    font-size: 11px
+
+.step-content .section-header,
+.step-content .panel-section,
+.step-content button,
+.step-content table,
+.step-content .mat-elevation-z2,
+.step-content .mat-radio-group,
+.step-content .mat-checkbox,
+.step-content .mat-checkbox-group
+  flex-shrink: 0
+
+.step-content .form-grid,
+.step-content .form-grid-wrapper
+  flex: 1 1 auto
+  
+  h4
+    background: linear-gradient(to bottom, #4a90e2 0%, #357abd 100%)
+    color: white
+    padding: 4px 10px
+    margin: 0 0 4px 0 !important
+    font-size: 12px
+    font-weight: 600
+    border: 1px solid #2d5f8d
+    border-radius: 2px
+
+.panel-section
+  border: 1px solid #c0c0c0
+  background: #f9f9f9
+  padding: 4px
+  margin-bottom: 4px
+  border-radius: 2px
+
+.submit-actions
+  display: flex
+  align-items: center
+  justify-content: flex-end
+  flex-wrap: wrap
+  gap: 8px
+
+.submit-actions .flex-spacer
+  flex: 1 1 auto
+
+.submit-summary .cbs-field
+  margin-bottom: 6px
+
+.cbs-value
+  font-size: 12px
+  font-weight: 600
+  color: #0d2a4a
+  background: #edf4ff
+  border: 1px solid #c5d9f2
+  padding: 4px 8px
+  border-radius: 2px
+  min-height: 24px
+  display: flex
+  align-items: center
+
+.cbs-value--alert
+  color: #b71c1c
+  background: #fdecea
+  border: 1px solid #f5c6cb
+
+.allocation-warning
+  color: #b71c1c
+  font-size: 11px
+  font-weight: 600
+  margin: 4px 0
+
+.cbs-section
+  width: 100%
+  max-width: 1200px
+  margin: 0 auto
+  box-sizing: border-box
+
+// Audit trail cards styling - CBS style with color coding
+.audit-card
+  background: #ffffff
+  border: 1px solid #dee2e6
+  border-radius: 3px
+  padding: 4px 8px
+  margin-bottom: 4px
+  margin-right: 6px
+  display: inline-block
+  min-width: 120px
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08)
+  
+  .card-label
+    font-size: 9px
+    color: #6c757d
+    font-weight: 600
+    text-transform: uppercase
+    letter-spacing: 0.3px
+    margin-bottom: 2px
+    display: block
+  
+  .card-value
+    font-size: 11px
+    font-weight: 600
+    margin: 0
+    display: block
+
+// Color coding for different card types
+.status-card
+  .card-label
+    color: #28a745
+  .card-value
+    color: #28a745
+    background: #d4edda
+    padding: 2px 8px
+    border-radius: 2px
+    display: inline-block
+
+.date-card
+  .card-label
+    color: #dc3545
+  .card-value
+    color: #dc3545
+
+.user-card
+  .card-label
+    color: #007bff
+  .card-value
+    color: #007bff
+    background: #cfe2ff
+    padding: 2px 8px
+    border-radius: 2px
+    display: inline-block
+
+.timestamp-card
+  .card-label
+    color: #fd7e14
+  .card-value
+    color: #fd7e14
+
+// ULTRA AGGRESSIVE DENSITY - Extreme CBS Style
+::ng-deep .mat-form-field
+  font-size: 12px !important
+  line-height: 1.2 !important
+  margin-bottom: 0 !important
+  
+::ng-deep .mat-form-field-wrapper
+  padding-bottom: 0em !important
+  margin-bottom: 0 !important
+
+::ng-deep .mat-form-field-infix
+  padding: 0.2em 0 !important
+  border-top: 0.15em solid transparent !important
+  width: auto !important
+
+::ng-deep .mat-form-field-label
+  font-size: 12px !important
+  top: 1.45em !important
+  line-height: 1.2 !important
+  font-weight: 600 !important
+  color: #123a6f !important
+  letter-spacing: 0.16px
+  pointer-events: none
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline
+  top: 0.55em !important
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix
+  padding: 0.35em 0 0.35em 0 !important
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-label
+  top: 1.35em !important
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-label,
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label
+  transform: translateY(-1.35em) scale(0.75) !important
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float .mat-form-field-label
+  color: #1f2933 !important
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float .mat-input-server:focus + .mat-form-field-label-wrapper .mat-form-field-label
+  transform: translateY(-0.75em) scale(0.75) !important
+
+::ng-deep .mat-input-element
+  font-size: 12px !important
+  padding: 0.35em 0.5em !important
+  height: 22px !important
+  line-height: 1.25 !important
+  color: #1a1d25 !important
+
+::ng-deep .mat-input-element::placeholder
+  color: #384860 !important
+  opacity: 0.9 !important
+
+::ng-deep .mat-select-value
+  font-size: 12px !important
+  line-height: 1.25 !important
+  color: #1a1d25 !important
+
+::ng-deep .mat-select-trigger
+  height: 22px !important
+  padding: 0.35em 0.5em !important
+  min-height: 22px !important
+
+::ng-deep .mat-select-arrow-wrapper
+  transform: translateY(-2px) !important
+
+::ng-deep .mat-select-arrow
+  width: 0
+  height: 0
+  border-left: 4px solid transparent
+  border-right: 4px solid transparent
+  border-top: 4px solid
+  margin: 0 4px
+
+// Stepper - ultra compact
+::ng-deep .mat-stepper-horizontal
+  font-size: 11px
+  margin-top: 4px !important
+
+::ng-deep .mat-horizontal-stepper-header-container
+  margin-bottom: 4px !important
+
+::ng-deep .mat-horizontal-stepper-header
+  padding: 2px 6px !important
+  height: auto !important
+  min-height: 34px !important
+
+// Ensure stepper content doesn't clip and can use available space
+::ng-deep .mat-horizontal-content-container
+  overflow: visible !important
+
+::ng-deep .mat-horizontal-stepper-content,
+::ng-deep .mat-stepper-horizontal .mat-step-content
+  overflow: visible !important
+  max-height: none !important
+
+::ng-deep .mat-step-label
+  font-size: 10px !important
+  min-width: auto !important
+
+::ng-deep .mat-step-icon
+  width: 16px !important
+  height: 16px !important
+  margin-right: 4px !important
+  font-size: 10px !important
+
+::ng-deep .mat-step-text-label
+  font-size: 10px !important
+
+// Compact table styling
+::ng-deep .mat-table
+  font-size: 9px
+
+::ng-deep .mat-header-cell
+  font-size: 9px
+  padding: 2px 4px !important
+  font-weight: 600
+
+::ng-deep .mat-cell
+  padding: 2px 4px !important
+  font-size: 9px
+
+::ng-deep .mat-row
+  min-height: 28px !important
+
+// Ultra compact button styling
+::ng-deep .mat-raised-button
+  font-size: 10px !important
+  padding: 0 8px !important
+  min-width: auto !important
+  height: 24px !important
+  line-height: 24px !important
+
+::ng-deep .mat-icon-button
+  width: 24px !important
+  height: 24px !important
+  line-height: 24px !important
+  
+  .mat-icon
+    font-size: 16px !important
+    width: 16px !important
+    height: 16px !important
+
+::ng-deep .mat-mini-fab
+  width: 28px !important
+  height: 28px !important
+
+::ng-deep .mat-button .mat-button-wrapper
+  padding: 0 !important
+
+// Active stepper styling
+::ng-deep .mat-step-header.cdk-keyboard-focused,
+::ng-deep .mat-step-header.cdk-program-focused,
+::ng-deep .mat-step-header:hover
+  background-color: rgba(0, 102, 204, 0.04)
+
+::ng-deep .mat-step-header .mat-step-icon-selected
+  background-color: #0066cc
+
+::ng-deep .mat-step-label.mat-step-label-active
+  color: #0066cc
+  font-weight: 600
+
+// Client Name readonly field styling  
+.client-name-field
+  background-color: #f9f9f9
+
+// Top section styling - CBS style with border
+.top-section
+  background: #f5f7fa
+  border: 2px solid #c0c0c0
+  border-radius: 3px
+  padding: 4px 10px !important
+  margin: 0 auto 6px auto !important
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05)
+  display: flex
+  justify-content: center
+  align-items: stretch
+  width: 100%
+  max-width: 1200px
+  box-sizing: border-box
+
+// Modal/Dialog styling for CBS-like appearance
+.dialog-container
+  max-width: 98vw !important
+  max-height: 98vh !important
+  width: 1600px !important
+
+// EXTREME density for rows and columns - CBS style
+.row
+  margin-bottom: 2px !important
+  margin-left: -2px !important
+  margin-right: -2px !important
+
+.col-md-3, .col-md-4, .col-md-6, .col-md-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-6, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-6
+  padding-left: 0 !important
+  padding-right: 0 !important
+
+.col-6, .col-12
+  padding-left: 0 !important
+  padding-right: 0 !important
+
+// Grid layout - CBS style two column baseline
+.cbs-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(240px, 280px))
+  gap: 3px 10px
+  margin: 0 auto !important
+  justify-content: flex-start
+  justify-items: stretch
+  align-items: start
+  width: 100%
+  max-width: 1160px
+
+
+.cbs-grid--tight,
+.cbs-grid--dense
+  gap: 2px 8px
+
+.cbs-grid--two
+  grid-template-columns: repeat(2, minmax(240px, 280px))
+
+.cbs-grid--three
+  grid-template-columns: repeat(3, minmax(240px, 280px))
+
+.cbs-grid--four
+  grid-template-columns: repeat(4, minmax(240px, 280px))
+
+
+.cbs-field
+  width: 100%
+  max-width: 280px
+  display: flex
+  flex-direction: column
+  justify-content: flex-end
+  align-items: stretch
+  margin: 0 auto
+
+.cbs-field--inline
+  flex-direction: row
+  align-items: center
+  gap: 6px
+  max-width: none
+  width: 100%
+
+.cbs-label
+  font-size: 12px
+  font-weight: 600
+  color: #1f2933
+  flex: 0 0 110px
+  text-align: right
+  line-height: 1.2
+
+.cbs-label.required
+  color: #0066cc
+
+.cbs-label.required::after
+  content: ' *'
+  color: #c62828
+  font-weight: 700
+
+.cbs-input
+  flex: 1 1 auto
+  max-width: 100%
+
+.cbs-input.mat-form-field
+  margin: 0 !important
+
+.cbs-input.mat-form-field-appearance-outline .mat-form-field-wrapper
+  padding-bottom: 0 !important
+
+.cbs-input.mat-form-field-appearance-outline .mat-form-field-flex
+  padding: 0 6px !important
+
+.cbs-input .mat-form-field-infix
+  padding: 0.2em 0 !important
+  min-width: 120px
+
+.cbs-input .mat-input-element,
+.cbs-input .mat-select-value
+  font-size: 12px !important
+  line-height: 1.2 !important
+
+.cbs-input .mat-select-trigger
+  padding: 0.25em 0.4em !important
+  height: 22px !important
+
+.cbs-field--inline.cbs-inline
+  align-items: center
+  max-width: none
+
+.cbs-field--inline.cbs-inline .cbs-label
+  flex: 0 0 150px
+  text-align: right
+
+.cbs-field--inline mat-checkbox
+  margin: 0 !important
+
+.address-card
+  border: 1px solid #c0c0c0
+  border-radius: 2px
+  padding: 4px 6px
+  margin-bottom: 6px
+  background: #fbfbfb
+
+.address-card__header
+  font-size: 11px
+  font-weight: 600
+  color: #0f2f56
+  margin-bottom: 4px
+
+.employment-card
+  border: 1px solid #c0c0c0
+  border-radius: 2px
+  padding: 4px 6px
+  margin-bottom: 6px
+  background: #fbfbfb
+
+.form-actions-inline
+  display: flex
+  gap: 6px
+  padding-top: 4px
+.cbs-field mat-form-field
+  width: 100%
+  min-width: 0
+  max-width: 100%
+
+.cbs-full
+  grid-column: 1 / -1 !important
+
+.cbs-full
+  max-width: none
+  width: 100%
+
+.cbs-full mat-form-field
+  width: 100%
+  max-width: none
+
+.cbs-inline
+  display: flex
+  align-items: center
+  justify-content: flex-start
+  min-height: 38px
+  padding-top: 4px
+  max-width: 260px
+
+.cbs-inline button,
+.cbs-inline mat-checkbox
+  margin-top: 4px
+
+@media (max-width: 1200px)
+  .cbs-grid
+    gap: 4px 10px
+    max-width: 100%
+
+@media (max-width: 992px)
+  .cbs-grid
+    grid-template-columns: repeat(1, minmax(0, 1fr))
+
+.mb-2
+  margin-bottom: 2px !important
+
+.mb-3
+  margin-bottom: 2px !important
+
+.mt-2
+  margin-top: 2px !important
+
+.mt-3
+  margin-top: 4px !important
+
+.p-2
+  padding: 2px !important
+
+// Remove card padding
+.card
+  border: 1px solid #c0c0c0
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1)
+
+.card .body
+  padding: 4px !important
+
+.card .header
+  padding: 4px 8px !important
+  
+  h2
+    font-size: 14px !important
+    margin: 0 !important
+
+// Section headers - CBS blue style
+.section-header
+  background: linear-gradient(to bottom, #4a90e2 0%, #357abd 100%)
+  color: white
+  padding: 2px 8px
+  margin: 0 0 2px 0
+  font-size: 10px
+  font-weight: 600
+  border: 1px solid #2d5f8d
+  border-radius: 2px
+
+// Make mat-expansion-panel more compact
+::ng-deep .mat-expansion-panel
+  margin-bottom: 2px !important
+
+::ng-deep .mat-expansion-panel-header
+  padding: 0 8px !important
+  height: 32px !important
+  font-size: 10px !important
+
+::ng-deep .mat-expansion-panel-body
+  padding: 4px !important
+
+// Tighter checkbox and radio spacing
+::ng-deep .mat-checkbox
+  margin-bottom: 2px !important
+
+::ng-deep .mat-checkbox-inner-container
+  width: 14px !important
+  height: 14px !important
+
+::ng-deep .mat-checkbox-label
+  font-size: 10px !important
+  line-height: 14px !important
+
+::ng-deep .mat-radio-button
+  margin-bottom: 2px !important
+
+::ng-deep .mat-radio-label
+  font-size: 10px !important
+
+// Date picker button sizing
+::ng-deep .mat-datepicker-toggle
+  width: 24px !important
+  height: 24px !important
+
+::ng-deep .mat-icon
+  font-size: 16px !important
+  width: 16px !important
+  height: 16px !important
+
+// Breadcrumb compact
+::ng-deep .breadcrumb
+  padding: 4px 8px !important
+  font-size: 10px !important
+  margin-bottom: 4px !important
+
+// Content block compact
+.content-block
+  padding: 0 !important
+  margin: 0 !important
+  max-width: 100% !important
+  width: 100% !important
+
+// Root content area - remove theme paddings in dialog usage
+.content
+  padding: 0 !important
+  margin: 0 !important
+
+// Remove any artificial max-width/centering from containers
+.row.clearfix
+  margin-left: 0 !important
+  margin-right: 0 !important
+
+// Ensure cards stretch full width and have no extra margins
+.card
+  margin: 0 !important
+
+.block-header
+  margin-bottom: 4px !important
+
+// Reduce space reserved for hints/errors to prevent layout jumps
+::ng-deep .mat-form-field-subscript-wrapper
+  margin-top: 0 !important
+  height: 0 !important
+
+// Make borders more visible
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-thick
+  color: rgba(0, 0, 0, 0.87) !important
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline
+  color: rgba(0, 0, 0, 0.42) !important
+
+::ng-deep .mat-form-field-appearance-outline:hover .mat-form-field-outline
+  color: rgba(0, 0, 0, 0.87) !important
+
+// Text alignment for small fields
+::ng-deep .mat-select-value-text
+  font-size: 10px !important
+
+// Remove extra spacing in forms
+form
+  margin: 0 !important
+  padding: 0 !important

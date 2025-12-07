@@ -1,0 +1,174 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="title-icon">search</mat-icon>
+    Client Lookup
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="search-criteria-section">
+      <div class="section-title">Search Criteria</div>
+      <div class="criteria-grid">
+        <div class="criteria-item">
+          <span class="criteria-label">Client ID Match</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <mat-select [(ngModel)]="searchCriteria.ClientID.mode">
+              <mat-option value="Like">Contains</mat-option>
+              <mat-option value="Exact">Exact</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="criteria-item">
+          <span class="criteria-label">Client ID</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <input matInput [(ngModel)]="searchCriteria.ClientID.value" (keyup.enter)="performSearch()" />
+          </mat-form-field>
+        </div>
+
+        <div class="criteria-item">
+          <span class="criteria-label">Name Match</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <mat-select [(ngModel)]="searchCriteria.Name.mode">
+              <mat-option value="Like">Contains</mat-option>
+              <mat-option value="Exact">Exact</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="criteria-item">
+          <span class="criteria-label">Name</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <input matInput [(ngModel)]="searchCriteria.Name.value" (keyup.enter)="performSearch()" />
+          </mat-form-field>
+        </div>
+
+        <div class="criteria-item">
+          <span class="criteria-label">ID Number Match</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <mat-select [(ngModel)]="searchCriteria.IDNumber.mode">
+              <mat-option value="Like">Contains</mat-option>
+              <mat-option value="Exact">Exact</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="criteria-item">
+          <span class="criteria-label">ID Number</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <input matInput [(ngModel)]="searchCriteria.IDNumber.value" (keyup.enter)="performSearch()" />
+          </mat-form-field>
+        </div>
+
+        <div class="criteria-item">
+          <span class="criteria-label">Mobile Match</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <mat-select [(ngModel)]="searchCriteria.MobileNo.mode">
+              <mat-option value="Like">Contains</mat-option>
+              <mat-option value="Exact">Exact</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="criteria-item">
+          <span class="criteria-label">Mobile No</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <input matInput [(ngModel)]="searchCriteria.MobileNo.value" (keyup.enter)="performSearch()" />
+          </mat-form-field>
+        </div>
+
+        <div class="criteria-item">
+          <span class="criteria-label">Legacy ID Match</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <mat-select [(ngModel)]="searchCriteria.LegacyAccountID.mode">
+              <mat-option value="Like">Contains</mat-option>
+              <mat-option value="Exact">Exact</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="criteria-item">
+          <span class="criteria-label">Legacy Account ID</span>
+          <mat-form-field appearance="outline" floatLabel="never" class="criteria-field">
+            <input matInput [(ngModel)]="searchCriteria.LegacyAccountID.value" (keyup.enter)="performSearch()" />
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="criteria-actions">
+        <div class="criteria-hint">Press Enter inside any field or use the buttons to search.</div>
+        <div class="criteria-buttons">
+          <button mat-raised-button color="primary" (click)="performSearch()" [disabled]="isLoading">
+            <mat-icon>search</mat-icon> Search
+          </button>
+          <button mat-raised-button (click)="clearSearch()" class="ml-2">
+            <mat-icon>clear</mat-icon> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-results-section">
+      <div class="section-title section-title--inline">
+        <span>Search Results</span>
+        <span class="results-chip" *ngIf="!isLoading">{{ searchResults.length }} result{{ searchResults.length === 1 ? '' : 's' }}</span>
+      </div>
+
+      <div class="results-note" *ngIf="!isLoading && searchResults.length">
+        Click any row to select a client.
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <mat-spinner diameter="36"></mat-spinner>
+        <p>Searching...</p>
+      </div>
+
+      <div *ngIf="!isLoading" class="table-container">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z2 w-100">
+          <ng-container matColumnDef="ClientID">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Client ID</th>
+            <td mat-cell *matCellDef="let row" class="table-cell">{{ row.ClientID }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="Name">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Name</th>
+            <td mat-cell *matCellDef="let row" class="table-cell">{{ row.Name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="IDNumber">
+            <th mat-header-cell *matHeaderCellDef class="table-header">ID Number</th>
+            <td mat-cell *matCellDef="let row" class="table-cell">{{ row.IDNumber }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="MobileNo">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Mobile No</th>
+            <td mat-cell *matCellDef="let row" class="table-cell">{{ row.MobileNo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="LegacyAccountID">
+            <th mat-header-cell *matHeaderCellDef class="table-header">Legacy Account ID</th>
+            <td mat-cell *matCellDef="let row" class="table-cell">{{ row.LegacyAccountID }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            class="table-row selectable-row"
+            matRipple
+            tabindex="0"
+            role="button"
+            (click)="selectClient(row)"
+            (keydown.enter)="selectClient(row)"
+            (keydown.space)="$event.preventDefault(); selectClient(row)"
+          ></tr>
+        </table>
+
+        <div *ngIf="searchResults.length === 0" class="no-results">
+          <mat-icon class="no-results-icon">info</mat-icon>
+          <p>No clients found. Try adjusting your search criteria.</p>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button (click)="onCancel()">
+      <mat-icon>close</mat-icon> Close
+    </button>
+  </mat-dialog-actions>
+</div>

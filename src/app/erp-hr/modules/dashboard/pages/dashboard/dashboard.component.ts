@@ -38,6 +38,43 @@ export type chartOptions = {
   
 };
 
+type NavEntry = {
+  type: "item" | "heading";
+  label: string;
+  modal?: string;
+};
+
+type DesktopTile = {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  statusClass: string;
+  cta: string;
+  metrics: { label: string; value: string }[];
+};
+
+type TaskbarItem = {
+  id: string;
+  title: string;
+  icon: string;
+  active?: boolean;
+};
+
+type StartMenuColumn = {
+  title: string;
+  apps: { id: string; label: string; icon: string }[];
+};
+
+type WorkflowItem = {
+  ref: string;
+  client: string;
+  step: string;
+  priority: string;
+  badgeClass: string;
+  received: string;
+};
+
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
@@ -54,6 +91,114 @@ export class DashboardComponent implements OnInit {
  private intervalId: any;
 
 currentUser: any;
+  navEntries: NavEntry[] = [
+    { type: "item", label: "Reports", modal: "reports" },
+    { type: "item", label: "Report Writer", modal: "reports" },
+    { type: "heading", label: "Identities" },
+    { type: "item", label: "Client Maintenance", modal: "client" },
+    { type: "item", label: "Account" },
+    { type: "item", label: "Deposit" },
+    { type: "item", label: "Limits & Collateral" },
+    { type: "item", label: "Workflow Setting" },
+    { type: "item", label: "Workflow Loan" },
+    { type: "item", label: "Loans", modal: "loans" },
+    { type: "item", label: "Overdrafts", modal: "overdraft" },
+    { type: "item", label: "Images" },
+    { type: "item", label: "Transaction" },
+    { type: "item", label: "Process" },
+    { type: "item", label: "MicroFinance" },
+    { type: "item", label: "Treasury" },
+    { type: "item", label: "Trade Finance" },
+    { type: "item", label: "Fixed Asset" },
+    { type: "item", label: "Other Modules" },
+    { type: "item", label: "General Ledger" },
+    { type: "item", label: "Product" },
+    { type: "item", label: "Charges & Rates" },
+    { type: "item", label: "Static Data" },
+    { type: "item", label: "System Security" },
+    { type: "item", label: "Utilities" },
+    { type: "item", label: "System Audit" },
+    { type: "item", label: "Clearing" },
+    { type: "item", label: "Swift" },
+    { type: "item", label: "System Utilities" },
+    { type: "item", label: "System BR.NET", modal: "system" }
+  ];
+
+  desktopTiles: DesktopTile[] = [
+    {
+      id: "client",
+      title: "Client Maintenance",
+      description: "All customer KYC, CIF, and lifecycle updates",
+      status: "Active",
+      statusClass: "status-active",
+      cta: "Open window",
+      metrics: [
+        { label: "Pending onboarding", value: "14 records" },
+        { label: "Approvals waiting", value: "6 workflows" },
+        { label: "KYC expiry", value: "3 this week" }
+      ]
+    },
+    {
+      id: "overdraft",
+      title: "Overdraft Application",
+      description: "Simulate limits, documents, and charges",
+      status: "Due",
+      statusClass: "status-warning",
+      cta: "Resume last",
+      metrics: [
+        { label: "Draft requests", value: "3" },
+        { label: "Docs missing", value: "5" },
+        { label: "SLA", value: "4 hrs" }
+      ]
+    },
+    {
+      id: "workflow",
+      title: "Workflow Queue",
+      description: "Loan & onboarding approvals routed to you",
+      status: "Idle",
+      statusClass: "status-idle",
+      cta: "Review queue",
+      metrics: [
+        { label: "Today", value: "28" },
+        { label: "Aging > 1d", value: "2" },
+        { label: "Escalations", value: "0" }
+      ]
+    }
+  ];
+
+  taskbarItems: TaskbarItem[] = [
+    { id: "client", title: "Client Maintenance", icon: "fas fa-user" },
+    { id: "overdraft", title: "Overdraft", icon: "fas fa-file-lines" },
+    { id: "workflow", title: "Workflow", icon: "fas fa-list-check" }
+  ];
+
+  startMenuColumns: StartMenuColumn[] = [
+    {
+      title: "Customer Journey",
+      apps: [
+        { id: "client", label: "Client Maintenance", icon: "fas fa-address-card" },
+        { id: "overdraft", label: "Overdraft Application", icon: "fas fa-hand-holding-dollar" },
+        { id: "workflow", label: "Workflow Queue", icon: "fas fa-route" }
+      ]
+    },
+    {
+      title: "Operations Desk",
+      apps: [
+        { id: "reports", label: "Reports", icon: "fas fa-clipboard-list" },
+        { id: "system", label: "System BR.NET", icon: "fas fa-gear" },
+        { id: "loans", label: "Loans Portfolio", icon: "fas fa-building-columns" }
+      ]
+    }
+  ];
+
+  workflowQueue: WorkflowItem[] = [
+    { ref: "WF-1023", client: "Equatoria Manufacturing", step: "Maker Checker", priority: "High", badgeClass: "badge--danger", received: "34 mins ago" },
+    { ref: "WF-1022", client: "Hifadhi Sacco", step: "Limit Review", priority: "Medium", badgeClass: "badge--warning", received: "1 hr ago" },
+    { ref: "WF-1018", client: "Retail Onboarding", step: "Docs Upload", priority: "Low", badgeClass: "badge--success", received: "3 hrs ago" }
+  ];
+
+  isStartMenuOpen = false;
+  activeModal: string | null = null;
   ngOnInit() {
     this.currentUser =this.tokenStorageService.getUser().username;
     this.chart1();
@@ -67,6 +212,43 @@ currentUser: any;
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+  }
+
+  toggleStartMenu(): void {
+    this.isStartMenuOpen = !this.isStartMenuOpen;
+  }
+
+  closeStartMenu(): void {
+    this.isStartMenuOpen = false;
+  }
+
+  handleNavEntry(entry: NavEntry): void {
+    if (entry.type !== "item" || !entry.modal) {
+      return;
+    }
+    this.openModal(entry.modal);
+  }
+
+  openModal(id?: string): void {
+    if (!id) {
+      return;
+    }
+    this.activeModal = id;
+    this.closeStartMenu();
+    this.setTaskbarState(id, true);
+  }
+
+  closeModal(): void {
+    if (this.activeModal) {
+      this.setTaskbarState(this.activeModal, false);
+    }
+    this.activeModal = null;
+  }
+
+  private setTaskbarState(id: string, active: boolean): void {
+    this.taskbarItems = this.taskbarItems.map((item) =>
+      item.id === id ? { ...item, active } : item
+    );
   }
   private chart1() {
     this.barChartOptions = {

@@ -9,7 +9,7 @@ import { Subject, takeUntil, Subscription, debounceTime, distinctUntilChanged } 
 import { NotificationServiceService } from "src/@core/Models/Notification/notification-service.service";
 import { SnackbarService } from "src/app/shared/services/snackbar.service";
 import Swal from "sweetalert2";
-import { ManageEmployeesComponent } from "../manage-employees/manage-employees.component";
+import { ManageEmployeesDialogComponent } from "../manage-employees-dialog/manage-employees-dialog.component";
 import { EmployeeService } from "src/app/erp-hr/data/employee-services/employee-management.service";
 import { PrivilegeService } from "src/app/erp-hr/data/PrivilegeService";
 import { FormBuilder, FormGroup } from "@angular/forms";
@@ -332,22 +332,71 @@ generateRandomId(): string {
     console.log("Action:", action);
     console.log("Record:", record);
     
-    let route = "/erp-hr/employees/manage-employees";
-    let queryParams: any = { action: action };
+    // Open in dialog
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = true;
+  dialogConfig.width = '92vw';
+  dialogConfig.maxWidth = '1500px';
+  dialogConfig.maxHeight = '98vh';
+  dialogConfig.height = '96vh';
+    dialogConfig.panelClass = 'custom-dialog-container';
     
-    if (record && record.clientId) {
-      queryParams.requestCode = record.clientId;
-     // queryParams.requestId = record.id || '';
-      queryParams.ClientTypeID = record.ClientTypeID || '';
-    } else if (action === 'Add') {
+    dialogConfig.data = {
+      action: action,
+      clientId: record?.clientId || '',
+      clientTypeId: record?.ClientTypeID || '',
+      prefillClientId: action === 'Add' && this.Form.get('clientIdFilter')?.value?.trim() !== ''
+    };
+    
+    if (action === 'Add') {
       const typedClientId = this.Form.get('clientIdFilter')?.value;
       if (typedClientId && typedClientId.trim() !== '') {
-        queryParams.requestCode = typedClientId;
-        queryParams.prefillClientId = true; 
+        dialogConfig.data.clientId = typedClientId;
+        dialogConfig.data.prefillClientId = true;
       }
     }
     
-    this.router.navigate([route], { queryParams: queryParams });
+    const dialogRef = this.dialog.open(ManageEmployeesDialogComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialog closed:', result);
+      // Refresh the list after dialog closes
+      this.getData();
+    });
+  }
+
+  superviseRecord(record: any) {
+    console.log("Supervise record:", record);
+    
+    if (!record || !record.clientId) {
+      this.snackbar.showNotification("snackbar-warning", "Invalid client record");
+      return;
+    }
+    
+    // Open in dialog with Supervise action
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = true;
+  dialogConfig.width = '92vw';
+  dialogConfig.maxWidth = '1500px';
+  dialogConfig.maxHeight = '98vh';
+  dialogConfig.height = '96vh';
+    dialogConfig.panelClass = 'custom-dialog-container';
+    
+    dialogConfig.data = {
+      action: 'Supervise',
+      clientId: record.clientId,
+      clientTypeId: record.ClientTypeID || ''
+    };
+    
+    const dialogRef = this.dialog.open(ManageEmployeesDialogComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Supervise dialog closed:', result);
+      // Refresh the list after dialog closes
+      this.getData();
+    });
   }
 
   // deleteRecord(id: number) {

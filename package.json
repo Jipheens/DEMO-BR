@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+  "lint": "tslint -p tsconfig.json -c tslint.json",
     "e2e": "ng e2e",
     "postinstall": "ngcc"
   },

@@ -195,328 +195,81 @@
         .transaction-item {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
+            padding: 15px 20px;
             border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-        
-        .transaction-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-size: 16px;
-            background: #f1f5f9;
-        }
-        
-        .transaction-details {
-            flex: 1;
-        }
-        
-        .transaction-title {
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--dark);
-        }
-        
-        .transaction-date {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-        
-        .transaction-amount {
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        .positive {
-            color: var(--accent);
-        }
-        
-        .negative {
-            color: var(--danger);
-        }
-        
-        .chart-container {
-            padding: 15px;
-        }
-        
-        .section-title {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 20px;
-            font-size: 18px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .banking-header {
-            background: linear-gradient(120deg, var(--primary), var(--secondary));
-            color: rgb(47, 8, 163);
-            border-radius: var(--card-radius);
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: var(--card-shadow);
-        }
-        
-        @media (max-width: 768px) {
-            .bank-employee {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .welcome-content {
-                text-align: center;
-            }
         }
         </style>
-              <div class="banking-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="mb-0">Customer module Dashboard</h1>
-                        <p class="mb-0 mt-2">Welcome to your financial management portal</p>
-                    </div>
-                    <!-- <div class="col-md-4 text-end">
-                        <div class="d-flex align-items-center justify-content-end">
-                            <div class="me-3">
-                                <div class="text-sm">Today's Date</div>
-                                <div class="fw-bold">{{currentDate}}.</div>
-                            </div>
-                            <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
-                        </div>
-                    </div> -->
-                    <div class="col-md-4 text-end">
-                      <div class="d-flex align-items-center justify-content-end">
-                        <div class="me-3">
-                          <div class="text-sm">Today's Date</div>
-                          <div class="fw-bold">
-                            {{ currentDate | date:'fullDate' }} <br>
-                            <span class="fs-4 text-primary">{{ currentDate | date:'mediumTime' }}</span>
-                          </div>
-                        </div>
-                        <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            
-            <app-gen-widgets></app-gen-widgets>
-            
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="welcome-card">
-                        <div class="welcome-content">
-                            <div class="row align-items-center">
-                                <div class="col-md-2 text-center">
-                                    <i class="fas fa-university bank-icon"></i>
-                                </div>
-                                
-                                <div class="col-md-8">
-                                    <div class="greeting">Welcome back</div>
-                                    <div class="username">{{currentUser}}!</div>
-                                    <p class="welcome-message">We're committed to providing you with secure and innovative banking solutions. Monitor your accounts, track transactions, and manage your finances all in one place. For assistance, contact our support team anytime.</p>
-                                </div>
-                                
-                                <div class="col-md-2 text-center">
-                                    <img src="assets/images/pngegg8.png" alt="Bank Employee" class="bank-employee">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-xl-3 col-lg-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">Quick Actions</div>
-                        <div class="card-body quick-actions">
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <div class="action-item">
-                                        <i class="fas fa-exchange-alt action-icon"></i>
-                                        <div class="action-title">Transfer</div>
-                                    </div>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="action-item">
-                                        <i class="fas fa-bill-wave action-icon"></i>
-                                        <div class="action-title">Pay Bills</div>
-                                    </div>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="action-item">
-                                        <i class="fas fa-piggy-bank action-icon"></i>
-                                        <div class="action-title">Savings</div>
-                                    </div>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="action-item">
-                                        <i class="fas fa-chart-line action-icon"></i>
-                                        <div class="action-title">Invest</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="action-item">
-                                        <i class="fas fa-file-invoice-dollar action-icon"></i>
-                                        <div class="action-title">Statements</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="action-item">
-                                        <i class="fas fa-cog action-icon"></i>
-                                        <div class="action-title">Settings</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <div class="card-header">Account Summary</div>
-                        <div class="card-body stats-container">
-                            <div class="stat-item">
-                                <div class="stat-icon bg-light-primary">
-                                    <i class="fas fa-wallet text-primary"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <div class="stat-value">$42,580.75</div>
-                                    <div class="stat-label">Checking Account</div>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon bg-light-success">
-                                    <i class="fas fa-piggy-bank text-success"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <div class="stat-value">$28,350.40</div>
-                                    <div class="stat-label">Savings Account</div>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon bg-light-warning">
-                                    <i class="fas fa-credit-card text-warning"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <div class="stat-value">$8,245.50</div>
-                                    <div class="stat-label">Credit Card Balance</div>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon bg-light-info">
-                                    <i class="fas fa-chart-line text-info"></i>
-                                </div>
-                                <div class="stat-details">
-                                    <div class="stat-value">$65,300.00</div>
-                                    <div class="stat-label">Investment Portfolio</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="welcome-card">
+            <div class="welcome-content">
+                <!-- Welcome content here -->
+            </div>
+        </div>
+
+        <!-- Quick Actions and other dashboard content -->
+
+        <div class="legacy-modal" *ngIf="activeModal === 'loanRequest'">
+            <div class="legacy-modal__overlay" (click)="closeModal()"></div>
+            <div class="legacy-modal__dialog">
+                <div class="legacy-modal__header">
+                    <h3>Loan Request</h3>
+                    <button class="btn-close" type="button" (click)="closeModal()"></button>
                 </div>
-                
-                <div class="col-xl-5 col-lg-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">Recent Transactions</div>
-                        <div class="card-body recent-transactions">
-                            <div class="transaction-item">
-                                <div class="transaction-icon bg-light-danger">
-                                    <i class="fas fa-shopping-cart text-danger"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <div class="transaction-title">Grocery Store</div>
-                                    <div class="transaction-date">Oct 15, 2023 • Debit Card</div>
-                                </div>
-                                <div class="transaction-amount negative">-$85.34</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-icon bg-light-success">
-                                    <i class="fas fa-arrow-down text-success"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <div class="transaction-title">Salary Deposit</div>
-                                    <div class="transaction-date">Oct 14, 2023 • Direct Deposit</div>
-                                </div>
-                                <div class="transaction-amount positive">+$4,250.00</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-icon bg-light-primary">
-                                    <i class="fas fa-home text-primary"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <div class="transaction-title">Mortgage Payment</div>
-                                    <div class="transaction-date">Oct 12, 2023 • Auto Pay</div>
-                                </div>
-                                <div class="transaction-amount negative">-$1,856.20</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-icon bg-light-warning">
-                                    <i class="fas fa-bolt text-warning"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <div class="transaction-title">Electricity Bill</div>
-                                    <div class="transaction-date">Oct 10, 2023 • Online Payment</div>
-                                </div>
-                                <div class="transaction-amount negative">-$132.45</div>
-                            </div>
-                            <div class="transaction-item">
-                                <div class="transaction-icon bg-light-info">
-                                    <i class="fas fa-utensils text-info"></i>
-                                </div>
-                                <div class="transaction-details">
-                                    <div class="transaction-title">Restaurant Payment</div>
-                                    <div class="transaction-date">Oct 8, 2023 • Debit Card</div>
-                                </div>
-                                <div class="transaction-amount negative">-$67.80</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="legacy-modal__body">
+                    <div class="form-row">
+                        <label class="form-field">
+                            <span>Loan Term (months)</span>
+                            <input type="number" placeholder="12" />
+                    </label>
+                    <label class="form-field">
+                        <span>Purpose</span>
+                        <select>
+                            <option>Working Capital</option>
+                            <option>Bridging</option>
+                        </select>
+                    </label>
                 </div>
-                
-                <div class="col-xl-4 col-lg-12">
-                    <div class="card bg-dark-green text-white">
-                        <div class="header">
-                            <h2>Weekly Banking Activity</h2>
-                        </div>
-                        <div class="body">
-                            <div class="section-title text-white">Transaction Volume</div>
-                            <div style="height: 250px; background-color: rgba(255, 255, 255, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                <div class="text-center p-4">
-                                    <i class="fas fa-chart-bar fa-3x text-white mb-3"></i>
-                                    <p class="text-white">Banking activity chart loading...</p>
-                                </div>
-                            </div>
-                            
-                            <div class="section-title text-white">Quick Stats</div>
-                            <div class="row text-center">
-                                <div class="col-4">
-                                    <div class="p-3">
-                                        <div class="fw-bold text-white fs-4">42</div>
-                                        <div class="text-white-50 small">Transactions</div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="p-3">
-                                        <div class="fw-bold text-white fs-4">$6,540</div>
-                                        <div class="text-white-50 small">Processed</div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="p-3">
-                                        <div class="fw-bold text-white fs-4">7</div>
-                                        <div class="text-white-50 small">Payments</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <label class="form-field">
+                    <span>Comments</span>
+                    <textarea rows="3"></textarea>
+                </label>
+            </div>
+            <div class="legacy-modal__footer">
+                <button class="btn btn-outline-secondary" type="button" (click)="closeModal()">Close</button>
+                <button class="btn btn-primary" type="button">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="legacy-modal" *ngIf="activeModal === 'workflow'">
+        <div class="legacy-modal__overlay" (click)="closeModal()"></div>
+        <div class="legacy-modal__dialog">
+            <div class="legacy-modal__header">
+                <h3>Workflow Queue</h3>
+                <button class="btn-close" type="button" (click)="closeModal()"></button>
+            </div>
+            <div class="legacy-modal__body">
+                <div class="workflow-table">
+                    <div class="table-row table-row--header">
+                        <span>Ref</span>
+                        <span>Client</span>
+                        <span>Step</span>
+                        <span>Priority</span>
+                        <span>Received</span>
+                    </div>
+                    <div class="table-row" *ngFor="let item of workflowQueue">
+                        <span>{{ item.ref }}</span>
+                        <span>{{ item.client }}</span>
+                        <span>{{ item.step }}</span>
+                        <span><span class="badge" [ngClass]="item.badgeClass">{{ item.priority }}</span></span>
+                        <span>{{ item.received }}</span>
                     </div>
                 </div>
             </div>
-  </div>
-</section>
+            <div class="legacy-modal__footer">
+                <button class="btn btn-outline-secondary" type="button" (click)="closeModal()">Close</button>
+                <button class="btn btn-primary" type="button">Open Workflow Portal</button>
+            </div>
+        </div>
+    </div>
+
