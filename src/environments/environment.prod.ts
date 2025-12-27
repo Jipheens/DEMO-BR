@@ -57,6 +57,7 @@ export const environment = {
   branchUrl:"http://localhost:5177",
   clintUrl:"http://172.17.50.10:6902",
     branachUrl:"http://localhost:5177",
-  clicntUrl:"http://172.17.50.10:6902"
+  clicntUrl:"http://172.17.50.10:6902",
+  lastUrl:"http://173.17.50.10:3466"
 
 };
